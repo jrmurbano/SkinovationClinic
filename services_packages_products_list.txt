@@ -1,0 +1,109 @@
+SERVICES
+
+1. Facials 
+1.1 Primary Facial (Face) - ₱ 499.00 [Service Time: 60 minutes] 
+1.2 Chest/Back - ₱ 649.00 [Service Time: 60 minutes] 
+1.3 Neck - ₱ 449.00 [Service Time: 60 minutes] 
+1.4 Charcoal (Facial with Diamond Peel + Charcoal) - ₱ 699.00 [Service Time: 60 minutes] 
+1.5 Collagen (Facial with Diamond Peel + Collagen Mask) - ₱ 699.00 [Service Time: 60 minutes] 
+1.6 Snow White (Facial with Diamond Peel + Vitamin C serum & mask) - ₱ 799.00 [Service Time: 60 minutes] 
+1.7 Casmara (Facial with Diamond Peel + Casmara Mask) - ₱ 1000.00 [Service Time: 60 minutes] 
+1.8 Diamond Peel - ₱ 499.00 [Service Time: 60 minutes]
+
+2. Anti-Aging & Face Lift 
+2.1 Radio Frequency (with Facial) - ₱ 999.00 [Service Time: 60 minutes] 
+2.2 Geneo Infusion (Rejuvenation & Brightening) - ₱ 999.00 [Service Time: 60 minutes] 
+2.3 Oxygeneo (Facial + RF + Infusion) - ₱ 1999.00 [Service Time: 60 minutes] 
+2.4 Skin Rejuvenation (Facial + Serum + PDT Light) - ₱ 999.00 [Service Time: 60 minutes] 
+2.5 Galvanic Therapy (Facial + Serum Infusion) - ₱ 799.00 [Service Time: 60 minutes] 
+2.6 PRP (Facial + PRP + PDT Light) - ₱ 1899.00 [Service Time: 60 minutes]
+
+3. Pico Laser 
+3.1 Carbon Doll Laser - ₱ 999.00 [Service Time: 60 minutes] 
+3.2 Pico Glow (Melasma/Freckles) - ₱ 999.00 [Service Time: 60 minutes] 
+3.3 Tattoo Removal (Depends on size) - ₱ ___ [Service Time: 60 minutes]
+
+4. Lightening Treatments 
+4.1 Vitamin C Infusion (Face) - ₱ 349.00 [Service Time: 15 minutes] 
+4.2 Underarm Whitening - ₱ 549.00 [Service Time: 15 minutes] 
+4.3 Back Whitening - ₱ 649.00 [Service Time: 15 minutes] 
+4.4 Chest Whitening - ₱ 549.00 [Service Time: 15 minutes] 
+4.5 Butt Whitening - ₱ 549.00 [Service Time: 15 minutes] 
+4.6 Neck Whitening - ₱ 349.00 [Service Time: 15 minutes] 
+4.7 Bikini Whitening - ₱ 549.00 [Service Time: 15 minutes] 
+4.8 Skin White Gluta (600mgs + Vitamin C) IV Push - ₱ 649.00 [Service Time: 15 minutes] 
+4.9 Snow White Gluta (5000mgs) IV Push - ₱ 999.00 [Service Time: 90 minutes] 
+4.10 Platinum Gluta (20,000 mgs) IV Drip - ₱ 1299.00 [Service Time: 90 minutes] 
+4.11 Luxury Drip (500,000 mgs) IV Drip - ₱ 2000.00 [Service Time: 90 minutes] 
+4.12 BB Glow (Facial with Diamond Peel + Mask + PDT Light) - ₱ 2199.00 [Service Time: 90 minutes] 
+4.13 BB Blush - ₱ 799.00 [Service Time: 30 minutes]
+
+5. Pimple Treatments 
+5.1 Pimple Injection (Per Pimple) - ₱ 99.00 [Service Time: 60 minutes] 
+5.2 Anti-Acne Treatment (Facial + Serum + Light) - ₱ 1599.00 [Service Time: 60 minutes]
+
+6. Body Slimming with Cavitation 
+6.1 Face - ₱ 899.00 [Service Time: 60 minutes] 
+6.2 Waist - ₱ 999.00 [Service Time: 60 minutes] 
+6.3 Thighs - ₱ 999.00 [Service Time: 60 minutes] 
+6.4 Arms - ₱ 999.00 [Service Time: 60 minutes]
+
+7. IPL (Hair Removal) 
+7.1 Face - ₱ 499.00 [Service Time: 15 minutes] 
+7.2 Neck - ₱ 499.00 [Service Time: 15 minutes] 
+7.3 Arm - ₱ 999.00 [Service Time: 15 minutes] 
+7.4 Brazilian - ₱ 699.00 [Service Time: 15 minutes] 
+7.5 Legs (lower/upper) - ₱ 999.00 [Service Time: 15 minutes] 
+7.6 Upperlip - ₱ 299.00 [Service Time: 15 minutes] 
+7.7 Underarms - ₱ 499.00 [Service Time: 15 minutes] 
+7.8 Bikini - ₱ 499.00 [Service Time: 15 minutes] 
+7.9 Chest - ₱ 999.00 [Service Time: 15 minutes] 
+7.10 Back (lower/upper) - ₱ 999.00 [Service Time: 15 minutes]
+
+8. Other Services 
+8.1 Warts Removal - (₱ 1500.00 Minimum/Area) [Service Time: 60 minutes] 
+8.2 Korean Lash Lift with Tint/without Tint - ₱ 699.00/₱ 499.00 [Service Time: 30 minutes]
+
+PRODUCTS
+1. Yellow soap(acne) - ₱140.00
+2. Pore Miniizer(Toner) - ₱380.00
+3. Sunscreen - ₱225.00
+4. Kojic Soap - ₱180.00
+5. Lightening cream - ₱230.00
+
+PACKAGES 
+3 + 1 Underarm Whitening - Price: ₱1847.00 [Sessions: 4; Duration: 90 days; Grace Period: 180 days] 
+3 + 1 Back Whitening - Price: ₱1847.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Bikini Whitening - Price: ₱1847.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Butt Whitening - Price: ₱1847.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Carbon Doll Laser - Price: ₱3197.00 [Sessions: 4; Duration: 120 days; Grace Period: 240 days] 
+3 + 1 Casmara Facial - Price: ₱3200.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Face Cavitation - Price: ₱1397.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Waist Cavitation - Price: ₱1397.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Thighs Cavitation - Price: ₱1397.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Arms Cavitation - Price: ₱1397.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Charcoal - Price: ₱2297.00 [Sessions: ; Duration: 4; Grace Period: 180 days] 
+3 + 1 Chest Infusion - Price: ₱1847.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Chest/Back Facial - Price: ₱1997.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Collagen - Price: ₱2297.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Diamond Peel - Price: ₱1697.00 [Sessions: 4; Duration: 90 days; Grace Period: 180 days] 
+3 + 1 Galvanic Therapy - Price: ₱2597.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Geneo Infusion - Price: ₱3197.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 IPL Arms - Price: ₱3197.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 IPL Back - Price: ₱3197.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 IPL Bikini - Price: ₱2,297.0 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 IPL Brazilian - Price: ₱3197.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 IPL Chest - Price: ₱3197.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 IPL Face - Price: ₱1697.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 IPL Legs - Price: ₱3197.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 IPL Neck - Price: ₱1697.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 IPL Thighs - Price: ₱3197.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 IPL Thighs (Front) - Price: ₱1697.00 [Sessions: 4; Duration: 90 days; Grace Period: 180 days] 
+3 + 1 IPL Underarms - Price: ₱1697.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 IPL Upperlip - Price: ₱1097.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Pico Glow (Melasma/Freckles) - Price: ₱3197.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Neck Cleaning - Price: ₱1397.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Neck Infusion - Price: ₱1247.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Oxygeneo - Price: ₱6197.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days] 
+3 + 1 Pico Laser (Underarm) - Price: ₱3197.00 [Sessions: 4; Duration: 120 days; Grace Period: 240 days] 
+3 + 1 Primary Facial - Price: ₱1697.00 [Sessions: 4; Duration: 120 days; Grace Period: 180 days]
