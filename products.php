@@ -1,21 +1,21 @@
 <?php
-include 'db.php';
+session_start();
+require_once 'config.php';
 
-// Removed category filtering logic
+// Check if user is logged in
+$isLoggedIn = isset($_SESSION['patient_id']);
+$headerFile = $isLoggedIn ? 'patient/patient_header.php' : 'header.php';
 function getAllProducts($conn)
 {
-    $sql = 'SELECT * FROM products ORDER BY product_name';
-    $stmt = $conn->prepare($sql);
-
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $products = [];
-    while ($row = $result->fetch_assoc()) {
-        $products[] = $row;
+    try {
+        $sql = 'SELECT * FROM products ORDER BY product_name';
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log('Error fetching products: ' . $e->getMessage());
+        return [];
     }
-
-    return $products;
 }
 
 $products = getAllProducts($conn);
@@ -28,6 +28,7 @@ $categoryName = 'All Products';
 <html lang="en">
 
 <head>
+    <?php include 'header.php'; ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products - Skinovation Beauty Clinic</title>
@@ -41,6 +42,7 @@ $categoryName = 'All Products';
         .services-header h1 {
             text-align: center;
         }
+
         .footer {
             background-color: var(--primary-color);
             color: white;
@@ -50,7 +52,7 @@ $categoryName = 'All Products';
 </head>
 
 <body>
-    <?php include 'header.php'; ?>
+    <?php include 'shared_header.php'; ?>
 
     <!-- Page Header -->
     <div class="section-header">

@@ -4,17 +4,16 @@ include 'db.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['patient_id'])) {
-    header('Location: login.php');
+    header('Location: login.php?redirect=booking');
     exit();
 }
 
 // Get package details
-if (isset($_GET['id'])) {
-    $package_id = $_GET['id'];
-    $stmt = $conn->prepare('SELECT * FROM packages WHERE package_id = ?');
-    $stmt->bind_param('i', $package_id);
-    $stmt->execute();
-    $package = $stmt->get_result()->fetch_assoc();
+if (isset($_GET['package_id'])) {
+    $package_id = $_GET['package_id'];
+    // Redirect to calendar view with package ID
+    header('Location: patient/calendar_view.php?package_id=' . $package_id);
+    exit();
 
     if (!$package) {
         header('Location: packages.php');
@@ -99,10 +98,9 @@ include 'header.php';
                             <div class="mb-3"> <label for="attendant_id" class="form-label">Select Attendant</label>
                                 <select class="form-select" id="attendant_id" name="attendant_id" required>
                                     <option value="">Choose an attendant</option>
-                                    <?php
-                                    $result = $conn->query('SELECT * FROM attendants');
+                                    <?php $result = $conn->query('SELECT attendant_id, first_name, last_name FROM attendants');
                                     while ($row = $result->fetch_assoc()) {
-                                        echo "<option value='" . $row['id'] . "'>" . $row['name'] . ' - ' . $row['specialization'] . '</option>';
+                                        echo "<option value='" . $row['attendant_id'] . "'>Dr. " . htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) . '</option>';
                                     }
                                     ?>
                                 </select>
