@@ -279,6 +279,34 @@ include 'db.php';
     <?php include 'footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            <?php if (!isset($_SESSION['patient_id'])): ?>
+            const reminderModal = document.createElement('div');
+            reminderModal.innerHTML = `
+                <div class="modal fade" id="reminderModal" tabindex="-1" aria-labelledby="reminderModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="reminderModalLabel">Welcome to Skinovation Clinic!</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Please log-in or register to book a service, package, or product.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-dark" data-bs-dismiss="modal">Got it!</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(reminderModal);
+            const modal = new bootstrap.Modal(document.getElementById('reminderModal'));
+            modal.show();
+            <?php endif; ?>
+        });
+    </script>
 </body>
 
 </html>

@@ -54,6 +54,11 @@ $body_class = $show_sidebar ? 'has-sidebar' : '';
                             <i class="fas fa-calendar-check"></i> My Appointments
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?php echo getPath('patient/my-profile.php'); ?>">
+                            <i class="fas fa-user"></i> My Profile
+                        </a>
+                    </li>
                     <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo isset($is_admin) ? 'dashboard.php' : 'admin/dashboard.php'; ?>">

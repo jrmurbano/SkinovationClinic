@@ -143,3 +143,32 @@ service_id:
 Package booking created with ID: 6
 Package appointment created successfully
 Transaction committed successfully
+
+
+2025-05-13 21:38:18 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-15
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [package_id] => 2
+    [notes] => 
+)
+
+SESSION data: Array
+(
+    [patient_id] => 1
+    [user_name] => Ramona Magbanua Urbano
+    [user_username] => ramzurbano
+)
+
+Processed form data:
+patient_id: 1
+appointment_date: 2025-05-15
+appointment_time: 14:00:00
+attendant_id: 1
+package_id: 2
+service_id: 
+Package booking created with ID: 7
+Package appointment created successfully
+Transaction committed successfully

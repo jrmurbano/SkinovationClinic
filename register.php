@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skinovation Beauty Clinic</title>
+    <title>Register</title>
     <link rel="icon" type="image/png" href="assets/img/ISCAP1-303-Skinovation-Clinic-COLORED-Logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <?php else: ?>
                 <div class="card shadow">
                     <div class="card-header bg-primary text-white">
-                        <h3 class="mb-0">Create an Account</h3>
+                        <h3 class="mb-0"><i class="fas fa-user-plus me-2"></i>Create an Account</h3>
                     </div>
                     <div class="card-body">
                         <?php if ($error): ?>
@@ -152,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="mb-3">
                                 <label for="first_name" class="form-label">First Name</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
                                     <input type="text" class="form-control" id="first_name" name="first_name"
                                         maxlength="100" placeholder="Enter your first name" required>
                                 </div>
@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="mb-3">
                                 <label for="middle_name" class="form-label">Middle Name</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
                                     <input type="text" class="form-control" id="middle_name" name="middle_name"
                                         maxlength="100" placeholder="Enter your middle name" required>
                                 </div>
@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="mb-3">
                                 <label for="last_name" class="form-label">Last Name</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
                                     <input type="text" class="form-control" id="last_name" name="last_name"
                                         maxlength="100" placeholder="Enter your last name" required>
                                 </div>
@@ -179,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="mb-3">
                                 <label for="username" class="form-label">Username</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
                                     <input type="text" class="form-control" id="username" name="username"
                                         maxlength="50" placeholder="Enter username" required>
                                 </div>
@@ -188,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="mb-3">
                                 <label for="phone" class="form-label">Phone Number</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                     <input type="text" class="form-control" id="phone" name="phone"
                                         pattern="\d{11}" maxlength="11" placeholder="Enter your phone number" required
                                         oninput="this.value = this.value.replace(/[^0-9]/g, '')"
@@ -199,11 +199,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                     <input type="password" class="form-control" id="password" name="password"
                                         maxlength="255" minlength="6" placeholder="Enter your password" required>
                                     <span class="input-group-text" style="cursor: pointer;" onclick="togglePassword()">
-                                        <i id="toggleIcon" class="bi bi-eye"></i>
+                                        <i id="toggleIcon" class="fas fa-eye"></i>
                                     </span>
                                 </div>
                             </div>
@@ -211,20 +211,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                             <div class="mb-3">
                                 <label for="confirm_password" class="form-label">Confirm Password</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                     <input type="password" class="form-control" id="confirm_password"
                                         name="confirm_password" maxlength="255" placeholder="Enter your password again" minlength="6" required>
                                 </div>
                             </div>
 
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary">Register</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-user-plus me-2"></i>Register
+                                </button>
+                            </div>
+
+                            <div class="mt-3 text-center">
+                                <p>Already have an account? <a href="login.php<?php echo isset($_GET['redirect']) ? '?redirect=' . $_GET['redirect'] : ''; ?>">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Login here</a></p>
                             </div>
                         </form>
-
-                        <div class="mt-3 text-center">
-                            <p>Already have an account? <a href="login.php<?php echo isset($_GET['redirect']) ? '?redirect=' . $_GET['redirect'] : ''; ?>">Login here</a></p>
-                        </div>
                     </div>
                 </div>
                 <?php endif; ?>

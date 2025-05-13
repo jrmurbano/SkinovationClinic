@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 13, 2025 at 01:56 PM
+-- Generation Time: May 13, 2025 at 11:30 PM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -40,7 +40,8 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`admin_id`, `admin_last_name`, `admin_first_name`, `admin_username`, `admin_password`) VALUES
-(1, 'Urbano', 'Jean', 'jrmurbano', '$2y$10$e0NR1z1F5J1u1J1u1J1u1u1J1u1J1u1J1u1J1u1J1u1J1u1J1u1u');
+(1, 'Urbano', 'Jean', 'jrmurbano', '$2y$10$e0NR1z1F5J1u1J1u1J1u1u1J1u1J1u1J1u1J1u1J1u1J1u1J1u1u'),
+(2, 'Urbano', 'Roshan', 'roshannaaaa', '$2y$10$wwnBJK186HIzzbuQSDAZTukPzBSxMGa6p1RJOplk0Md163EVVcABC');
 
 -- --------------------------------------------------------
 
@@ -55,8 +56,8 @@ CREATE TABLE `appointments` (
   `attendant_id` int NOT NULL,
   `appointment_date` date NOT NULL,
   `appointment_time` time NOT NULL,
-  `status` enum('pending','confirmed','completed','cancelled') COLLATE utf8mb4_general_ci DEFAULT 'pending',
-  `notes` text COLLATE utf8mb4_general_ci,
+  `status` enum('pending','confirmed','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'pending',
+  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -77,6 +78,13 @@ CREATE TABLE `attendants` (
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `attendants`
+--
+
+INSERT INTO `attendants` (`attendant_id`, `last_name`, `first_name`, `shift_date`, `shift_time`, `updated_at`, `created_at`) VALUES
+(1, 'Skinovation', 'trial', '2025-05-13', '09:00:00', '2025-05-13 23:35:42', '2025-05-13 23:35:42');
+
 -- --------------------------------------------------------
 
 --
@@ -88,7 +96,7 @@ CREATE TABLE `feedback` (
   `appointment_id` int NOT NULL,
   `patient_id` int NOT NULL,
   `rating` int NOT NULL,
-  `comment` text COLLATE utf8mb4_general_ci,
+  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -100,8 +108,8 @@ CREATE TABLE `feedback` (
 
 CREATE TABLE `packages` (
   `package_id` int NOT NULL,
-  `package_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `description` text COLLATE utf8mb4_general_ci,
+  `package_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `price` decimal(10,2) NOT NULL,
   `sessions` int NOT NULL,
   `duration_days` int NOT NULL COMMENT 'Duration in days',
@@ -163,10 +171,19 @@ CREATE TABLE `package_appointments` (
   `attendant_id` int NOT NULL,
   `appointment_date` date NOT NULL,
   `appointment_time` time NOT NULL,
-  `status` enum('pending','confirmed','completed','cancelled') COLLATE utf8mb4_general_ci DEFAULT 'pending',
+  `status` enum('pending','confirmed','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'pending',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `package_appointments`
+--
+
+INSERT INTO `package_appointments` (`package_appointment_id`, `booking_id`, `attendant_id`, `appointment_date`, `appointment_time`, `status`, `created_at`, `updated_at`) VALUES
+(3, 5, 1, '2025-05-12', '10:00:00', 'pending', '2025-05-13 23:37:13', '2025-05-13 23:37:13'),
+(4, 6, 1, '2025-05-21', '11:00:00', 'cancelled', '2025-05-13 23:41:01', '2025-05-13 23:42:23'),
+(5, 7, 1, '2025-05-15', '14:00:00', 'pending', '2025-05-14 05:38:18', '2025-05-14 05:38:18');
 
 -- --------------------------------------------------------
 
@@ -185,6 +202,15 @@ CREATE TABLE `package_bookings` (
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `package_bookings`
+--
+
+INSERT INTO `package_bookings` (`booking_id`, `patient_id`, `package_id`, `sessions_remaining`, `valid_until`, `grace_period_until`, `created_at`, `updated_at`) VALUES
+(5, 2, 1, 4, '2025-08-11', '2025-11-09', '2025-05-13 23:37:13', '2025-05-13 23:37:13'),
+(6, 2, 1, 5, '2025-08-11', '2025-11-09', '2025-05-13 23:41:01', '2025-05-13 23:42:23'),
+(7, 1, 2, 4, '2025-09-11', '2025-11-10', '2025-05-14 05:38:18', '2025-05-14 05:38:18');
+
 -- --------------------------------------------------------
 
 --
@@ -193,12 +219,12 @@ CREATE TABLE `package_bookings` (
 
 CREATE TABLE `patients` (
   `patient_id` int NOT NULL,
-  `last_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `first_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `middle_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `username` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `phone` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `last_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `first_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `middle_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -208,7 +234,8 @@ CREATE TABLE `patients` (
 --
 
 INSERT INTO `patients` (`patient_id`, `last_name`, `first_name`, `middle_name`, `username`, `password`, `phone`, `created_at`, `updated_at`) VALUES
-(1, 'Urbano', 'Ramona', 'Magbanua', 'ramzurbano', '$2y$10$1jzEodSG/t1G9DdCyK.AeONnukZuX1TW6tWCN7GqbSY3rZknngiRu', '09496269783', '2025-05-13 15:06:45', '2025-05-13 15:06:45');
+(1, 'Urbano', 'Ramona', 'Magbanua', 'ramzurbano', '$2y$10$1jzEodSG/t1G9DdCyK.AeONnukZuX1TW6tWCN7GqbSY3rZknngiRu', '09496269783', '2025-05-13 15:06:45', '2025-05-13 15:06:45'),
+(2, 'Diaz', 'Emil Joaquin', 'Hinolan', 'emil123', '$2y$10$h8bfGeF7ziBPJaD7TlKQ0e3Q66r5Y/YGPwXfCe7Cs.FRZvwmqzVPu', '09695282766', '2025-05-13 22:22:40', '2025-05-13 22:22:40');
 
 -- --------------------------------------------------------
 
@@ -218,13 +245,13 @@ INSERT INTO `patients` (`patient_id`, `last_name`, `first_name`, `middle_name`, 
 
 CREATE TABLE `products` (
   `product_id` int NOT NULL,
-  `product_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `description` text COLLATE utf8mb4_general_ci,
+  `product_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `price` decimal(10,2) NOT NULL,
   `stock` int NOT NULL DEFAULT '0',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `product_image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `product_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -246,8 +273,8 @@ INSERT INTO `products` (`product_id`, `product_name`, `description`, `price`, `s
 
 CREATE TABLE `services` (
   `service_id` int NOT NULL,
-  `service_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
-  `description` text COLLATE utf8mb4_general_ci,
+  `service_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `price` decimal(10,2) DEFAULT NULL,
   `duration` int NOT NULL COMMENT 'Duration in minutes',
   `category_id` int NOT NULL,
@@ -311,7 +338,7 @@ INSERT INTO `services` (`service_id`, `service_name`, `description`, `price`, `d
 
 CREATE TABLE `service_categories` (
   `category_id` int NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -417,7 +444,7 @@ ALTER TABLE `service_categories`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `admin_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `admin_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `appointments`
@@ -429,7 +456,7 @@ ALTER TABLE `appointments`
 -- AUTO_INCREMENT for table `attendants`
 --
 ALTER TABLE `attendants`
-  MODIFY `attendant_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `attendant_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `feedback`
@@ -447,19 +474,19 @@ ALTER TABLE `packages`
 -- AUTO_INCREMENT for table `package_appointments`
 --
 ALTER TABLE `package_appointments`
-  MODIFY `package_appointment_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `package_appointment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `package_bookings`
 --
 ALTER TABLE `package_bookings`
-  MODIFY `booking_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `booking_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `patients`
 --
 ALTER TABLE `patients`
-  MODIFY `patient_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `patient_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `products`

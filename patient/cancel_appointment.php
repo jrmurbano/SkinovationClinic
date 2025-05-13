@@ -18,6 +18,24 @@ if (!isset($_GET['id'])) {
 $appointment_id = $_GET['id'];
 $patient_id = $_SESSION['patient_id'];
 
+// Added validation to ensure cancellation is only allowed 2 days before the appointment
+$stmt = $conn->prepare("SELECT appointment_date FROM appointments WHERE appointment_id = ? AND patient_id = ?");
+$stmt->bind_param('ii', $appointment_id, $patient_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    $appointment = $result->fetch_assoc();
+    $appointment_date = strtotime($appointment['appointment_date']);
+    $current_date = strtotime(date('Y-m-d'));
+
+    if ($appointment_date - $current_date <= 86400) { // Less than or equal to 1 day
+        $_SESSION['error'] = 'Appointments can only be cancelled at least 2 days in advance.';
+        header('Location: my-appointments.php');
+        exit();
+    }
+}
+
 // Start transaction
 $conn->begin_transaction();
 
@@ -43,8 +61,12 @@ try {
         $stmt->execute();
         $result = $stmt->get_result();
 
+        // Fixed syntax issue with exception handling
         if ($result->num_rows === 0) {
-            throw new Exception('Appointment not found or already cancelled');
+            $conn->rollback();
+            $_SESSION['error'] = 'Appointment not found or already cancelled';
+            header('Location: my-appointments.php');
+            exit();
         }
 
         // Update package appointment status

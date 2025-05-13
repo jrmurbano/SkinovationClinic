@@ -8,15 +8,16 @@ if (isset($_SESSION['patient_id'])) {
     if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) {
         header('Location: dashboard.php');
     } else {
-        header('Location: patient/home.php');
+        header('Location: patient/my-appointments.php');
     }
     exit();
 }
 
 $error = '';
 
+// Cleaned up duplicate redirection logic
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = $_POST['email'];
+    $username = $_POST['username'];
     $password = $_POST['password'];
 
     if (empty($username) || empty($password)) {
@@ -34,11 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['middle_name'] . ' ' . $user['last_name'];
                 $_SESSION['user_username'] = $user['username'];
 
-                // Check if there's a pending booking
-                if (isset($_GET['redirect']) && $_GET['redirect'] == 'booking' && isset($_SESSION['pending_booking'])) {
-                    header('Location: booking.php?service_id=' . $_SESSION['pending_booking']['service_id']);
+                // Redirect based on booking flow
+                if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking' && isset($_GET['type']) && isset($_GET['id'])) {
+                    header('Location: patient/booking_redirect.php?type=' . $_GET['type'] . '&id=' . $_GET['id']);
                 } else {
-                    header('Location: index.php');
+                    header('Location: patient/my-appointments.php');
                 }
                 exit();
             } else {
@@ -55,6 +56,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking') {
     echo "<script>alert('Please log-in or register first to book');</script>";
 }
+// Ensure proper redirection for booking flow
+if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking' && isset($_GET['type']) && isset($_GET['id'])) {
+    header('Location: patient/booking_redirect.php?type=' . urlencode($_GET['type']) . '&id=' . urlencode($_GET['id']));
+    exit();
+} else if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking' && isset($_SESSION['pending_booking'])) {
+    header('Location: booking.php?service_id=' . $_SESSION['pending_booking']['service_id']);
+    exit();
+}
+
+// Debugging log to trace redirection flow
+error_log("Login: Redirect parameter: " . print_r($_GET, true));
 ?>
 
 <!DOCTYPE html>
@@ -63,7 +75,7 @@ if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skinovation Beauty Clinic</title>
+    <title>Log In</title>
     <link rel="icon" type="image/png" href="assets/img/ISCAP1-303-Skinovation-Clinic-COLORED-Logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
@@ -92,7 +104,7 @@ if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking') {
             <div class="col-md-6 col-lg-5">
                 <div class="card shadow">
                     <div class="card-header bg-primary text-white text-center py-3">
-                        <h3 class="mb-0">Login</h3>
+                        <h3 class="mb-0"><i class="fas fa-sign-in-alt me-2"></i>Login</h3>
                     </div>
                     <div class="card-body p-4">
                         <?php if ($error): ?>
@@ -101,10 +113,10 @@ if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking') {
 
                         <form method="post" action="">
                             <div class="mb-3">
-                                <label for="email" class="form-label">Username</label>
+                                <label for="username" class="form-label">Username</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                    <input type="text" class="form-control" id="email" name="email"
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" id="username" name="username"
                                         maxlength="50" placeholder="Enter your username" required>
                                 </div>
                             </div>
@@ -112,11 +124,11 @@ if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking') {
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
                                 <div class="input-group">
-                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
                                     <input type="password" class="form-control" id="password" name="password"
                                         maxlength="255" placeholder="Enter your password" required>
                                     <span class="input-group-text" style="cursor: pointer;" onclick="togglePassword()">
-                                        <i id="toggleIcon" class="bi bi-eye"></i>
+                                        <i id="toggleIcon" class="fas fa-eye"></i>
                                     </span>
                                 </div>
                             </div>
@@ -125,12 +137,13 @@ if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking') {
 
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                                    <i class="fas fa-sign-in-alt me-2"></i>Login
                                 </button>
                             </div>
 
                             <div class="mt-3 text-center">
-                                <p>New to the clinic? <a href="register.php<?php echo isset($_GET['redirect']) ? '?redirect=' . $_GET['redirect'] : ''; ?>">Register here!</a></p>
+                                <p>New to the clinic? <a href="register.php<?php echo isset($_GET['redirect']) ? '?redirect=' . $_GET['redirect'] : ''; ?>">
+                                    <i class="fas fa-user-plus me-1"></i>Register here!</a></p>
                             </div>
 
                         </form>
@@ -143,18 +156,19 @@ if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking') {
     <?php include 'footer.php'; ?>
 
     <script>
+        // Fixed icon class mismatch in togglePassword function
         function togglePassword() {
             const passwordField = document.getElementById("password");
             const toggleIcon = document.getElementById("toggleIcon");
 
             if (passwordField.type === "password") {
                 passwordField.type = "text";
-                toggleIcon.classList.remove("bi-eye");
-                toggleIcon.classList.add("bi-eye-slash");
+                toggleIcon.classList.remove("fas", "fa-eye");
+                toggleIcon.classList.add("fas", "fa-eye-slash");
             } else {
                 passwordField.type = "password";
-                toggleIcon.classList.remove("bi-eye-slash");
-                toggleIcon.classList.add("bi-eye");
+                toggleIcon.classList.remove("fas", "fa-eye-slash");
+                toggleIcon.classList.add("fas", "fa-eye");
             }
         }
     </script>

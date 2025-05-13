@@ -1,37 +1,33 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
-include '../db.php';
+include '../config.php';
 
-// Handle login
-$login_error = '';
+// Check if admin is already logged in
+if (isset($_SESSION['admin_id'])) {
+    header('Location: dashboard.php');
+    exit();
+}
+
+$error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $username = $_POST['username'] ?? '';
+    $password = $_POST['password'] ?? '';
 
-    // Query to check admin credentials
-    $stmt = $conn->prepare("SELECT * FROM admin WHERE username = ?");
-    $stmt->bind_param('s', $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    if ($username && $password) {
+        $stmt = $conn->prepare('SELECT * FROM admin WHERE admin_username = :username');
+        $stmt->bindValue(':username', $username, PDO::PARAM_STR);
+        $stmt->execute();
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($result->num_rows > 0) {
-        $admin = $result->fetch_assoc();
-        if (password_verify($password, $admin['password'])) {
-            // Login successful
-            $_SESSION['admin_username'] = $username;
-            header('Location: admin_dashboard.php');
+        if ($admin && isset($admin['admin_password']) && password_verify($password, $admin['admin_password'])) {
+            $_SESSION['admin_id'] = $admin['admin_id'];
+            header('Location: dashboard.php');
             exit();
         } else {
-            // Login failed
-            $login_error = 'Invalid username or password.';
+            $error = 'Invalid username or password.';
         }
     } else {
-        // Login failed
-        $login_error = 'Invalid username or password.';
+        $error = 'Please fill in all fields.';
     }
 }
 ?>
@@ -41,40 +37,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Skinovation Beauty Clinic</title>
+    <title>Admin Login</title>
+    <link rel="icon" type="image/png" href="assets/img/ISCAP1-303-Skinovation-Clinic-COLORED-Logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="../assets/css/admin.css" rel="stylesheet">
+    <link href="../assets/css/style.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header text-center">
-                        <h3><i class="fas fa-user-shield"></i> Admin Login</h3>
-                    </div>
-                    <div class="card-body">
-                        <?php if ($login_error): ?>
-                        <div class="alert alert-danger"> <?php echo $login_error; ?> </div>
-                        <?php endif; ?>
-                        <form method="post">
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary w-100">Login</button>
-                        </form>
-                    </div>
-                </div>
+<div class="d-flex justify-content-center align-items-center vh-50">
+    <div class="card shadow-lg p-4" style="width: 100%; max-width: 400px;">
+        <h1 class="text-center mb-4"><i class="fas fa-user-shield"></i> Admin Login</h1>
+        <?php if ($error): ?>
+            <div class="alert alert-danger"> <?php echo $error; ?> </div>
+        <?php endif; ?>
+        <form method="POST">
+            <div class="mb-3">
+                <label for="username" class="form-label"><i class="fas fa-user"></i> Username</label>
+                <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
             </div>
-        </div>
+            <div class="mb-3">
+                <label for="password" class="form-label"><i class="fas fa-lock"></i> Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

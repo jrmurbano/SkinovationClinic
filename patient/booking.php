@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book Appointment - Skinovation Beauty Clinic</title>
+    <title>Book Appointment</title>
     <link rel="icon" type="image/png" href="../assets/img/ISCAP1-303-Skinovation-Clinic-COLORED-Logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
@@ -193,18 +193,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                         <?php if (!isset($_SESSION['user_id'])): ?>
                         <form method="post" action="">
-                            <div class="mb-3">
-                                <label for="attendant_id" class="form-label">Select Attendant</label>
-                                <select class="form-select" id="attendant_id" name="attendant_id" required>
-                                    <option value="">Choose an attendant</option>
-                                    <?php foreach ($all_attendants as $attendant): ?>
-                                    <option value="<?php echo $attendant['id']; ?>">
-                                        <?php echo htmlspecialchars($attendant['name']); ?>
-                                    </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
                             <div class="mb-3">
                                 <label for="appointment_date" class="form-label">Select Date</label>
                                 <input type="date" class="form-control" id="appointment_date" name="appointment_date"

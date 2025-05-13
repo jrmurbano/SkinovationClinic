@@ -3,7 +3,8 @@
 if (!isset($_SESSION['patient_id'])) {
     die('<script>window.location.href = "../login.php";</script>');
 }
-
-// ...existing code...
-
 ?>
+
+<li class="nav-item">
+    <a class="nav-link" href="my-profile.php">My Profile</a>
+</li>

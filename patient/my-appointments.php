@@ -69,7 +69,7 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php include '../header.php'; ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Appointments - Skinovation Clinic</title>
+    <title>My Appointments</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
@@ -146,62 +146,100 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background-color: #f8d7da;
             color: #721c24;
         }
+
+        .footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 3rem 0;
+        }
+
     </style>
 </head>
 
 <body>
-    <?php include 'patient_header.php'; ?> <div class="container mt-4">
-        <div class="row justify-content-center">
-            <div class="col-md-10 card shadow-sm">
-                <h2 class="text-center mb-4">My Appointments</h2>
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">My Appointments</h1>
+        <p class="lead">Manage your upcoming and past appointments with ease.</p>
+    </div>
 
-                <?php if (count($appointments) > 0): ?> <div class="appointments-list">
-                    <?php foreach ($appointments as $appointment): ?>
-                    <div class="appointment-card">
-                        <div class="appointment-header">
-                            <h3><?php echo clean($appointment['name']); ?></h3>
-                            <span class="status-badge status-<?php echo strtolower($appointment['status']); ?>">
-                                <?php echo ucfirst($appointment['status']); ?>
-                                <?php echo $appointment['appointment_type'] === 'package' ? ' (Package)' : ''; ?>
-                            </span>
-                        </div>
-                        <div class="appointment-details">
-                            <p><strong>Date:</strong> <?php echo date('F j, Y', strtotime($appointment['appointment_date'])); ?></p>
-                            <p><strong>Time:</strong> <?php echo date('g:i A', strtotime($appointment['appointment_time'])); ?></p>
-                            <p><strong>Attendant:</strong> <?php echo clean($appointment['attendant_first_name'] . ' ' . $appointment['attendant_last_name']); ?></p>
-                            <p><strong>Price:</strong> ₱<?php echo number_format($appointment['price'], 2); ?></p>
-                            <?php if (!empty($appointment['notes'])): ?>
-                            <p><strong>Notes:</strong> <?php echo clean($appointment['notes']); ?></p>
-                            <?php endif; ?>
-                        </div> <?php if ($appointment['status'] === 'pending'): ?>
-                        <div class="mt-3">
-                            <a href="cancel_appointment.php?id=<?php echo $appointment['appointment_id']; ?>" class="btn btn-danger"
-                                onclick="return confirm('Are you sure you want to cancel this appointment?' + 
-                                      '<?php echo $appointment['appointment_type'] === 'package' ? '\nYour session will be returned to your package.' : ''; ?>');">
-                                Cancel Appointment
-                            </a>
-                        </div>
-                        <?php endif; ?>
-                    </div> <?php endforeach; ?>
+    <?php
+    // Added success message display for reschedule and cancel actions
+    if (isset($_GET['message'])) {
+        echo '<div class="alert alert-success text-center">' . htmlspecialchars($_GET['message']) . '</div>';
+    }
+    ?>
+
+    <?php if (count($appointments) > 0): ?>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">Upcoming Appointments</h3>
                 </div>
-                <?php else: ?>
-                <div class="card shadow-sm text-center">
-                    <div class="card-body no-appointments text-center py-5">
-                        <div class="empty-state-icon mb-4">
-                            <i class="fas fa-calendar-alt fa-4x text-muted"></i>
-                        </div>
-                        <h3 class="mb-3">No Appointments Yet</h3>
-                        <p class="text-muted mb-4">You haven't booked any appointments yet. Start your journey to better
-                            skin today!</p>
-                        <a href="booking.php" class="btn btn-primary btn-lg">
-                            <i class="fas fa-plus-circle me-2"></i>Book Your First Appointment
-                        </a>
+                <div class="card-body">
+                    <div class="appointments-list">
+                        <?php foreach ($appointments as $appointment): ?>
+                            <?php if (strtotime($appointment['appointment_date']) >= strtotime(date('Y-m-d'))): ?>
+                                <div class="appointment-card mb-3">
+                                    <h5 class="text-primary">Service: <?php echo clean($appointment['name']); ?></h5>
+                                    <p><strong>Date:</strong> <?php echo date('F j, Y', strtotime($appointment['appointment_date'])); ?></p>
+                                    <p><strong>Time:</strong> <?php echo date('g:i A', strtotime($appointment['appointment_time'])); ?></p>
+                                    <p><strong>Attendant:</strong> <?php echo clean($appointment['attendant_first_name'] . ' ' . $appointment['attendant_last_name']); ?></p>
+                                    <p><strong>Price:</strong> ₱<?php echo number_format($appointment['price'], 2); ?></p>
+                                    <div class="d-flex gap-2">
+                                        <a href="reschedule_appointment.php?id=<?php echo $appointment['appointment_id']; ?>" class="btn btn-warning btn-sm" <?php echo (strtotime($appointment['appointment_date']) <= strtotime(date('Y-m-d'))) ? 'disabled' : ''; ?>>Reschedule</a>
+                                        <a href="cancel_appointment.php?id=<?php echo $appointment['appointment_id']; ?>" class="btn btn-danger btn-sm" <?php echo (strtotime($appointment['appointment_date']) <= strtotime('+1 day')) ? 'disabled' : ''; ?>>Cancel</a>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
                     </div>
                 </div>
-                <?php endif; ?>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="card-title mb-0">Appointment History</h3>
+                </div>
+                <div class="card-body">
+                    <div class="appointments-list">
+                        <?php foreach ($appointments as $appointment): ?>
+                            <?php if (strtotime($appointment['appointment_date']) < strtotime(date('Y-m-d'))): ?>
+                                <div class="appointment-card mb-3">
+                                    <h5 class="text-secondary">Service: <?php echo clean($appointment['name']); ?></h5>
+                                    <p><strong>Date:</strong> <?php echo date('F j, Y', strtotime($appointment['appointment_date'])); ?></p>
+                                    <p><strong>Time:</strong> <?php echo date('g:i A', strtotime($appointment['appointment_time'])); ?></p>
+                                    <p><strong>Attendant:</strong> <?php echo clean($appointment['attendant_first_name'] . ' ' . $appointment['attendant_last_name']); ?></p>
+                                    <p><strong>Price:</strong> ₱<?php echo number_format($appointment['price'], 2); ?></p>
+                                    <p><strong>Status:</strong> <span class="status-badge status-<?php echo strtolower($appointment['status']); ?>"> <?php echo ucfirst($appointment['status']); ?></span></p>
+                                </div>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+    <?php else: ?>
+    <div class="text-center">
+        <div class="card shadow-sm">
+            <div class="card-body py-5">
+                <div class="empty-state-icon mb-4">
+                    <i class="fas fa-calendar-alt fa-4x text-muted"></i>
+                </div>
+                <h3 class="mb-3">No Appointments Yet</h3>
+                <p class="text-muted mb-4">You haven't booked any appointments yet. Start your journey to better skin today!</p>
+                <a href="booking.php" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus-circle me-2"></i>Book Your First Appointment
+                </a>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+</div>
 
     <?php include '../footer.php'; ?>
 </body>

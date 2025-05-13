@@ -106,3 +106,8 @@ if (document.getElementById('booking-form')) {
         }
     });
 }
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    sidebar.classList.toggle('collapsed');
+}

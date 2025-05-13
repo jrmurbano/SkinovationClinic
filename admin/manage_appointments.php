@@ -14,24 +14,20 @@ if (!isset($_SESSION['admin_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings</title>
+    <title>Manage Appointments</title>
     <link rel="icon" type="image/png" href="assets/img/ISCAP1-303-Skinovation-Clinic-COLORED-Logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="../assets/css/admin.css" rel="stylesheet">
     <link href="../assets/css/style.css" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
 <div class="d-flex">
     <?php include 'admin_sidebar.php'; ?>
     <div class="content p-4">
         <div class="container mt-5">
-            <h1><i class="fas fa-cogs"></i> Settings</h1>
-            <p>UI for settings will go here.</p>
-        </div>
-        <div class="container mt-5">
-            <a href="register_admin.php" class="btn btn-secondary">Create Account</a>
+            <h1><i class="fas fa-calendar-alt"></i> Manage Appointments</h1>
+            <p>UI for managing appointments will go here.</p>
         </div>
     </div>
 </div>
