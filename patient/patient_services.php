@@ -4,6 +4,17 @@ include '../db.php';
 
 $GLOBALS['is_admin'] = false; // Set this flag for proper path resolution
 
+// Prevent browser caching to ensure strict authentication
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
+// Check if user is logged in
+if (!isset($_SESSION['patient_id'])) {
+    header('Location: ../login.php');
+    exit();
+}
+
 // Get category from URL parameter
 $category = isset($_GET['category']) ? $_GET['category'] : 'all';
 
@@ -11,9 +22,9 @@ $category = isset($_GET['category']) ? $_GET['category'] : 'all';
 function getServicesByCategory($conn, $category)
 {
     if ($category == 'all') {
-        $sql = 'SELECT * FROM services ORDER BY category, name';
+        $sql = 'SELECT * FROM services ORDER BY category_id, name';
     } else {
-        $sql = 'SELECT * FROM services WHERE category = ? ORDER BY name';
+        $sql = 'SELECT * FROM services WHERE category_id = ? ORDER BY name';
     }
 
     $stmt = $conn->prepare($sql);

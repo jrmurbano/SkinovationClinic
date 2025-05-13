@@ -2,22 +2,19 @@
     <div class="container">
         <div class="row g-4">
             <div class="col-md-4">
+                <img src="<?php echo getPath('assets/img/ISCAP1-303-Skinovation-Clinic-WHITE-Logo.png'); ?>" alt="Skinovation Clinic Logo" height="60" class="me-2 image-fluid mb-3">
+                <br>
                 <h5 class="mb-3">Skinovation Beauty Clinic</h5>
                 <p class="mb-3">Your trusted partner for beauty and skincare treatments. We provide professional
                     services with certified Cosmetic Nurses.</p>
-                <div class="social-links">
-                    <a href="#" class="text-white me-2"><i class="bi bi-facebook"></i></a>
-                    <a href="#" class="text-white me-2"><i class="bi bi-instagram"></i></a>
-                    <a href="#" class="text-white me-2"><i class="bi bi-twitter"></i></a>
-                    <a href="#" class="text-white"><i class="bi bi-youtube"></i></a>
-                </div>
             </div>
             <div class="col-md-4">
                 <h5 class="mb-3">Quick Links</h5>
                 <ul class="list-unstyled">
-                    <li class="mb-2"><a href="index.php" class="text-white text-decoration-none">Home</a></li>
-                    <li class="mb-2"><a href="services.php" class="text-white text-decoration-none">Services</a></li>
-
+                    <li class="mb-2"><a href="index.php" class="text-white text-decoration-none"><i class="fas fa-home me-2"></i>Home</a></li>
+                    <li class="mb-2"><a href="services.php" class="text-white text-decoration-none"><i class="fas fa-concierge-bell me-2"></i>Services</a></li>
+                    <li class="mb-2"><a href="packages.php" class="text-white text-decoration-none"><i class="fas fa-box me-2"></i>Packages</a></li>
+                    <li class="mb-2"><a href="products.php" class="text-white text-decoration-none"><i class="fas fa-shopping-bag me-2"></i>Products</a></li>
                 </ul>
             </div>
             <div class="col-md-4">

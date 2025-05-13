@@ -3,12 +3,12 @@ session_start();
 include 'db.php';
 
 // Check if user is already logged in
-if (isset($_SESSION['user_id'])) {
-    // Redirect to appropriate page based on user type
+if (isset($_SESSION['patient_id'])) {
+    // Redirect patients to their home page
     if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) {
         header('Location: dashboard.php');
     } else {
-        header('Location: index.php');
+        header('Location: patient/home.php');
     }
     exit();
 }
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (empty($username) || empty($password)) {
         $error = 'Please enter both username and password.';
     } else {
-        $stmt = $conn->prepare('SELECT patient_id, name, username, password FROM patients WHERE username = ?');
+        $stmt = $conn->prepare('SELECT patient_id, first_name, middle_name, last_name, username, password FROM patients WHERE username = ?');
         $stmt->bind_param('s', $username);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -30,15 +30,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $user = $result->fetch_assoc();
             if (password_verify($password, $user['password'])) {
                 // Set session variables
-                $_SESSION['user_id'] = $user['patient_id'];
-                $_SESSION['user_name'] = $user['name'];
+                $_SESSION['patient_id'] = $user['patient_id'];
+                $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['middle_name'] . ' ' . $user['last_name'];
                 $_SESSION['user_username'] = $user['username'];
 
                 // Check if there's a pending booking
                 if (isset($_GET['redirect']) && $_GET['redirect'] == 'booking' && isset($_SESSION['pending_booking'])) {
                     header('Location: booking.php?service_id=' . $_SESSION['pending_booking']['service_id']);
                 } else {
-                    header('Location: index.php');
+                    header('Location: patient/home.php');
                 }
                 exit();
             } else {
@@ -48,6 +48,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $error = 'Username not found.';
         }
     }
+}
+?>
+
+<?php
+if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking') {
+    echo "<script>alert('Please log-in or register first to book');</script>";
 }
 ?>
 
@@ -62,6 +68,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        .services-header h1 {
+            text-align: center;
+        }
+        .footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 3rem 0;
+        }
+    </style>
+
+
 </head>
 
 <body>
@@ -85,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-person"></i></span>
                                     <input type="text" class="form-control" id="email" name="email"
-                                        maxlength="50" required>
+                                        maxlength="50" placeholder="Enter your username" required>
                                 </div>
                             </div>
 
@@ -94,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                     <input type="password" class="form-control" id="password" name="password"
-                                        maxlength="255" required>
+                                        maxlength="255" placeholder="Enter your password" required>
                                     <span class="input-group-text" style="cursor: pointer;" onclick="togglePassword()">
                                         <i id="toggleIcon" class="bi bi-eye"></i>
                                     </span>
@@ -107,10 +126,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-box-arrow-in-right me-2"></i>Login
                                 </button>
-                                <a href="register.php" class="btn btn-outline-secondary">
-                                    <i class="bi bi-person-plus me-2"></i>Create Account
-                                </a>
                             </div>
+
+                             <div class="mt-3 text-center">
+                                <p>New to the clinic? <a href="register.php<?php echo isset($_GET['redirect']) ? '?redirect=' . $_GET['redirect'] : ''; ?>">Register here!</a></p>
+                            </div>
+
                         </form>
                     </div>
                 </div>

@@ -3,7 +3,7 @@ session_start();
 include 'db.php';
 
 // Check if user is already logged in
-if (isset($_SESSION['user_id'])) {
+if (isset($_SESSION['patient_id'])) {
     // Redirect to appropriate page
     if (isset($_GET['redirect']) && $_GET['redirect'] == 'booking' && isset($_SESSION['pending_booking'])) {
         header('Location: booking.php?service_id=' . $_SESSION['pending_booking']['service_id']);
@@ -18,15 +18,17 @@ $success = false;
 
 // Process registration form
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name = $_POST['name'];
+    $first_name = $_POST['first_name'];
+    $middle_name = $_POST['middle_name'];
+    $last_name = $_POST['last_name'];
     $username = $_POST['username'];
     $phone = $_POST['phone'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password']; // Validate inputs
-    if (empty($name) || empty($username) || empty($phone) || empty($password) || empty($confirm_password)) {
+    if (empty($first_name) || empty($middle_name) || empty($last_name) || empty($username) || empty($phone) || empty($password) || empty($confirm_password)) {
         $error = 'Please fill in all fields.';
-    } elseif (strlen($name) > 100) {
-        $error = 'Name must not exceed 100 characters.';
+    } elseif (strlen($first_name) > 100 || strlen($middle_name) > 100 || strlen($last_name) > 100) {
+        $error = 'Name fields must not exceed 100 characters each.';
     } elseif (strlen($username) > 50) {
         $error = 'Username must not exceed 50 characters.';
     } elseif (strlen($phone) !== 11 || !ctype_digit($phone)) {
@@ -48,15 +50,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
             // Insert new user
-            $stmt = $conn->prepare('INSERT INTO patients (name, username, phone, password, created_at) VALUES (?, ?, ?, ?, NOW())');
-            $stmt->bind_param('ssss', $name, $username, $phone, $hashed_password);
+            $stmt = $conn->prepare('INSERT INTO patients (first_name, middle_name, last_name, username, phone, password, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())');
+            $stmt->bind_param('ssssss', $first_name, $middle_name, $last_name, $username, $phone, $hashed_password);
 
             if ($stmt->execute()) {
-                $user_id = $conn->insert_id;
+                $patient_id = $conn->insert_id;
 
                 // Set session variables
-                $_SESSION['user_id'] = $user_id;
-                $_SESSION['user_name'] = $name;
+                $_SESSION['patient_id'] = $patient_id;
+                $_SESSION['user_name'] = $first_name . ' ' . $middle_name . ' ' . $last_name;
                 $_SESSION['user_username'] = $username;
 
                 // If there's a pending booking, process it
@@ -71,8 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     if ($result->num_rows == 0) {
                         // Insert the booking
-                        $stmt = $conn->prepare("INSERT INTO appointments (user_id, service_id, dermatologist_id, appointment_date, appointment_time, notes, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())");
-                        $stmt->bind_param('iiisss', $user_id, $pending_booking['service_id'], $pending_booking['dermatologist_id'], $pending_booking['appointment_date'], $pending_booking['appointment_time'], $pending_booking['notes']);
+                        $stmt = $conn->prepare("INSERT INTO appointments (patient_id, service_id, dermatologist_id, appointment_date, appointment_time, notes, status, created_at) VALUES (?, ?, ?, ?, ?, ?, 'pending', NOW())");
+                        $stmt->bind_param('iiisss', $patient_id, $pending_booking['service_id'], $pending_booking['dermatologist_id'], $pending_booking['appointment_date'], $pending_booking['appointment_time'], $pending_booking['notes']);
 
                         if ($stmt->execute()) {
                             // Clear pending booking from session
@@ -110,6 +112,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        .services-header h1 {
+            text-align: center;
+        }
+        .footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 3rem 0;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -136,11 +150,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                         <form method="post" action="">
                             <div class="mb-3">
-                                <label for="name" class="form-label">Name</label>
+                                <label for="first_name" class="form-label">First Name</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                    <input type="text" class="form-control" id="name" name="name"
-                                        maxlength="100" required>
+                                    <input type="text" class="form-control" id="first_name" name="first_name"
+                                        maxlength="100" placeholder="Enter your first name" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="middle_name" class="form-label">Middle Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                    <input type="text" class="form-control" id="middle_name" name="middle_name"
+                                        maxlength="100" placeholder="Enter your middle name" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                    <input type="text" class="form-control" id="last_name" name="last_name"
+                                        maxlength="100" placeholder="Enter your last name" required>
                                 </div>
                             </div>
 
@@ -149,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
                                     <input type="text" class="form-control" id="username" name="username"
-                                        maxlength="50" required>
+                                        maxlength="50" placeholder="Enter username" required>
                                 </div>
                             </div>
 
@@ -158,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-telephone"></i></span>
                                     <input type="text" class="form-control" id="phone" name="phone"
-                                        pattern="\d{11}" maxlength="11" required
+                                        pattern="\d{11}" maxlength="11" placeholder="Enter your phone number" required
                                         oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                         title="Please enter exactly 11 digits">
                                 </div>
@@ -169,7 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                     <input type="password" class="form-control" id="password" name="password"
-                                        maxlength="255" minlength="6" required>
+                                        maxlength="255" minlength="6" placeholder="Enter your password" required>
                                     <span class="input-group-text" style="cursor: pointer;" onclick="togglePassword()">
                                         <i id="toggleIcon" class="bi bi-eye"></i>
                                     </span>
@@ -181,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                     <input type="password" class="form-control" id="confirm_password"
-                                        name="confirm_password" maxlength="255" minlength="6" required>
+                                        name="confirm_password" maxlength="255" placeholder="Enter your password again" minlength="6" required>
                                 </div>
                             </div>
 
@@ -206,7 +238,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Form validation
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('form');
-            const nameInput = document.getElementById('name');
+            const firstNameInput = document.getElementById('first_name');
+            const middleNameInput = document.getElementById('middle_name');
+            const lastNameInput = document.getElementById('last_name');
             const usernameInput = document.getElementById('username');
             const phoneInput = document.getElementById('phone');
             const passwordInput = document.getElementById('password');
@@ -215,13 +249,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             form.addEventListener('submit', function(event) {
                 let isValid = true;
 
-                // Validate name
-                if (nameInput.value.length > 100) {
+                // Validate name fields
+                if (firstNameInput.value.length > 100 || middleNameInput.value.length > 100 || lastNameInput.value.length > 100) {
                     isValid = false;
-                    nameInput.classList.add('is-invalid');
-                    showError(nameInput, 'Name must not exceed 100 characters');
+                    firstNameInput.classList.add('is-invalid');
+                    middleNameInput.classList.add('is-invalid');
+                    lastNameInput.classList.add('is-invalid');
+                    showError(firstNameInput, 'Name fields must not exceed 100 characters each');
                 } else {
-                    nameInput.classList.remove('is-invalid');
+                    firstNameInput.classList.remove('is-invalid');
+                    middleNameInput.classList.remove('is-invalid');
+                    lastNameInput.classList.remove('is-invalid');
                 }
 
                 // Validate username

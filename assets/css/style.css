@@ -229,8 +229,7 @@ body {
 }
 
 .page-header h1 {
-    font-weight: bold;
-    margin-bottom: 1rem;
+    font-weight: 600;
 }
 
 .page-header p {
@@ -293,6 +292,12 @@ body {
 
 .navbar {
     padding: 0.5rem 1rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+.navbar-nav .nav-link {
+    font-weight: 400;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Side Navigation */

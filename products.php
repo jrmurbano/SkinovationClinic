@@ -1,19 +1,11 @@
 <?php
 include 'db.php';
 
-// Get all products or filter by category
-$category = isset($_GET['category']) ? $_GET['category'] : 'all';
-
-function getAllProducts($conn, $category = 'all')
+// Removed category filtering logic
+function getAllProducts($conn)
 {
-    if ($category == 'all') {
-        $sql = 'SELECT * FROM products ORDER BY category, name';
-        $stmt = $conn->prepare($sql);
-    } else {
-        $sql = 'SELECT * FROM products WHERE category = ? ORDER BY name';
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param('s', $category);
-    }
+    $sql = 'SELECT * FROM products ORDER BY product_name';
+    $stmt = $conn->prepare($sql);
 
     $stmt->execute();
     $result = $stmt->get_result();
@@ -26,23 +18,10 @@ function getAllProducts($conn, $category = 'all')
     return $products;
 }
 
-$products = getAllProducts($conn, $category);
+$products = getAllProducts($conn);
 
-// Get category name for display
-function getCategoryName($category)
-{
-    $categories = [
-        'skincare' => 'Skincare Products',
-        'facial' => 'Facial Care',
-        'body' => 'Body Care',
-        'sunscreen' => 'Sun Protection',
-        'all' => 'All Products',
-    ];
-
-    return isset($categories[$category]) ? $categories[$category] : 'All Products';
-}
-
-$categoryName = getCategoryName($category);
+// Removed category name logic
+$categoryName = 'All Products';
 ?>
 
 <!DOCTYPE html>
@@ -56,7 +35,18 @@ $categoryName = getCategoryName($category);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .services-header h1 {
+            text-align: center;
+        }
+        .footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 3rem 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -64,7 +54,7 @@ $categoryName = getCategoryName($category);
 
     <!-- Page Header -->
     <div class="section-header">
-        <div class="container">
+        <div class="container text-center mt-5 mb-5">
             <h1 class="display-4 fw-bold animate__animated animate__fadeInDown"><?php echo $categoryName; ?></h1>
             <p class="lead animate__animated animate__fadeInUp">Professional skincare products for your beauty routine
             </p>
@@ -72,58 +62,33 @@ $categoryName = getCategoryName($category);
     </div>
 
     <div class="container">
-        <!-- Category Filter -->
-        <div class="category-filter">
-            <div class="row justify-content-center">
-                <div class="col-md-10">
-                    <div class="d-flex flex-wrap justify-content-center gap-2">
-                        <a href="?category=all" class="btn <?php echo $category == 'all' ? 'btn-purple' : 'btn-outline-purple'; ?>">
-                            <i class="bi bi-grid-3x3-gap me-1"></i>All Products
-                        </a>
-                        <a href="?category=skincare" class="btn <?php echo $category == 'skincare' ? 'btn-purple' : 'btn-outline-purple'; ?>">
-                            <i class="bi bi-droplet me-1"></i>Skincare
-                        </a>
-                        <a href="?category=facial" class="btn <?php echo $category == 'facial' ? 'btn-purple' : 'btn-outline-purple'; ?>">
-                            <i class="bi bi-star me-1"></i>Facial Care
-                        </a>
-                        <a href="?category=body" class="btn <?php echo $category == 'body' ? 'btn-purple' : 'btn-outline-purple'; ?>">
-                            <i class="bi bi-hearts me-1"></i>Body Care
-                        </a>
-                        <a href="?category=sunscreen" class="btn <?php echo $category == 'sunscreen' ? 'btn-purple' : 'btn-outline-purple'; ?>">
-                            <i class="bi bi-brightness-high me-1"></i>Sun Protection
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Products Grid -->
         <div class="row g-4 my-4">
             <?php if (empty($products)): ?>
             <div class="col-12">
                 <div class="alert alert-info text-center">
                     <i class="bi bi-info-circle me-2"></i>
-                    No products found in this category.
+                    No products found.
                 </div>
             </div>
             <?php else: ?>
             <?php foreach ($products as $product): ?>
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-lg-4">
                 <div class="product-card card h-100">
-                    <?php if ($product['image_url']): ?>
-                    <img src="<?php echo htmlspecialchars($product['image_url']); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($product['name']); ?>">
+                    <?php if (!empty($product['product_image'])): ?>
+                    <img src="<?php echo htmlspecialchars($product['product_image'] ?? ''); ?>" class="card-img-top" alt="<?php echo htmlspecialchars($product['product_name'] ?? ''); ?>">
                     <?php endif; ?>
                     <div class="card-body">
-                        <h5 class="card-title"><?php echo htmlspecialchars($product['name']); ?></h5>
+                        <h5 class="card-title"> <?php echo htmlspecialchars($product['product_name'] ?? ''); ?> </h5>
                         <?php if (!empty($product['description'])): ?>
-                        <p class="card-text text-muted"><?php echo htmlspecialchars($product['description']); ?></p>
+                        <p class="card-text text-muted"> <?php echo htmlspecialchars($product['description']); ?> </p>
                         <?php endif; ?>
                         <div class="d-flex justify-content-between align-items-center mt-3">
                             <p class="price mb-0">₱<?php echo number_format($product['price'], 2); ?></p>
                             <button class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#orderModal"
-                                data-product-id="<?php echo $product['id']; ?>" data-product-name="<?php echo htmlspecialchars($product['name']); ?>"
+                                data-product-id="<?php echo $product['product_id']; ?>" data-product-name="<?php echo htmlspecialchars($product['product_name'] ?? ''); ?>"
                                 data-product-price="<?php echo $product['price']; ?>">
-                                <i class="bi bi-cart-plus me-1"></i>Order
+                                <i class="bi bi-cart-plus me-1"></i>Pre-Order
                             </button>
                         </div>
                     </div>

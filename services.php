@@ -9,9 +9,9 @@ $category = isset($_GET['category']) ? $_GET['category'] : 'all';
 function getServicesByCategory($conn, $category)
 {
     if ($category == 'all') {
-        $sql = 'SELECT * FROM services ORDER BY category, name';
+        $sql = 'SELECT * FROM services ORDER BY service_name';
     } else {
-        $sql = 'SELECT * FROM services WHERE category = ? ORDER BY name';
+        $sql = 'SELECT * FROM services WHERE category_id = ? ORDER BY service_name';
     }
 
     $stmt = $conn->prepare($sql);
@@ -30,6 +30,21 @@ function getServicesByCategory($conn, $category)
 
     return $services;
 }
+
+// Fetch categories from the database
+function getCategories($conn) {
+    $sql = 'SELECT DISTINCT category_id, name AS category_name FROM service_categories';
+    $result = $conn->query($sql);
+
+    $categories = [];
+    while ($row = $result->fetch_assoc()) {
+        $categories[$row['category_id']] = $row['category_name'];
+    }
+
+    return $categories;
+}
+
+$categories = getCategories($conn);
 
 // Get services
 $services = getServicesByCategory($conn, $category);
@@ -63,9 +78,19 @@ $categoryName = getCategoryName($category);
     <link rel="icon" type="image/png" href="assets/img/ISCAP1-303-Skinovation-Clinic-COLORED-Logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        .services-header h1 {
+            text-align: center;
+        }
+        .footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 3rem 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -73,46 +98,28 @@ $categoryName = getCategoryName($category);
 
     <!-- Page Header -->
     <div class="section-header">
-        <div class="container">
+        <div class="container text-center mt-5 mb-5">
             <h1 class="display-4 fw-bold animate__animated animate__fadeInDown"><?php echo $categoryName; ?></h1>
             <p class="lead animate__animated animate__fadeInUp">Experience our premium beauty and skincare treatments
             </p>
         </div>
     </div>
 
-    <!-- Category Filter -->
+    <!-- Filter Dropdown -->
     <div class="container">
-        <div class="category-filter">
-            <div class="row justify-content-center">
-                <div class="col-md-10">
-                    <div class="d-flex flex-wrap justify-content-center gap-2">
-                        <a href="?category=all" class="btn <?php echo $category == 'all' ? 'btn-purple' : 'btn-outline-purple'; ?>">
-                            <i class="bi bi-grid-3x3-gap me-1"></i>All
-                        </a>
-                        <a href="?category=facials" class="btn <?php echo $category == 'facials' ? 'btn-purple' : 'btn-outline-purple'; ?>">
-                            <i class="bi bi-stars me-1"></i>Facials
-                        </a>
-                        <a href="?category=lightening" class="btn <?php echo $category == 'lightening' ? 'btn-purple' : 'btn-outline-purple'; ?>">
-                            <i class="bi bi-brightness-high me-1"></i>Lightening
-                        </a>
-                        <a href="?category=pimple" class="btn <?php echo $category == 'pimple' ? 'btn-purple' : 'btn-outline-purple'; ?>">
-                            <i class="bi bi-patch-check me-1"></i>Pimple Treatments
-                        </a>
-                        <a href="?category=slimming" class="btn <?php echo $category == 'slimming' ? 'btn-purple' : 'btn-outline-purple'; ?>">
-                            <i class="bi bi-hourglass-split me-1"></i>Body Slimming
-                        </a>
-                        <a href="?category=hair-removal" class="btn <?php echo $category == 'hair-removal' ? 'btn-purple' : 'btn-outline-purple'; ?>">
-                            <i class="bi bi-lightning me-1"></i>Hair Removal
-                        </a>
-                        <a href="?category=other" class="btn <?php echo $category == 'other' ? 'btn-purple' : 'btn-outline-purple'; ?>">
-                            <i class="bi bi-plus-circle me-1"></i>Other Services
-                        </a>
-                    </div>
-                </div>
-            </div>
+        <div class="mb-4">
+            <label for="category" class="form-label">Filter by Category:</label>
+            <select id="category" class="form-select" onchange="location = this.value;">
+                <option value="services.php?category=all" <?php echo $category == 'all' ? 'selected' : ''; ?>>All Services</option>
+                <?php foreach ($categories as $id => $name): ?>
+                    <option value="services.php?category=<?php echo $id; ?>" <?php echo $category == $id ? 'selected' : ''; ?>><?php echo htmlspecialchars($name); ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
+    </div>
 
-        <!-- Services Grid -->
+    <!-- Services Grid -->
+    <div class="container">
         <div class="row g-4 my-4">
             <?php if (empty($services)): ?>
             <div class="col-12">
@@ -126,7 +133,7 @@ $categoryName = getCategoryName($category);
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 service-card">
                     <div class="card-body">
-                        <h5 class="card-title"><?php echo htmlspecialchars($service['name']); ?></h5>
+                        <h5 class="card-title"><?php echo htmlspecialchars($service['service_name'] ?? ''); ?></h5>
                         <?php if ($service['description']): ?>
                         <p class="card-text text-muted service-description">
                             <?php echo htmlspecialchars($service['description']); ?>
@@ -140,7 +147,9 @@ $categoryName = getCategoryName($category);
                                     <?php echo $service['duration']; ?> minutes
                                 </p>
                             </div>
-                            <a href="<?php echo isset($_SESSION['user_id']) ? 'patient/booking.php?service_id=' . $service['id'] : 'login.php?redirect=booking&service_id=' . $service['id']; ?>" class="btn btn-purple">
+                            <a href="<?php echo isset($_SESSION['patient_id']) 
+                                ? 'patient/booking.php?service_id=' . htmlspecialchars($service['id'] ?? '0') 
+                                : 'login.php?redirect=booking&service_id=' . htmlspecialchars($service['id'] ?? '0'); ?>" class="btn btn-purple">
                                 <i class="bi bi-calendar-plus me-1"></i>Book Now
                             </a>
                         </div>

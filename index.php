@@ -14,6 +14,7 @@ include 'db.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --primary-color: #6f42c1;
@@ -150,8 +151,7 @@ include 'db.php';
             <p class="lead fs-4 mb-4 animate__animated animate__fadeInUp">Your trusted destination for premium beauty
                 and skincare services.<br>Where beauty meets excellence.</p>
             <div class="animate__animated animate__fadeInUp animate__delay-1s">
-                <a href="#what-we-offer" class="btn btn-purple btn-lg px-5 py-3 me-3 btn-pulse">Explore Services</a>
-                <a href="services.php" class="btn btn-outline-light btn-lg px-5 py-3 hover-grow">Book Now</a>
+                <a href="services.php" class="btn btn-purple btn-lg px-5 py-3 me-3 btn-pulse">Explore Services</a>
             </div>
         </div>
     </div>
@@ -233,60 +233,43 @@ include 'db.php';
                 </div>
             </div>
         </div>
-    </section> <!-- Testimonials -->
-    <section id="testimonials" class="py-5">
+    </section> 
+    
+    <!-- Testimonials Section -->
+    <section class="py-5">
         <div class="container">
-            <div class="section-title slide-in-left">
-                <h2>What Our Clients Say</h2>
-                <p>Read about the experiences of our valued clients</p>
-            </div>
-            <div class="row g-4 stagger-fade-in">
-                <div class="col-md-4">
-                    <div class="testimonial-item fade-in">
-                        <i class="bi bi-stars fs-1 text-purple mb-3"></i>
-                        <h5>Sarah Johnson</h5>
-                        <p class="text-muted small">Regular Client</p>
-                        <div class="mb-3">
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
+            <h2 class="text-center mb-5">What Our Clients Say</h2>
+            <div class="row">
+                <div class="col-md-8 mx-auto">
+                    <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <div class="testimonial-item text-center">
+                                    <p class="testimonial-text">"The facial treatment was amazing! My skin feels so refreshed and rejuvenated. The staff was very professional and friendly."</p>
+                                    <h5 class="client-name">Maria Santos</h5>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="testimonial-item text-center">
+                                    <p class="testimonial-text">"I've been struggling with acne for years, and after just three sessions of their anti-acne treatment, I've seen significant improvement!"</p>
+                                    <h5 class="client-name">John Rivera</h5>
+                                </div>
+                            </div>
+                            <div class="carousel-item">
+                                <div class="testimonial-item text-center">
+                                    <p class="testimonial-text">"The online booking system is so convenient. I love being able to schedule my appointments anytime without having to call."</p>
+                                    <h5 class="client-name">Anna Lee</h5>
+                                </div>
+                            </div>
                         </div>
-                        <p class="fst-italic">"The services are exceptional! My skin has never looked better since I
-                            started their facial treatments."</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="testimonial-item fade-in" style="animation-delay: 0.2s;">
-                        <i class="bi bi-heart fs-1 text-purple mb-3"></i>
-                        <h5>Maria Garcia</h5>
-                        <p class="text-muted small">Package Client</p>
-                        <div class="mb-3">
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-half text-warning"></i>
-                        </div>
-                        <p class="fst-italic">"Their package deals are amazing value. The staff is professional and the
-                            results are outstanding."</p>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="testimonial-item fade-in" style="animation-delay: 0.4s;">
-                        <i class="bi bi-emoji-smile fs-1 text-purple mb-3"></i>
-                        <h5>Emily Chen</h5>
-                        <p class="text-muted small">Loyal Customer</p>
-                        <div class="mb-3">
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                        </div>
-                        <p class="fst-italic">"I love their skincare products! Using them daily has made such a
-                            difference in my complexion."</p>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
                     </div>
                 </div>
             </div>

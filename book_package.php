@@ -3,7 +3,7 @@ session_start();
 include 'db.php';
 
 // Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['patient_id'])) {
     header('Location: login.php');
     exit();
 }
@@ -27,7 +27,7 @@ if (isset($_GET['id'])) {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $user_id = $_SESSION['user_id'];
+    $patient_id = $_SESSION['patient_id'];
     $appointment_date = $_POST['appointment_date'];
     $appointment_time = $_POST['appointment_time'];
     $attendant_id = $_POST['attendant_id']; // Create the package booking
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $sessions = $package['sessions'];
     $duration = $package['duration_days'];
     $grace_period = $package['grace_period_days'];
-    $stmt->bind_param('iiiii', $user_id, $package_id, $sessions, $duration, $grace_period);
+    $stmt->bind_param('iiiii', $patient_id, $package_id, $sessions, $duration, $grace_period);
 
     if ($stmt->execute()) {
         // Book the first appointment
