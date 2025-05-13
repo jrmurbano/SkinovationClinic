@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if (isset($_GET['redirect']) && $_GET['redirect'] == 'booking' && isset($_SESSION['pending_booking'])) {
                     header('Location: booking.php?service_id=' . $_SESSION['pending_booking']['service_id']);
                 } else {
-                    header('Location: patient/home.php');
+                    header('Location: index.php');
                 }
                 exit();
             } else {
@@ -73,6 +73,7 @@ if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking') {
         .services-header h1 {
             text-align: center;
         }
+
         .footer {
             background-color: var(--primary-color);
             color: white;
@@ -128,7 +129,7 @@ if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking') {
                                 </button>
                             </div>
 
-                             <div class="mt-3 text-center">
+                            <div class="mt-3 text-center">
                                 <p>New to the clinic? <a href="register.php<?php echo isset($_GET['redirect']) ? '?redirect=' . $_GET['redirect'] : ''; ?>">Register here!</a></p>
                             </div>
 
