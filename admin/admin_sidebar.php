@@ -5,11 +5,10 @@
     </div>
     <ul class="nav flex-column">
         <li class="nav-item"><a href="dashboard.php" class="nav-link text-white">Dashboard</a></li>
-        <li class="nav-item"><a href="manage_services.php" class="nav-link text-white">Manage Services</a></li>
-        <li class="nav-item"><a href="manage_attendants.php" class="nav-link text-white">Manage Attendants</a></li>
-        <li class="nav-item"><a href="manage_appointments.php" class="nav-link text-white">Manage Appointments</a></li>
-        <li class="nav-item"><a href="manage_patients.php" class="nav-link text-white">Manage Patients</a></li>
-        <li class="nav-item"><a href="manage_notifications.php" class="nav-link text-white">Manage Notifications</a></li>
+        <li class="nav-item"><a href="maintenance.php" class="nav-link text-white">Maintenance</a></li>
+        <li class="nav-item"><a href="appointments.php" class="nav-link text-white">Appointments</a></li>
+        <li class="nav-item"><a href="patients.php" class="nav-link text-white">Patients</a></li>
+        <li class="nav-item"><a href="notifications.php" class="nav-link text-white">Notifications</a></li>
         <li class="nav-item"><a href="settings.php" class="nav-link text-white">Settings</a></li>
         <li class="nav-item"><a href="logout.php" class="nav-link text-white">Logout</a></li>
     </ul>
