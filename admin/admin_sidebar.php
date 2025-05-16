@@ -1,4 +1,3 @@
-<button class="sidebar-toggler" onclick="toggleSidebar()">☰</button>
 <nav class="sidebar bg-dark text-white p-3">
     <div class="text-center mb-4">
         <img src="../assets/img/ISCAP1-303-Skinovation-Clinic-WHITE-Logo.png" alt="Skinovation Clinic Logo" class="img-fluid" style="max-width: 150px;">
