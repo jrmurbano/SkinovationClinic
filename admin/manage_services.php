@@ -15,13 +15,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {
             case 'add':
-                $stmt = $conn->prepare("INSERT INTO services (service_name, description, price, duration, category_id) VALUES (?, ?, ?, ?, ?)");
+                $imagePath = null;
+                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                    $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+                    $filename = uniqid('service_', true) . '.' . $ext;
+                    $target = '../assets/img/' . $filename;
+                    if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
+                        $imagePath = 'assets/img/' . $filename;
+                    }
+                }
+                $stmt = $conn->prepare("INSERT INTO services (service_name, description, price, duration, category_id, image) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $_POST['service_name'],
                     $_POST['description'],
                     $_POST['price'],
                     $_POST['duration'],
-                    $_POST['category_id']
+                    $_POST['category_id'],
+                    $imagePath
                 ]);
                 $_SESSION['success'] = "Service added successfully!";
                 break;
@@ -115,6 +125,7 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <table class="table table-striped">
                             <thead>
                                 <tr>
+                                    <th>Image</th>
                                     <th>Service Name</th>
                                     <th>Category</th>
                                     <th>Price</th>
@@ -125,6 +136,13 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <tbody>
                                 <?php foreach ($services as $service): ?>
                                 <tr>
+                                    <td>
+                                        <?php if (!empty($service['image'])): ?>
+                                            <img src="../<?php echo htmlspecialchars($service['image']); ?>" alt="Service Image" style="max-width:60px;max-height:60px;object-fit:cover;">
+                                        <?php else: ?>
+                                            <span class="text-muted"><i class="fas fa-image"></i> No Image</span>
+                                        <?php endif; ?>
+                                    </td>
                                     <td><?php echo clean($service['service_name']); ?></td>
                                     <td><?php echo clean($service['category_name']); ?></td>
                                     <td>₱<?php echo number_format($service['price'], 2); ?></td>
@@ -154,19 +172,19 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="modal fade" id="addServiceModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="add">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add New Service</h5>
+                    <h5 class="modal-title"><i class="fas fa-plus"></i> Add New Service</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Service Name</label>
-                        <input type="text" class="form-control" name="service_name" required>
+                        <label class="form-label"><i class="fas fa-spa"></i> Service Name</label>
+                        <input type="text" class="form-control" name="service_name" placeholder="Enter service name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Category</label>
+                        <label class="form-label"><i class="fas fa-list"></i> Category</label>
                         <select class="form-select" name="category_id" required>
                             <option value="">Select Category</option>
                             <?php foreach ($categories as $category): ?>
@@ -177,26 +195,41 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" name="description" rows="3"></textarea>
+                        <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
+                        <textarea class="form-control" name="description" rows="3" placeholder="Enter description"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Price</label>
-                        <input type="number" class="form-control" name="price" step="0.01" required>
+                        <label class="form-label"><i class="fas fa-tag"></i> Price (₱)</label>
+                        <input type="number" class="form-control" name="price" step="0.01" placeholder="Enter price" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Duration (minutes)</label>
-                        <input type="number" class="form-control" name="duration" required>
+                        <label class="form-label"><i class="fas fa-clock"></i> Duration (minutes)</label>
+                        <input type="number" class="form-control" name="duration" placeholder="Enter duration in minutes" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-image"></i> Image</label>
+                        <input type="file" class="form-control" name="image" accept="image/*" onchange="previewServiceImage(event)">
+                        <img id="serviceImagePreview" src="#" alt="Image Preview" style="display:none;max-width:100%;margin-top:10px;" />
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Service</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Add Service</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+<script>
+function previewServiceImage(event) {
+    const [file] = event.target.files;
+    if (file) {
+        const preview = document.getElementById('serviceImagePreview');
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+    }
+}
+</script>
 
 <!-- Edit Service Modal -->
 <div class="modal fade" id="editServiceModal" tabindex="-1">
@@ -274,4 +307,4 @@ function deleteService(serviceId) {
 }
 </script>
 </body>
-</html> 
+</html>

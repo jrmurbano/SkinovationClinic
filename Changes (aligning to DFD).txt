@@ -1,0 +1,57 @@
+Changes (aligning to DFD):
+
+On the index page, please add some icons or an emoji on that modal greeting the user. Think of something welcoming!
+
+1. On admin side, Add "Reschedule Requests" on side bar. The  side bar must be in this order
+- Dashboard
+- Maintenance
+- Appointments
+- Reschedule Requests
+- Cancellation Requests
+- Patients
+- Notifications
+- Settings
+- Logout
+
+Please apply font awesome icons on the sidebar.
+
+2. On admin side, maintenance page, after the cards should be a table (make it responsive). It is where we'll put the treatment (service/package) and product history log where its function is to display logs whenever we add, edit, delete, or a service/package/products has been availed by the customer.
+
+3. On admin side, settings page, put a function where we could an attendant and set closed clinic days. When adding an attendant, correspond the fields to the database. Both functions must have calendar-view but different ths time to the patients. Here in admin, on the top side of the calendar are the attendants lined horizontally while on the left side is the time vertically. This should affect the availability when the patient tries to book something.
+
+Also on every calendar view, Sundays must be disabled but still show the date.
+
+4. On services table (refer to database), let us add image column. The admin must be able to add a picture when adding a service or a product (packages will have no picture). Adjust all the affected code. The fields in adding a service/product must be
+- Service Name
+- Category (service only)
+- Description
+- Price (in Philippine Peso)
+- Duration
+- Image (it should preview when uploaded)
+Please add placeholders and font awesome icons on in put fields please.
+
+5. Let's move to Appointments functionalities. So, when the patient tries to Book Appointment, Reschedule Appointment, and/or Cancel an appointment, the admin must FIRST confirm it. The status of that said appointment should be displayed on the patients' My Appointments page - upcoming appointments.
+
+6. On patient side calendar view, there's an error in dates. When I select a date on the calendar, it changes into -1 date when date is displayed on the Select Appointment Time part and  again when Continue Booking button is clicked and it shows another -1 date. Please fix. Also in this modal, it should only display the following
+- Selected Date
+- Selected Time
+- Selected Service/Package/Product: (only displayed the already selected service/package/product, remove redundant dropdown button)
+- Amount to be paid (in Philippine peso)
+Please add placeholders and font awesome icons on the modal please.
+After this should be a text box and next to it says "I agree with the clinic's policy in appointments". The policy word should be clickable and show another modal again that display the list of policy. Please improve how I word it into a formal one
+- Rescheduling and Cancelling Request from patients side shoud only available until 1 day before the appointment. On the day of the appointment, these buttons should be disabled.
+
+7. On this process, user browses services/packages/products>>>system requests user to log-in/register first>>>user follows through>>> must be displayed by the service/package/product they clicked Book Now and the calendar view and continue booking.
+Please don't change anything on the process of user log-in/register first>>>My Appointments page.
+
+7. Now, back to the Appointment Scheduler and let's add Appointment Reminders and Notification, add a notification icon across all interfaces of both admin and patient (top right of interface, icon must be font awesome). When the admin confirms appointment/reschedules, it sets a notification to be sent on both admin and patient the day before the appointment and on the day apointment. Please choose an appropriate notification sound.
+
+When the admin confirms cancellation, it must remove the notification. Don't forget the provide me the SQL query I needed to execute.
+
+The notifications table should be this
+- notification_id
+- [foreign keys]
+- message
+- is_read
+
+The patient must be able to "Mark as Read" a notification and admin can see if patient already marked as read them.

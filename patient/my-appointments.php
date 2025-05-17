@@ -25,7 +25,7 @@ $sql = "SELECT
             a.appointment_date,
             a.appointment_time,
             a.status,
-            a.notes,
+            '' as notes,
             s.service_name as name,
             s.price,
             att.first_name as attendant_first_name,

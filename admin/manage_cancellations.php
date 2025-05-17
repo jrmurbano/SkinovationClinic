@@ -209,7 +209,7 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> No pending appointments to manage.
+                    <i class="fas fa-info-circle"></i> No cancellation requests to manage.
                 </div>
             <?php endif; ?>
         </div>

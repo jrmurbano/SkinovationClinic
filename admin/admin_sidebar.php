@@ -52,22 +52,15 @@ $unread_notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </ul>
     </div>
     <ul class="nav flex-column">
-        <li class="nav-item"><a href="dashboard.php" class="nav-link text-white">Dashboard</a></li>
-        <li class="nav-item"><a href="maintenance.php" class="nav-link text-white">Maintenance</a></li>
-        <li class="nav-item"><a href="appointments.php" class="nav-link text-white">Appointments</a></li>
-        <li class="nav-item"><a href="patients.php" class="nav-link text-white">Patients</a></li>
-        <li class="nav-item">
-            <a class="nav-link" href="notifications.php">
-                <i class="fas fa-bell"></i> Notifications
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="manage_cancellations.php">
-                <i class="fas fa-times-circle"></i> Cancellation Requests
-            </a>
-        </li>
-        <li class="nav-item"><a href="settings.php" class="nav-link text-white">Settings</a></li>
-        <li class="nav-item"><a href="logout.php" class="nav-link text-white">Logout</a></li>
+        <li class="nav-item"><a href="dashboard.php" class="nav-link text-white"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li class="nav-item"><a href="maintenance.php" class="nav-link text-white"><i class="fas fa-tools"></i> Maintenance</a></li>
+        <li class="nav-item"><a href="appointments.php" class="nav-link text-white"><i class="fas fa-calendar-check"></i> Appointments</a></li>
+        <li class="nav-item"><a href="manage_reschedules.php" class="nav-link text-white"><i class="fas fa-calendar-alt"></i> Reschedule Requests</a></li>
+        <li class="nav-item"><a href="manage_cancellations.php" class="nav-link text-white"><i class="fas fa-times-circle"></i> Cancellation Requests</a></li>
+        <li class="nav-item"><a href="patients.php" class="nav-link text-white"><i class="fas fa-user-friends"></i> Patients</a></li>
+        <li class="nav-item"><a class="nav-link text-white" href="notifications.php"><i class="fas fa-bell"></i> Notifications</a></li>
+        <li class="nav-item"><a href="settings.php" class="nav-link text-white"><i class="fas fa-cog"></i> Settings</a></li>
+        <li class="nav-item"><a href="logout.php" class="nav-link text-white"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
     </ul>
 </nav>
 
@@ -77,6 +70,7 @@ $unread_notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
         backdrop-filter: blur(5px);
         min-height: 100vh;
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        width: 300px; /* widened from default */
     }
 
     .sidebar .nav-link {

@@ -11,12 +11,15 @@
     /* Light Lavender */
 }
 
+
 /* Base Styles */
+
 body {
     font-family: 'Poppins', sans-serif;
     color: #333;
     line-height: 1.6;
-    padding-top: 70px; /* Account for fixed navbar */
+    padding-top: 70px;
+    /* Account for fixed navbar */
 }
 
 
@@ -149,6 +152,7 @@ body {
 
 
 /* Service Page Styles */
+
 .service-description {
     color: #666;
     margin-bottom: 1rem;
@@ -182,17 +186,19 @@ body {
     color: var(--primary-color);
 }
 
+
 /* Package Page Styles */
+
 .package-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: none;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     height: 100%;
 }
 
 .package-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 .category-title {
@@ -218,7 +224,9 @@ body {
     color: #888;
 }
 
+
 /* Page Headers */
+
 .page-header {
     background: linear-gradient(rgba(111, 66, 193, 0.9), rgba(111, 66, 193, 0.9)), url('../img/hero-bg.jpg');
     background-size: cover;
@@ -237,7 +245,9 @@ body {
     opacity: 0.9;
 }
 
+
 /* Product Cards */
+
 .product-card {
     height: 100%;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -248,7 +258,7 @@ body {
 
 .product-card:hover {
     transform: translateY(-10px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 .product-card img {
@@ -261,7 +271,9 @@ body {
     padding: 1.5rem;
 }
 
+
 /* Category Filter */
+
 .category-filter {
     margin: 2rem 0;
     text-align: center;
@@ -279,7 +291,9 @@ body {
     border-color: var(--primary-color);
 }
 
+
 /* Fixed Header and Sidebar Styles */
+
 .main-header {
     position: fixed;
     top: 0;
@@ -287,7 +301,7 @@ body {
     left: 0;
     z-index: 1030;
     background: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
 }
 
 .navbar {
@@ -300,10 +314,13 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
+
 /* Side Navigation */
+
 .side-nav {
     position: fixed;
-    top: 70px; /* Below fixed header */
+    top: 70px;
+    /* Below fixed header */
     left: 0;
     bottom: 0;
     width: 250px;
@@ -334,31 +351,33 @@ body {
     text-align: center;
 }
 
+
 /* Main content area with sidebar */
+
 .has-sidebar .main-content {
-    margin-left: 250px; /* Match side-nav width */
+    margin-left: 250px;
+    /* Match side-nav width */
     padding: 2rem;
 }
 
+
 /* Responsive layout */
+
 @media (max-width: 991.98px) {
     .side-nav {
         transform: translateX(-100%);
     }
-
     .side-nav.show {
         transform: translateX(0);
     }
-
     .has-sidebar .main-content {
         margin-left: 0;
     }
-
     .navbar-collapse {
         background: #fff;
         padding: 1rem;
         border-radius: 0.25rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
     }
 }
 
@@ -410,7 +429,9 @@ body {
     color: #fff;
 }
 
+
 /* Button Styles */
+
 .btn-primary {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
@@ -440,12 +461,16 @@ body {
     color: var(--primary-color) !important;
 }
 
+
 /* Card Styles */
+
 .card-header.bg-primary {
     background-color: var(--primary-color) !important;
 }
 
+
 /* Header/Navbar Styles */
+
 .brand-text {
     color: var(--primary-color);
     font-weight: bold;

@@ -132,8 +132,11 @@ $categoryName = getCategoryName($category);
             <?php foreach ($services as $service): ?>
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 service-card">
+                    <?php if (!empty($service['image'])): ?>
+                        <img src="<?php echo htmlspecialchars($service['image']); ?>" class="card-img-top" alt="Service Image" style="max-height:200px;object-fit:cover;">
+                    <?php endif; ?>
                     <div class="card-body">
-                        <h5 class="card-title"><?php echo htmlspecialchars($service['service_name'] ?? ''); ?></h5>
+                        <h5 class="card-title"><i class="fas fa-spa"></i> <?php echo htmlspecialchars($service['service_name'] ?? ''); ?></h5>
                         <?php if ($service['description']): ?>
                         <p class="card-text text-muted service-description">
                             <?php echo htmlspecialchars($service['description']); ?>
@@ -141,7 +144,7 @@ $categoryName = getCategoryName($category);
                         <?php endif; ?>
                         <div class="d-flex justify-content-between align-items-end mt-3">
                             <div>
-                                <p class="service-price mb-1">₱<?php echo number_format($service['price'], 2); ?></p>
+                                <p class="service-price mb-1"><i class="fas fa-tag"></i> ₱<?php echo number_format($service['price'], 2); ?></p>
                                 <p class="service-duration mb-0">
                                     <i class="bi bi-clock me-1"></i>
                                     <?php echo $service['duration']; ?> minutes

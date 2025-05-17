@@ -69,6 +69,50 @@ while ($row = $result->fetch_assoc()) {
     }
     $booked_slots[$attendant][$date][] = $time;
 }
+
+// Fetch all attendants with shift ranges and closed days for backend availability logic only
+$attendants = [];
+$attendant_map = [];
+$stmt = $conn->query("SELECT * FROM attendants ORDER BY first_name, last_name");
+while ($row = $stmt->fetch_assoc()) {
+    $attendants[] = $row;
+    $attendant_map[$row['attendant_id']] = $row;
+}
+$closed_days = [];
+$stmt = $conn->query("SELECT * FROM closed_dates");
+while ($row = $stmt->fetch_assoc()) {
+    $closed_days[] = $row;
+}
+function is_closed_day($date, $closed_days) {
+    foreach ($closed_days as $c) {
+        if ($date >= $c['start_date'] && $date <= $c['end_date']) return true;
+    }
+    return false;
+}
+function is_attendant_available($attendant, $date, $time, $closed_days) {
+    if (is_closed_day($date, $closed_days)) return false;
+    // Defensive: check if shift keys exist
+    if (!isset($attendant['shift_date_start']) || !isset($attendant['shift_date_end']) || !isset($attendant['shift_time_start']) || !isset($attendant['shift_time_end'])) {
+        return false;
+    }
+    if ($date < $attendant['shift_date_start'] || $date > $attendant['shift_date_end']) return false;
+    if ($time < $attendant['shift_time_start'] || $time > $attendant['shift_time_end']) return false;
+    return true;
+}
+// Only keep booked slots for attendants that are available on that date/time
+$filtered_booked_slots = [];
+foreach ($booked_slots as $attendant_id => $dates) {
+    if (!isset($attendant_map[$attendant_id])) continue;
+    $attendant = $attendant_map[$attendant_id];
+    foreach ($dates as $date => $times) {
+        foreach ($times as $time) {
+            if (is_attendant_available($attendant, $date, $time, $closed_days)) {
+                $filtered_booked_slots[$attendant_id][$date][] = $time;
+            }
+        }
+    }
+}
+$booked_slots = $filtered_booked_slots;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -89,12 +133,20 @@ while ($row = $result->fetch_assoc()) {
         .fc-event {
             cursor: pointer;
         }
-
         .fc-day:hover {
             background-color: #f8f9fa;
             cursor: pointer;
         }
-
+        .fc-day-sun {
+            background-color: #e9ecef !important; /* Bootstrap gray-100 */
+            color: #adb5bd !important; /* Bootstrap gray-500 */
+            opacity: 1 !important;
+        }
+        .fc-day-disabled {
+            background-color: #e9ecef !important;
+            color: #adb5bd !important;
+            opacity: 1 !important;
+        }
         .time-slot {
             padding: 10px;
             margin: 5px 0;
@@ -102,27 +154,23 @@ while ($row = $result->fetch_assoc()) {
             cursor: pointer;
             text-align: center;
         }
-
         .time-slot.available {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-
         .time-slot.booked {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
             cursor: not-allowed;
         }
-
         .staff-column {
             padding: 10px;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
         .staff-name {
             font-weight: bold;
             padding: 10px;
@@ -265,7 +313,28 @@ while ($row = $result->fetch_assoc()) {
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 selectable: true,
+                selectAllow: function(selectInfo) {
+                    // Disable Sundays
+                    var day = selectInfo.start.getDay();
+                    return day !== 0;
+                },
+                dayCellDidMount: function(arg) {
+                    // Gray out Sundays like past days, but keep the date visible
+                    if (arg.date.getDay() === 0) {
+                        arg.el.classList.add('fc-day-sun');
+                    }
+                    // Gray out past days (except today)
+                    var today = new Date();
+                    today.setHours(0,0,0,0);
+                    var cellDate = new Date(arg.date);
+                    cellDate.setHours(0,0,0,0);
+                    if (cellDate < today) {
+                        arg.el.classList.add('fc-day-disabled');
+                    }
+                },
                 select: function(info) {
+                    // Prevent selection on Sundays
+                    if (info.start.getDay() === 0) return;
                     showTimeSlots(info.start);
                 },
                 headerToolbar: {

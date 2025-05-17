@@ -82,6 +82,51 @@ if (!isset($_SESSION['admin_id'])) {
                 </div>
             </div>
         </div>
+        <!-- History Log Table -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h4 class="mb-3"><i class="fas fa-history"></i> Treatment & Product History Log</h4>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date/Time</th>
+                                        <th>Type</th>
+                                        <th>Name</th>
+                                        <th>Action</th>
+                                        <th>Performed By</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Example static row, replace with dynamic PHP later -->
+                                    <tr>
+                                        <td>2025-05-18 14:30</td>
+                                        <td>Service</td>
+                                        <td>Facial Treatment</td>
+                                        <td>Added</td>
+                                        <td>Admin Jane</td>
+                                        <td>New service added to the system.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2025-05-18 15:00</td>
+                                        <td>Product</td>
+                                        <td>Skin Cleanser</td>
+                                        <td>Availed</td>
+                                        <td>Maria Santos</td>
+                                        <td>Product purchased by customer.</td>
+                                    </tr>
+                                    <!-- End example rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-muted small mt-2">* This log will display all add, edit, delete, and availed actions for services, packages, and products.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

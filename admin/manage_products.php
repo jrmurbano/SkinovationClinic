@@ -15,25 +15,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {
             case 'add':
-                $stmt = $conn->prepare("INSERT INTO products (product_name, description, price, stock) VALUES (?, ?, ?, ?)");
-                $stmt->execute([
-                    $_POST['product_name'],
-                    $_POST['description'],
-                    $_POST['price'],
-                    $_POST['stock']
-                ]);
-                $_SESSION['success'] = "Product added successfully!";
-                break;
-
-            case 'edit':
-                $stmt = $conn->prepare("UPDATE products SET product_name = ?, description = ?, price = ?, stock = ? WHERE product_id = ?");
+                $imagePath = null;
+                if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                    $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+                    $filename = uniqid('product_', true) . '.' . $ext;
+                    $target = '../assets/img/' . $filename;
+                    if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
+                        $imagePath = 'assets/img/' . $filename;
+                    }
+                }
+                $stmt = $conn->prepare("INSERT INTO products (product_name, description, price, stock, image) VALUES (?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $_POST['product_name'],
                     $_POST['description'],
                     $_POST['price'],
                     $_POST['stock'],
-                    $_POST['product_id']
+                    $imagePath
                 ]);
+                $_SESSION['success'] = "Product added successfully!";
+                break;
+
+            case 'edit':
+                $imagePath = null;
+                if (isset($_FILES['edit_image']) && $_FILES['edit_image']['error'] === UPLOAD_ERR_OK) {
+                    $ext = pathinfo($_FILES['edit_image']['name'], PATHINFO_EXTENSION);
+                    $filename = uniqid('product_', true) . '.' . $ext;
+                    $target = '../assets/img/' . $filename;
+                    if (move_uploaded_file($_FILES['edit_image']['tmp_name'], $target)) {
+                        $imagePath = 'assets/img/' . $filename;
+                    }
+                }
+                if ($imagePath) {
+                    $stmt = $conn->prepare("UPDATE products SET product_name = ?, description = ?, price = ?, stock = ?, image = ? WHERE product_id = ?");
+                    $stmt->execute([
+                        $_POST['product_name'],
+                        $_POST['description'],
+                        $_POST['price'],
+                        $_POST['stock'],
+                        $imagePath,
+                        $_POST['product_id']
+                    ]);
+                } else {
+                    $stmt = $conn->prepare("UPDATE products SET product_name = ?, description = ?, price = ?, stock = ? WHERE product_id = ?");
+                    $stmt->execute([
+                        $_POST['product_name'],
+                        $_POST['description'],
+                        $_POST['price'],
+                        $_POST['stock'],
+                        $_POST['product_id']
+                    ]);
+                }
                 $_SESSION['success'] = "Product updated successfully!";
                 break;
 
@@ -103,7 +134,9 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <table class="table table-striped">
                             <thead>
                                 <tr>
+                                    <th>Image</th>
                                     <th>Product Name</th>
+                                    <th>Description</th>
                                     <th>Price</th>
                                     <th>Stock</th>
                                     <th>Actions</th>
@@ -112,7 +145,15 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <tbody>
                                 <?php foreach ($products as $product): ?>
                                 <tr>
-                                    <td><?php echo clean($product['product_name']); ?></td>
+                                    <td>
+                                        <?php if (!empty($product['image'])): ?>
+                                            <img src="../<?php echo htmlspecialchars($product['image']); ?>" alt="Product Image" style="max-width:60px;max-height:60px;object-fit:cover;">
+                                        <?php else: ?>
+                                            <span class="text-muted"><i class="fas fa-image"></i> No Image</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($product['product_name']); ?></td>
+                                    <td><?php echo htmlspecialchars($product['description']); ?></td>
                                     <td>₱<?php echo number_format($product['price'], 2); ?></td>
                                     <td><?php echo $product['stock']; ?></td>
                                     <td>
@@ -140,76 +181,123 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="modal fade" id="addProductModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="add">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add New Product</h5>
+                    <h5 class="modal-title"><i class="fas fa-plus"></i> Add New Product</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Product Name</label>
-                        <input type="text" class="form-control" name="product_name" required>
+                        <label class="form-label"><i class="fas fa-box"></i> Product Name</label>
+                        <input type="text" class="form-control" name="product_name" placeholder="Enter product name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" name="description" rows="3"></textarea>
+                        <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
+                        <textarea class="form-control" name="description" rows="3" placeholder="Enter description"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Price</label>
-                        <input type="number" class="form-control" name="price" step="0.01" required>
+                        <label class="form-label"><i class="fas fa-tag"></i> Price (₱)</label>
+                        <input type="number" class="form-control" name="price" step="0.01" placeholder="Enter price" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Stock</label>
-                        <input type="number" class="form-control" name="stock" required>
+                        <label class="form-label"><i class="fas fa-boxes"></i> Stock</label>
+                        <input type="number" class="form-control" name="stock" placeholder="Enter stock quantity" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-image"></i> Image</label>
+                        <input type="file" class="form-control" name="image" accept="image/*" onchange="previewProductImage(event)">
+                        <img id="productImagePreview" src="#" alt="Image Preview" style="display:none;max-width:100%;margin-top:10px;" />
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">Add Product</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Add Product</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+<script>
+function previewProductImage(event) {
+    const [file] = event.target.files;
+    if (file) {
+        const preview = document.getElementById('productImagePreview');
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+    }
+}
+</script>
 
 <!-- Edit Product Modal -->
 <div class="modal fade" id="editProductModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="product_id" id="edit_product_id">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Product</h5>
+                    <h5 class="modal-title"><i class="fas fa-edit"></i> Edit Product</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Product Name</label>
+                        <label class="form-label"><i class="fas fa-box"></i> Product Name</label>
                         <input type="text" class="form-control" name="product_name" id="edit_product_name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Description</label>
+                        <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
                         <textarea class="form-control" name="description" id="edit_description" rows="3"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Price</label>
+                        <label class="form-label"><i class="fas fa-tag"></i> Price (₱)</label>
                         <input type="number" class="form-control" name="price" id="edit_price" step="0.01" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Stock</label>
+                        <label class="form-label"><i class="fas fa-boxes"></i> Stock</label>
                         <input type="number" class="form-control" name="stock" id="edit_stock" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-image"></i> Image</label>
+                        <input type="file" class="form-control" name="edit_image" id="edit_image" accept="image/*" onchange="previewEditProductImage(event)">
+                        <img id="editProductImagePreview" src="#" alt="Image Preview" style="display:none;max-width:100%;margin-top:10px;" />
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Update Product</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Product</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+<script>
+function previewEditProductImage(event) {
+    const [file] = event.target.files;
+    if (file) {
+        const preview = document.getElementById('editProductImagePreview');
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+    }
+}
+function editProduct(product) {
+    document.getElementById('edit_product_id').value = product.product_id;
+    document.getElementById('edit_product_name').value = product.product_name;
+    document.getElementById('edit_description').value = product.description;
+    document.getElementById('edit_price').value = product.price;
+    document.getElementById('edit_stock').value = product.stock;
+    // Show image preview if image exists
+    const preview = document.getElementById('editProductImagePreview');
+    if (product.image) {
+        preview.src = '../' + product.image;
+        preview.style.display = 'block';
+    } else {
+        preview.style.display = 'none';
+    }
+    document.getElementById('edit_image').value = '';
+    new bootstrap.Modal(document.getElementById('editProductModal')).show();
+}
+</script>
 
 <!-- Delete Product Form -->
 <form id="deleteProductForm" method="POST" style="display: none;">
@@ -219,16 +307,6 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-function editProduct(product) {
-    document.getElementById('edit_product_id').value = product.product_id;
-    document.getElementById('edit_product_name').value = product.product_name;
-    document.getElementById('edit_description').value = product.description;
-    document.getElementById('edit_price').value = product.price;
-    document.getElementById('edit_stock').value = product.stock;
-    
-    new bootstrap.Modal(document.getElementById('editProductModal')).show();
-}
-
 function deleteProduct(productId) {
     if (confirm('Are you sure you want to delete this product?')) {
         document.getElementById('delete_product_id').value = productId;
@@ -237,4 +315,4 @@ function deleteProduct(productId) {
 }
 </script>
 </body>
-</html> 
+</html>

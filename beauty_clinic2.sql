@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: May 16, 2025 at 02:55 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost:3306
+-- Generation Time: May 17, 2025 at 07:39 PM
+-- Server version: 8.0.30
+-- PHP Version: 8.1.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,11 +28,11 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `admin` (
-  `admin_id` int(11) NOT NULL,
-  `admin_last_name` varchar(100) NOT NULL,
-  `admin_first_name` varchar(100) NOT NULL,
-  `admin_username` varchar(50) NOT NULL,
-  `admin_password` varchar(255) NOT NULL
+  `admin_id` int NOT NULL,
+  `admin_last_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `admin_first_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `admin_username` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `admin_password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -51,17 +51,23 @@ INSERT INTO `admin` (`admin_id`, `admin_last_name`, `admin_first_name`, `admin_u
 --
 
 CREATE TABLE `appointments` (
-  `appointment_id` int(11) NOT NULL,
-  `patient_id` int(11) NOT NULL,
-  `service_id` int(11) NOT NULL,
-  `attendant_id` int(11) NOT NULL,
+  `appointment_id` int NOT NULL,
+  `patient_id` int NOT NULL,
+  `service_id` int NOT NULL,
+  `attendant_id` int NOT NULL,
   `appointment_date` date NOT NULL,
   `appointment_time` time NOT NULL,
-  `status` enum('pending','confirmed','completed','cancelled') DEFAULT 'pending',
-  `notes` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `status` enum('pending','confirmed','completed','cancelled') COLLATE utf8mb4_general_ci DEFAULT 'pending',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `appointments`
+--
+
+INSERT INTO `appointments` (`appointment_id`, `patient_id`, `service_id`, `attendant_id`, `appointment_date`, `appointment_time`, `status`, `created_at`, `updated_at`) VALUES
+(1, 2, 8, 1, '2025-05-19', '14:00:00', 'cancelled', '2025-05-17 19:11:47', '2025-05-17 19:12:16');
 
 -- --------------------------------------------------------
 
@@ -70,13 +76,13 @@ CREATE TABLE `appointments` (
 --
 
 CREATE TABLE `attendants` (
-  `attendant_id` int(11) NOT NULL,
-  `last_name` varchar(100) NOT NULL,
-  `first_name` varchar(100) NOT NULL,
+  `attendant_id` int NOT NULL,
+  `last_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `first_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
   `shift_date` date NOT NULL,
   `shift_time` time NOT NULL,
-  `updated_at` datetime DEFAULT current_timestamp(),
-  `created_at` datetime DEFAULT current_timestamp()
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -84,7 +90,7 @@ CREATE TABLE `attendants` (
 --
 
 INSERT INTO `attendants` (`attendant_id`, `last_name`, `first_name`, `shift_date`, `shift_time`, `updated_at`, `created_at`) VALUES
-(1, 'Skinovation', 'trial', '2025-05-13', '09:00:00', '2025-05-13 23:35:42', '2025-05-13 23:35:42');
+(1, 'Reyes', 'Kranchy', '2025-05-18', '10:00:00', '2025-05-18 03:17:52', '2025-05-13 23:35:42');
 
 -- --------------------------------------------------------
 
@@ -93,14 +99,14 @@ INSERT INTO `attendants` (`attendant_id`, `last_name`, `first_name`, `shift_date
 --
 
 CREATE TABLE `cancellation_requests` (
-  `request_id` int(11) NOT NULL,
-  `appointment_id` int(11) NOT NULL,
-  `appointment_type` enum('regular','package') NOT NULL,
-  `patient_id` int(11) NOT NULL,
-  `reason` text DEFAULT NULL,
-  `status` enum('pending','approved','rejected') DEFAULT 'pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `request_id` int NOT NULL,
+  `appointment_id` int NOT NULL,
+  `appointment_type` enum('regular','package') COLLATE utf8mb4_general_ci NOT NULL,
+  `patient_id` int NOT NULL,
+  `reason` text COLLATE utf8mb4_general_ci,
+  `status` enum('pending','approved','rejected') COLLATE utf8mb4_general_ci DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -110,12 +116,19 @@ CREATE TABLE `cancellation_requests` (
 --
 
 CREATE TABLE `closed_dates` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
-  `reason` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `reason` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `closed_dates`
+--
+
+INSERT INTO `closed_dates` (`id`, `start_date`, `end_date`, `reason`, `created_at`) VALUES
+(1, '2025-06-12', '2025-06-13', 'Independence Day', '2025-05-17 18:53:53');
 
 -- --------------------------------------------------------
 
@@ -124,12 +137,12 @@ CREATE TABLE `closed_dates` (
 --
 
 CREATE TABLE `feedback` (
-  `feedback_id` int(11) NOT NULL,
-  `appointment_id` int(11) NOT NULL,
-  `patient_id` int(11) NOT NULL,
-  `rating` int(11) NOT NULL,
-  `comment` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `feedback_id` int NOT NULL,
+  `appointment_id` int NOT NULL,
+  `patient_id` int NOT NULL,
+  `rating` int NOT NULL,
+  `comment` text COLLATE utf8mb4_general_ci,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -139,11 +152,11 @@ CREATE TABLE `feedback` (
 --
 
 CREATE TABLE `notifications` (
-  `notification_id` int(11) NOT NULL,
-  `type` enum('appointment','confirmation','cancellation','reschedule') NOT NULL,
-  `appointment_id` int(11) DEFAULT NULL,
-  `is_read` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `notification_id` int NOT NULL,
+  `type` enum('appointment','confirmation','cancellation','reschedule') COLLATE utf8mb4_general_ci NOT NULL,
+  `appointment_id` int DEFAULT NULL,
+  `is_read` tinyint(1) DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -153,13 +166,13 @@ CREATE TABLE `notifications` (
 --
 
 CREATE TABLE `owner` (
-  `owner_id` int(11) NOT NULL,
-  `last_name` varchar(100) NOT NULL,
-  `first_name` varchar(100) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `owner_id` int NOT NULL,
+  `last_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `first_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `username` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -169,11 +182,11 @@ CREATE TABLE `owner` (
 --
 
 CREATE TABLE `owners` (
-  `owner_id` int(11) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `owner_id` int NOT NULL,
+  `username` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -190,15 +203,15 @@ INSERT INTO `owners` (`owner_id`, `username`, `password`, `email`, `created_at`)
 --
 
 CREATE TABLE `packages` (
-  `package_id` int(11) NOT NULL,
-  `package_name` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
+  `package_id` int NOT NULL,
+  `package_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text COLLATE utf8mb4_general_ci,
   `price` decimal(10,2) NOT NULL,
-  `sessions` int(11) NOT NULL,
-  `duration_days` int(11) NOT NULL COMMENT 'Duration in days',
-  `grace_period_days` int(11) NOT NULL COMMENT 'Grace period in days',
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `sessions` int NOT NULL,
+  `duration_days` int NOT NULL COMMENT 'Duration in days',
+  `grace_period_days` int NOT NULL COMMENT 'Grace period in days',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -248,14 +261,14 @@ INSERT INTO `packages` (`package_id`, `package_name`, `description`, `price`, `s
 --
 
 CREATE TABLE `package_appointments` (
-  `package_appointment_id` int(11) NOT NULL,
-  `booking_id` int(11) NOT NULL,
-  `attendant_id` int(11) NOT NULL,
+  `package_appointment_id` int NOT NULL,
+  `booking_id` int NOT NULL,
+  `attendant_id` int NOT NULL,
   `appointment_date` date NOT NULL,
   `appointment_time` time NOT NULL,
-  `status` enum('pending','confirmed','completed','cancelled') DEFAULT 'pending',
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `status` enum('pending','confirmed','completed','cancelled') COLLATE utf8mb4_general_ci DEFAULT 'pending',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -277,14 +290,14 @@ INSERT INTO `package_appointments` (`package_appointment_id`, `booking_id`, `att
 --
 
 CREATE TABLE `package_bookings` (
-  `booking_id` int(11) NOT NULL,
-  `patient_id` int(11) NOT NULL,
-  `package_id` int(11) NOT NULL,
-  `sessions_remaining` int(11) NOT NULL,
+  `booking_id` int NOT NULL,
+  `patient_id` int NOT NULL,
+  `package_id` int NOT NULL,
+  `sessions_remaining` int NOT NULL,
   `valid_until` date NOT NULL,
   `grace_period_until` date NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -306,16 +319,16 @@ INSERT INTO `package_bookings` (`booking_id`, `patient_id`, `package_id`, `sessi
 --
 
 CREATE TABLE `patients` (
-  `patient_id` int(11) NOT NULL,
-  `last_name` varchar(100) NOT NULL,
-  `first_name` varchar(100) NOT NULL,
-  `middle_name` varchar(255) DEFAULT NULL,
-  `username` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `phone` varchar(20) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `archived` tinyint(1) DEFAULT 0
+  `patient_id` int NOT NULL,
+  `last_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `first_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `middle_name` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `username` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_general_ci NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `archived` tinyint(1) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -333,14 +346,14 @@ INSERT INTO `patients` (`patient_id`, `last_name`, `first_name`, `middle_name`, 
 --
 
 CREATE TABLE `products` (
-  `product_id` int(11) NOT NULL,
-  `product_name` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
+  `product_id` int NOT NULL,
+  `product_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text COLLATE utf8mb4_general_ci,
   `price` decimal(10,2) NOT NULL,
-  `stock` int(11) NOT NULL DEFAULT 0,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `product_image` varchar(255) DEFAULT NULL
+  `stock` int NOT NULL DEFAULT '0',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `product_image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -348,11 +361,11 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`product_id`, `product_name`, `description`, `price`, `stock`, `created_at`, `updated_at`, `product_image`) VALUES
-(1, 'Yellow soap (acne)', NULL, 140.00, 0, '2025-05-13 14:39:04', '2025-05-13 14:43:21', 'assets/img/yellow_soap.png'),
-(2, 'Pore Minimizer (Toner)', NULL, 380.00, 0, '2025-05-13 14:39:04', '2025-05-13 14:43:21', 'assets/img/pore_minimizer.png'),
-(3, 'Sunscreen', NULL, 225.00, 0, '2025-05-13 14:39:04', '2025-05-13 14:43:21', 'assets/img/sunscreen.png'),
-(4, 'Kojic Soap', '', 180.00, 0, '2025-05-13 14:39:04', '2025-05-15 23:23:24', 'assets/img/kojic_soap.png'),
-(5, 'Lightening cream', NULL, 230.00, 0, '2025-05-13 14:39:04', '2025-05-13 14:43:21', 'assets/img/lightening_cream.png');
+(1, 'Yellow soap (acne)', '', 140.00, 100, '2025-05-13 14:39:04', '2025-05-17 19:14:02', 'assets/img/yellow_soap.png'),
+(2, 'Pore Minimizer (Toner)', '', 380.00, 100, '2025-05-13 14:39:04', '2025-05-17 19:13:53', 'assets/img/pore_minimizer.png'),
+(3, 'Sunscreen', '', 225.00, 100, '2025-05-13 14:39:04', '2025-05-17 19:13:57', 'assets/img/sunscreen.png'),
+(4, 'Kojic Soap', '', 180.00, 100, '2025-05-13 14:39:04', '2025-05-17 19:13:42', 'assets/img/kojic_soap.png'),
+(5, 'Lightening cream', '', 230.00, 100, '2025-05-13 14:39:04', '2025-05-17 19:13:48', 'assets/img/lightening_cream.png');
 
 -- --------------------------------------------------------
 
@@ -361,16 +374,16 @@ INSERT INTO `products` (`product_id`, `product_name`, `description`, `price`, `s
 --
 
 CREATE TABLE `requests` (
-  `request_id` int(11) NOT NULL,
-  `appointment_id` int(11) NOT NULL,
-  `patient_id` int(11) NOT NULL,
-  `type` enum('reschedule','cancellation') NOT NULL,
+  `request_id` int NOT NULL,
+  `appointment_id` int NOT NULL,
+  `patient_id` int NOT NULL,
+  `type` enum('reschedule','cancellation') COLLATE utf8mb4_general_ci NOT NULL,
   `requested_date` date DEFAULT NULL,
   `requested_time` time DEFAULT NULL,
-  `status` enum('pending','approved','denied') DEFAULT 'pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status` enum('pending','approved','denied') COLLATE utf8mb4_general_ci DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `admin_response_at` timestamp NULL DEFAULT NULL,
-  `admin_id` int(11) DEFAULT NULL
+  `admin_id` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -380,63 +393,64 @@ CREATE TABLE `requests` (
 --
 
 CREATE TABLE `services` (
-  `service_id` int(11) NOT NULL,
-  `service_name` varchar(100) NOT NULL,
-  `description` text DEFAULT NULL,
+  `service_id` int NOT NULL,
+  `service_name` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `description` text COLLATE utf8mb4_general_ci,
   `price` decimal(10,2) DEFAULT NULL,
-  `duration` int(11) NOT NULL COMMENT 'Duration in minutes',
-  `category_id` int(11) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `duration` int NOT NULL COMMENT 'Duration in minutes',
+  `category_id` int NOT NULL,
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `services`
 --
 
-INSERT INTO `services` (`service_id`, `service_name`, `description`, `price`, `duration`, `category_id`, `created_at`, `updated_at`) VALUES
-(1, 'Primary Facial (Face)', NULL, 499.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(2, 'Chest/Back', NULL, 649.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(3, 'Neck', NULL, 449.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(4, 'Charcoal', 'Facial with Diamond Peel + Charcoal', 699.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(5, 'Collagen', 'Facial with Diamond Peel + Collagen Mask', 699.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(6, 'Snow White', 'Facial with Diamond Peel + Vitamin C serum & mask', 799.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(7, 'Casmara', 'Facial with Diamond Peel + Casmara Mask', 1000.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(8, 'Diamond Peel', NULL, 499.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(9, 'Radio Frequency', 'With Facial', 999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(10, 'Geneo Infusion', 'Rejuvenation & Brightening', 999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(11, 'Oxygeneo', 'Facial + RF + Infusion', 1999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(12, 'Skin Rejuvenation', 'Facial + Serum + PDT Light', 999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(13, 'Galvanic Therapy', 'Facial + Serum Infusion', 799.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(14, 'PRP', 'Facial + PRP + PDT Light', 1899.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(15, 'Carbon Doll Laser', NULL, 999.00, 60, 3, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(16, 'Pico Glow', 'Melasma/Freckles', 999.00, 60, 3, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(17, 'Tattoo Removal', 'Depends on size', 999.00, 60, 3, '2025-05-13 06:03:46', '2025-05-13 14:30:47'),
-(18, 'Vitamin C Infusion', 'Face', 349.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(19, 'Underarm Whitening', NULL, 549.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(20, 'Back Whitening', NULL, 649.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(21, 'Chest Whitening', NULL, 549.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(22, 'Butt Whitening', NULL, 549.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(23, 'Neck Whitening', NULL, 349.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(24, 'Pimple Injection', 'Per Pimple', 99.00, 60, 5, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(25, 'Anti-Acne Treatment', 'Facial + Serum + Light', 1599.00, 60, 5, '2025-05-13 06:03:46', '2025-05-16 08:39:17'),
-(26, 'Face Cavitation', NULL, 899.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(27, 'Waist Cavitation', NULL, 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(28, 'Thighs Cavitation', NULL, 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(29, 'Arms Cavitation', NULL, 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(30, 'IPL Face', NULL, 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(31, 'IPL Neck', NULL, 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(32, 'IPL Arm', NULL, 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(33, 'IPL Brazilian', NULL, 699.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(34, 'IPL Legs', 'Lower/Upper', 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(35, 'IPL Upperlip', NULL, 299.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(36, 'IPL Underarms', NULL, 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(37, 'IPL Bikini', NULL, 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(38, 'IPL Chest', NULL, 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(39, 'IPL Back', 'Lower/Upper', 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(40, 'Warts Removal', 'Minimum price per area', 1500.00, 60, 8, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(41, 'Korean Lash Lift with Tint', NULL, 699.00, 30, 8, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(42, 'Korean Lash Lift without Tint', NULL, 499.00, 30, 8, '2025-05-13 06:03:46', '2025-05-13 06:03:46');
+INSERT INTO `services` (`service_id`, `service_name`, `description`, `price`, `duration`, `category_id`, `created_at`, `updated_at`, `image`) VALUES
+(1, 'Primary Facial (Face)', NULL, 499.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(2, 'Chest/Back', NULL, 649.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(3, 'Neck', NULL, 449.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(4, 'Charcoal', 'Facial with Diamond Peel + Charcoal', 699.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(5, 'Collagen', 'Facial with Diamond Peel + Collagen Mask', 699.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(6, 'Snow White', 'Facial with Diamond Peel + Vitamin C serum & mask', 799.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(7, 'Casmara', 'Facial with Diamond Peel + Casmara Mask', 1000.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(8, 'Diamond Peel', NULL, 499.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(9, 'Radio Frequency', 'With Facial', 999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(10, 'Geneo Infusion', 'Rejuvenation & Brightening', 999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(11, 'Oxygeneo', 'Facial + RF + Infusion', 1999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(12, 'Skin Rejuvenation', 'Facial + Serum + PDT Light', 999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(13, 'Galvanic Therapy', 'Facial + Serum Infusion', 799.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(14, 'PRP', 'Facial + PRP + PDT Light', 1899.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(15, 'Carbon Doll Laser', NULL, 999.00, 60, 3, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(16, 'Pico Glow', 'Melasma/Freckles', 999.00, 60, 3, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(17, 'Tattoo Removal', 'Depends on size', 999.00, 60, 3, '2025-05-13 06:03:46', '2025-05-13 14:30:47', NULL),
+(18, 'Vitamin C Infusion', 'Face', 349.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(19, 'Underarm Whitening', NULL, 549.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(20, 'Back Whitening', NULL, 649.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(21, 'Chest Whitening', NULL, 549.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(22, 'Butt Whitening', NULL, 549.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(23, 'Neck Whitening', NULL, 349.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(24, 'Pimple Injection', 'Per Pimple', 99.00, 60, 5, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(25, 'Anti-Acne Treatment', 'Facial + Serum + Light', 1599.00, 60, 5, '2025-05-13 06:03:46', '2025-05-16 08:39:17', NULL),
+(26, 'Face Cavitation', NULL, 899.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(27, 'Waist Cavitation', NULL, 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(28, 'Thighs Cavitation', NULL, 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(29, 'Arms Cavitation', NULL, 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(30, 'IPL Face', NULL, 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(31, 'IPL Neck', NULL, 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(32, 'IPL Arm', NULL, 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(33, 'IPL Brazilian', NULL, 699.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(34, 'IPL Legs', 'Lower/Upper', 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(35, 'IPL Upperlip', NULL, 299.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(36, 'IPL Underarms', NULL, 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(37, 'IPL Bikini', NULL, 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(38, 'IPL Chest', NULL, 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(39, 'IPL Back', 'Lower/Upper', 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(40, 'Warts Removal', 'Minimum price per area', 1500.00, 60, 8, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(41, 'Korean Lash Lift with Tint', NULL, 699.00, 30, 8, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(42, 'Korean Lash Lift without Tint', NULL, 499.00, 30, 8, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL);
 
 -- --------------------------------------------------------
 
@@ -445,8 +459,8 @@ INSERT INTO `services` (`service_id`, `service_name`, `description`, `price`, `d
 --
 
 CREATE TABLE `service_categories` (
-  `category_id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL
+  `category_id` int NOT NULL,
+  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -470,16 +484,16 @@ INSERT INTO `service_categories` (`category_id`, `name`) VALUES
 --
 
 CREATE TABLE `staff` (
-  `staff_id` int(11) NOT NULL,
-  `first_name` varchar(50) NOT NULL,
-  `last_name` varchar(50) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `phone` varchar(20) NOT NULL,
-  `position` varchar(50) NOT NULL,
+  `staff_id` int NOT NULL,
+  `first_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `last_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `position` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `hire_date` date NOT NULL,
-  `status` enum('active','inactive') DEFAULT 'active',
-  `created_at` datetime DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `status` enum('active','inactive') COLLATE utf8mb4_unicode_ci DEFAULT 'active',
+  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -489,13 +503,13 @@ CREATE TABLE `staff` (
 --
 
 CREATE TABLE `store_hours` (
-  `id` int(11) NOT NULL,
-  `day_of_week` enum('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday') NOT NULL,
+  `id` int NOT NULL,
+  `day_of_week` enum('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday') COLLATE utf8mb4_general_ci NOT NULL,
   `open_time` time NOT NULL,
   `close_time` time NOT NULL,
-  `is_closed` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `is_closed` tinyint(1) DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -665,115 +679,115 @@ ALTER TABLE `store_hours`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `admin_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `appointment_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `appointment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `attendants`
 --
 ALTER TABLE `attendants`
-  MODIFY `attendant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `attendant_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `cancellation_requests`
 --
 ALTER TABLE `cancellation_requests`
-  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `request_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `closed_dates`
 --
 ALTER TABLE `closed_dates`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `feedback`
 --
 ALTER TABLE `feedback`
-  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `feedback_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `notification_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `owner`
 --
 ALTER TABLE `owner`
-  MODIFY `owner_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `owner_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `owners`
 --
 ALTER TABLE `owners`
-  MODIFY `owner_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `owner_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `packages`
 --
 ALTER TABLE `packages`
-  MODIFY `package_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `package_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `package_appointments`
 --
 ALTER TABLE `package_appointments`
-  MODIFY `package_appointment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `package_appointment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `package_bookings`
 --
 ALTER TABLE `package_bookings`
-  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `booking_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `patients`
 --
 ALTER TABLE `patients`
-  MODIFY `patient_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `patient_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `product_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `requests`
 --
 ALTER TABLE `requests`
-  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `request_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `service_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `service_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `service_categories`
 --
 ALTER TABLE `service_categories`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `category_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `staff`
 --
 ALTER TABLE `staff`
-  MODIFY `staff_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `staff_id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `store_hours`
 --
 ALTER TABLE `store_hours`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- Constraints for dumped tables
