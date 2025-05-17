@@ -396,3 +396,31 @@ package_id:
 service_id: 18
 Regular appointment created successfully
 Transaction committed successfully
+
+
+2025-05-17 19:11:47 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-19
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 8
+    [notes] => 
+)
+
+SESSION data: Array
+(
+    [patient_id] => 2
+    [user_name] => Emil Joaquin Hinolan Diaz
+    [user_username] => emil123
+)
+
+Processed form data:
+patient_id: 2
+appointment_date: 2025-05-19
+appointment_time: 14:00:00
+attendant_id: 1
+package_id: 
+service_id: 8
+Regular appointment created successfully
+Transaction committed successfully
