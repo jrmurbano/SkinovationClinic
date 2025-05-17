@@ -46,6 +46,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$_POST['package_id']]);
                 $_SESSION['success'] = "Package deleted successfully!";
                 break;
+
+            case 'confirm_package':
+                $stmt = $conn->prepare("
+                    SELECT pa.*, pb.patient_id, p.package_name, pt.first_name, pt.last_name
+                    FROM package_appointments pa 
+                    JOIN package_bookings pb ON pa.booking_id = pb.booking_id 
+                    JOIN packages p ON pb.package_id = p.package_id
+                    JOIN patients pt ON pb.patient_id = pt.patient_id
+                    WHERE pa.package_appointment_id = ?
+                ");
+                $stmt->execute([$_POST['package_appointment_id']]);
+                $appointment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($appointment) {
+                    $stmt = $conn->prepare("UPDATE package_appointments SET status = 'confirmed' WHERE package_appointment_id = ?");
+                    $stmt->execute([$_POST['package_appointment_id']]);
+
+                    // Create notification for patient
+                    $title = "Package Appointment Confirmed";
+                    $message = sprintf(
+                        "Your package appointment for %s on %s at %s has been confirmed.",
+                        $appointment['package_name'],
+                        date('F j, Y', strtotime($appointment['appointment_date'])),
+                        date('g:i A', strtotime($appointment['appointment_time']))
+                    );
+                    createNotification($conn, 'package', $_POST['package_appointment_id'], $title, $message, $appointment['patient_id']);
+                }
+                $_SESSION['success'] = "Package appointment confirmed successfully!";
+                break;
+
+            case 'cancel_package':
+                $stmt = $conn->prepare("
+                    SELECT pa.*, pb.patient_id, p.package_name, pt.first_name, pt.last_name
+                    FROM package_appointments pa 
+                    JOIN package_bookings pb ON pa.booking_id = pb.booking_id 
+                    JOIN packages p ON pb.package_id = p.package_id
+                    JOIN patients pt ON pb.patient_id = pt.patient_id
+                    WHERE pa.package_appointment_id = ?
+                ");
+                $stmt->execute([$_POST['package_appointment_id']]);
+                $appointment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($appointment) {
+                    $stmt = $conn->prepare("UPDATE package_appointments SET status = 'cancelled' WHERE package_appointment_id = ?");
+                    $stmt->execute([$_POST['package_appointment_id']]);
+
+                    // Create notification for patient
+                    $title = "Package Appointment Cancelled";
+                    $message = sprintf(
+                        "Your package appointment for %s on %s at %s has been cancelled.",
+                        $appointment['package_name'],
+                        date('F j, Y', strtotime($appointment['appointment_date'])),
+                        date('g:i A', strtotime($appointment['appointment_time']))
+                    );
+                    createNotification($conn, 'package', $_POST['package_appointment_id'], $title, $message, $appointment['patient_id']);
+                }
+                $_SESSION['success'] = "Package appointment cancelled successfully!";
+                break;
         }
         header('Location: manage_packages.php');
         exit();
@@ -140,6 +198,72 @@ $packages = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
             </div>
+
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-clock"></i> Pending Package Appointments</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <?php
+                        $stmt = $conn->query("
+                            SELECT pa.*, pb.patient_id, p.package_name, pt.first_name, pt.last_name, att.first_name as attendant_first_name, att.last_name as attendant_last_name
+                            FROM package_appointments pa 
+                            JOIN package_bookings pb ON pa.booking_id = pb.booking_id 
+                            JOIN packages p ON pb.package_id = p.package_id
+                            JOIN patients pt ON pb.patient_id = pt.patient_id
+                            JOIN attendants att ON pa.attendant_id = att.attendant_id
+                            WHERE pa.status = 'pending'
+                            ORDER BY pa.appointment_date ASC, pa.appointment_time ASC
+                        ");
+                        $pending_appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                        ?>
+                        <?php if (empty($pending_appointments)): ?>
+                            <p class="text-center text-muted mb-0">No pending package appointments</p>
+                        <?php else: ?>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Patient</th>
+                                        <th>Package</th>
+                                        <th>Date</th>
+                                        <th>Time</th>
+                                        <th>Attendant</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($pending_appointments as $appointment): ?>
+                                    <tr>
+                                        <td><?php echo clean($appointment['first_name'] . ' ' . $appointment['last_name']); ?></td>
+                                        <td><?php echo clean($appointment['package_name']); ?></td>
+                                        <td><?php echo date('M d, Y', strtotime($appointment['appointment_date'])); ?></td>
+                                        <td><?php echo date('h:i A', strtotime($appointment['appointment_time'])); ?></td>
+                                        <td><?php echo clean($appointment['attendant_first_name'] . ' ' . $appointment['attendant_last_name']); ?></td>
+                                        <td>
+                                            <form method="POST" class="d-inline">
+                                                <input type="hidden" name="action" value="confirm_package">
+                                                <input type="hidden" name="package_appointment_id" value="<?php echo $appointment['package_appointment_id']; ?>">
+                                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Are you sure you want to confirm this package appointment?')">
+                                                    <i class="fas fa-check"></i> Confirm
+                                                </button>
+                                            </form>
+                                            <form method="POST" class="d-inline">
+                                                <input type="hidden" name="action" value="cancel_package">
+                                                <input type="hidden" name="package_appointment_id" value="<?php echo $appointment['package_appointment_id']; ?>">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel this package appointment?')">
+                                                    <i class="fas fa-times"></i> Cancel
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -151,38 +275,56 @@ $packages = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <form method="POST">
                 <input type="hidden" name="action" value="add">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add New Package</h5>
+                    <h5 class="modal-title"><i class="fas fa-plus"></i> Add New Package</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Package Name</label>
-                        <input type="text" class="form-control" name="package_name" required>
+                        <label class="form-label"><i class="fas fa-box-open"></i> Package Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-box-open"></i></span>
+                            <input type="text" class="form-control" name="package_name" placeholder="Enter package name" required>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" name="description" rows="3"></textarea>
+                        <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-align-left"></i></span>
+                            <textarea class="form-control" name="description" rows="3" placeholder="Enter package description"></textarea>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Price</label>
-                        <input type="number" class="form-control" name="price" step="0.01" required>
+                        <label class="form-label"><i class="fas fa-tag"></i> Price (₱)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₱</span>
+                            <input type="number" class="form-control" name="price" step="0.01" placeholder="Enter price" required>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Number of Sessions</label>
-                        <input type="number" class="form-control" name="sessions" required>
+                        <label class="form-label"><i class="fas fa-list-ol"></i> Number of Sessions</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-list-ol"></i></span>
+                            <input type="number" class="form-control" name="sessions" placeholder="Enter number of sessions" required>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Duration (days)</label>
-                        <input type="number" class="form-control" name="duration_days" required>
+                        <label class="form-label"><i class="fas fa-calendar-day"></i> Duration (days)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-calendar-day"></i></span>
+                            <input type="number" class="form-control" name="duration_days" placeholder="Enter duration in days" required>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Grace Period (days)</label>
-                        <input type="number" class="form-control" name="grace_period_days" required>
+                        <label class="form-label"><i class="fas fa-hourglass-half"></i> Grace Period (days)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-hourglass-half"></i></span>
+                            <input type="number" class="form-control" name="grace_period_days" placeholder="Enter grace period in days" required>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success">Add Package</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Add Package</button>
                 </div>
             </form>
         </div>
@@ -197,38 +339,56 @@ $packages = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="package_id" id="edit_package_id">
                 <div class="modal-header">
-                    <h5 class="modal-title">Edit Package</h5>
+                    <h5 class="modal-title"><i class="fas fa-edit"></i> Edit Package</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Package Name</label>
-                        <input type="text" class="form-control" name="package_name" id="edit_package_name" required>
+                        <label class="form-label"><i class="fas fa-box-open"></i> Package Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-box-open"></i></span>
+                            <input type="text" class="form-control" name="package_name" id="edit_package_name" placeholder="Enter package name" required>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-control" name="description" id="edit_description" rows="3"></textarea>
+                        <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-align-left"></i></span>
+                            <textarea class="form-control" name="description" id="edit_description" rows="3" placeholder="Enter package description"></textarea>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Price</label>
-                        <input type="number" class="form-control" name="price" id="edit_price" step="0.01" required>
+                        <label class="form-label"><i class="fas fa-tag"></i> Price (₱)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">₱</span>
+                            <input type="number" class="form-control" name="price" id="edit_price" step="0.01" placeholder="Enter price" required>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Number of Sessions</label>
-                        <input type="number" class="form-control" name="sessions" id="edit_sessions" required>
+                        <label class="form-label"><i class="fas fa-list-ol"></i> Number of Sessions</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-list-ol"></i></span>
+                            <input type="number" class="form-control" name="sessions" id="edit_sessions" placeholder="Enter number of sessions" required>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Duration (days)</label>
-                        <input type="number" class="form-control" name="duration_days" id="edit_duration_days" required>
+                        <label class="form-label"><i class="fas fa-calendar-day"></i> Duration (days)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-calendar-day"></i></span>
+                            <input type="number" class="form-control" name="duration_days" id="edit_duration_days" placeholder="Enter duration in days" required>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Grace Period (days)</label>
-                        <input type="number" class="form-control" name="grace_period_days" id="edit_grace_period_days" required>
+                        <label class="form-label"><i class="fas fa-hourglass-half"></i> Grace Period (days)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-hourglass-half"></i></span>
+                            <input type="number" class="form-control" name="grace_period_days" id="edit_grace_period_days" placeholder="Enter grace period in days" required>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Update Package</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Package</button>
                 </div>
             </form>
         </div>

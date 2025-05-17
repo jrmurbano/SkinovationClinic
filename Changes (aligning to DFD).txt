@@ -44,7 +44,7 @@ After this should be a text box and next to it says "I agree with the clinic's p
 7. On this process, user browses services/packages/products>>>system requests user to log-in/register first>>>user follows through>>> must be displayed by the service/package/product they clicked Book Now and the calendar view and continue booking.
 Please don't change anything on the process of user log-in/register first>>>My Appointments page.
 
-7. Now, back to the Appointment Scheduler and let's add Appointment Reminders and Notification, add a notification icon across all interfaces of both admin and patient (top right of interface, icon must be font awesome). When the admin confirms appointment/reschedules, it sets a notification to be sent on both admin and patient the day before the appointment and on the day apointment. Please choose an appropriate notification sound.
+8. Now, back to the Appointment Scheduler and let's add Appointment Reminders and Notification, add a notification icon across all interfaces of both admin and patient (top right of interface, icon must be font awesome). When the admin confirms appointment/reschedules, it sets a notification to be sent on both admin and patient the day before the appointment and on the day apointment. Please choose an appropriate notification sound.
 
 When the admin confirms cancellation, it must remove the notification. Don't forget the provide me the SQL query I needed to execute.
 

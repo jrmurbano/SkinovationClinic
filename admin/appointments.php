@@ -408,20 +408,22 @@ $cancelled_appointments = count(array_filter($appointments, function($a) { retur
                                         </span>
                                     </td>
                                     <td>
-                                        <div class="btn-group">
-                                          
-                                            <?php if ($appointment['status'] === 'pending'): ?>
+                                        <?php if ($appointment['status'] === 'pending'): ?>
                                             <form method="POST" class="d-inline">
+                                                <input type="hidden" name="action" value="confirm">
                                                 <input type="hidden" name="appointment_id" value="<?php echo $appointment['appointment_id']; ?>">
-                                                <button type="submit" name="action" value="confirm" class="btn btn-success btn-sm">
-                                                    <i class="fas fa-check"></i>
-                                                </button>
-                                                <button type="submit" name="action" value="cancel" class="btn btn-danger btn-sm">
-                                                    <i class="fas fa-times"></i>
+                                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Are you sure you want to confirm this appointment?')">
+                                                    <i class="fas fa-check"></i> Confirm
                                                 </button>
                                             </form>
-                                            <?php endif; ?>
-                                        </div>
+                                            <form method="POST" class="d-inline">
+                                                <input type="hidden" name="action" value="cancel">
+                                                <input type="hidden" name="appointment_id" value="<?php echo $appointment['appointment_id']; ?>">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                                                    <i class="fas fa-times"></i> Cancel
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>

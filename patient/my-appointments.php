@@ -188,9 +188,32 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <p><strong>Time:</strong> <?php echo date('g:i A', strtotime($appointment['appointment_time'])); ?></p>
                                     <p><strong>Attendant:</strong> <?php echo clean($appointment['attendant_first_name'] . ' ' . $appointment['attendant_last_name']); ?></p>
                                     <p><strong>Price:</strong> ₱<?php echo number_format($appointment['price'], 2); ?></p>
+                                    <p><strong>Status:</strong> 
+                                        <span class="badge bg-<?php 
+                                            echo $appointment['status'] === 'confirmed' ? 'success' : 
+                                                ($appointment['status'] === 'cancelled' ? 'danger' : 'warning'); 
+                                        ?>">
+                                            <?php echo ucfirst($appointment['status']); ?>
+                                        </span>
+                                        <?php if ($appointment['status'] === 'pending'): ?>
+                                            <small class="text-muted">(Waiting for admin confirmation)</small>
+                                        <?php endif; ?>
+                                    </p>
                                     <div class="d-flex gap-2">
-                                        <a href="reschedule_appointment.php?id=<?php echo $appointment['appointment_id']; ?>" class="btn btn-warning btn-sm" <?php echo (strtotime($appointment['appointment_date']) <= strtotime(date('Y-m-d'))) ? 'disabled' : ''; ?>>Reschedule</a>
-                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#cancelModal<?php echo $appointment['appointment_id']; ?>" <?php echo (strtotime($appointment['appointment_date']) <= strtotime('+1 day')) ? 'disabled' : ''; ?>>Request Cancellation</button>
+                                        <?php if ($appointment['status'] === 'confirmed' || $appointment['status'] === 'pending'): ?>
+                                            <a href="reschedule_appointment.php?id=<?php echo $appointment['appointment_id']; ?>" 
+                                               class="btn btn-warning btn-sm" 
+                                               <?php echo (strtotime($appointment['appointment_date']) <= strtotime(date('Y-m-d'))) ? 'disabled' : ''; ?>>
+                                                <i class="fas fa-calendar-alt"></i> Reschedule
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-danger btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#cancelModal<?php echo $appointment['appointment_id']; ?>"
+                                                    <?php echo (strtotime($appointment['appointment_date']) <= strtotime('+1 day')) ? 'disabled' : ''; ?>>
+                                                <i class="fas fa-times"></i> Request Cancellation
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
 
                                     <!-- Cancellation Request Modal -->

@@ -424,3 +424,87 @@ package_id:
 service_id: 8
 Regular appointment created successfully
 Transaction committed successfully
+
+
+2025-05-18 04:52:35 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-17
+    [appointment_time] => 09:00:00
+    [attendant_id] => 1
+    [service_id] => 9
+    [notes] => 
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 2
+    [user_name] => Emil Joaquin Hinolan Diaz
+    [user_username] => emil123
+)
+
+Processed form data:
+patient_id: 2
+appointment_date: 2025-05-17
+appointment_time: 09:00:00
+attendant_id: 1
+package_id: 
+service_id: 9
+Transaction rolled back. Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'notes' in 'field list'
+
+
+2025-05-18 04:54:27 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-17
+    [appointment_time] => 10:00:00
+    [attendant_id] => 1
+    [service_id] => 14
+    [notes] => 
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 2
+    [user_name] => Emil Joaquin Hinolan Diaz
+    [user_username] => emil123
+)
+
+Processed form data:
+patient_id: 2
+appointment_date: 2025-05-17
+appointment_time: 10:00:00
+attendant_id: 1
+package_id: 
+service_id: 14
+Transaction rolled back. Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'notes' in 'field list'
+
+
+2025-05-18 04:57:24 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-17
+    [appointment_time] => 09:00:00
+    [attendant_id] => 1
+    [service_id] => 2
+    [notes] => 
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 2
+    [user_name] => Emil Joaquin Hinolan Diaz
+    [user_username] => emil123
+)
+
+Processed form data:
+patient_id: 2
+appointment_date: 2025-05-17
+appointment_time: 09:00:00
+attendant_id: 1
+package_id: 
+service_id: 2
+Transaction rolled back. Error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'notes' in 'field list'
