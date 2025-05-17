@@ -87,11 +87,11 @@ $categoryName = 'All Products';
                         <?php endif; ?>
                         <div class="d-flex justify-content-between align-items-center mt-3">
                             <p class="price mb-0">₱<?php echo number_format($product['price'], 2); ?></p>
-                            <button class="btn btn-purple btn-sm" data-bs-toggle="modal" data-bs-target="#orderModal"
-                                data-product-id="<?php echo $product['product_id']; ?>" data-product-name="<?php echo htmlspecialchars($product['product_name'] ?? ''); ?>"
-                                data-product-price="<?php echo $product['price']; ?>">
+                            <a href="<?php echo isset($_SESSION['patient_id']) 
+                                ? 'patient/calendar_view.php?product_id=' . htmlspecialchars($product['product_id'] ?? '0') 
+                                : 'login.php?redirect=booking&product_id=' . htmlspecialchars($product['product_id'] ?? '0'); ?>" class="btn btn-purple btn-sm">
                                 <i class="bi bi-cart-plus me-1"></i>Pre-Order
-                            </button>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -101,73 +101,9 @@ $categoryName = 'All Products';
         </div>
     </div>
 
-    <!-- Order Modal -->
-    <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="orderModalLabel">Order Product</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="orderForm">
-                        <input type="hidden" id="productId" name="product_id">
-                        <div class="mb-3">
-                            <label for="productName" class="form-label">Product</label>
-                            <input type="text" class="form-control" id="productName" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="quantity" class="form-label">Quantity</label>
-                            <input type="number" class="form-control" id="quantity" name="quantity" min="1"
-                                value="1">
-                        </div>
-                        <div class="mb-3">
-                            <label for="totalPrice" class="form-label">Total Price</label>
-                            <input type="text" class="form-control" id="totalPrice" readonly>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-purple" id="submitOrder">Place Order</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <?php include 'footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Handle product order modal
-        const orderModal = document.getElementById('orderModal');
-        if (orderModal) {
-            orderModal.addEventListener('show.bs.modal', event => {
-                const button = event.relatedTarget;
-                const productId = button.getAttribute('data-product-id');
-                const productName = button.getAttribute('data-product-name');
-                const productPrice = parseFloat(button.getAttribute('data-product-price'));
-
-                const modalProductId = orderModal.querySelector('#productId');
-                const modalProductName = orderModal.querySelector('#productName');
-                const modalQuantity = orderModal.querySelector('#quantity');
-                const modalTotalPrice = orderModal.querySelector('#totalPrice');
-
-                modalProductId.value = productId;
-                modalProductName.value = productName;
-                updateTotalPrice(productPrice, modalQuantity.value);
-
-                modalQuantity.addEventListener('change', () => {
-                    updateTotalPrice(productPrice, modalQuantity.value);
-                });
-
-                function updateTotalPrice(price, quantity) {
-                    const total = price * quantity;
-                    modalTotalPrice.value = '₱' + total.toFixed(2);
-                }
-            });
-        }
-    </script>
 </body>
 
 </html>

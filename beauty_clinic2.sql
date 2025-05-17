@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: May 13, 2025 at 11:30 PM
--- Server version: 8.0.30
--- PHP Version: 8.1.10
+-- Host: 127.0.0.1
+-- Generation Time: May 16, 2025 at 02:55 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,11 +28,11 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `admin` (
-  `admin_id` int NOT NULL,
-  `admin_last_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `admin_first_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `admin_username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `admin_password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+  `admin_id` int(11) NOT NULL,
+  `admin_last_name` varchar(100) NOT NULL,
+  `admin_first_name` varchar(100) NOT NULL,
+  `admin_username` varchar(50) NOT NULL,
+  `admin_password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -41,7 +41,8 @@ CREATE TABLE `admin` (
 
 INSERT INTO `admin` (`admin_id`, `admin_last_name`, `admin_first_name`, `admin_username`, `admin_password`) VALUES
 (1, 'Urbano', 'Jean', 'jrmurbano', '$2y$10$e0NR1z1F5J1u1J1u1J1u1u1J1u1J1u1J1u1J1u1J1u1J1u1J1u1u'),
-(2, 'Urbano', 'Roshan', 'roshannaaaa', '$2y$10$wwnBJK186HIzzbuQSDAZTukPzBSxMGa6p1RJOplk0Md163EVVcABC');
+(2, 'Urbano', 'Roshan', 'roshannaaaa', '$2y$10$wwnBJK186HIzzbuQSDAZTukPzBSxMGa6p1RJOplk0Md163EVVcABC'),
+(3, 'reyes', 'khi', 'khi', '$2y$10$D7ty7Gevr7NipuHg4cCR9uKGqiirMdLOsOFs8tuCs1HU8jLsr9pEO');
 
 -- --------------------------------------------------------
 
@@ -50,16 +51,16 @@ INSERT INTO `admin` (`admin_id`, `admin_last_name`, `admin_first_name`, `admin_u
 --
 
 CREATE TABLE `appointments` (
-  `appointment_id` int NOT NULL,
-  `patient_id` int NOT NULL,
-  `service_id` int NOT NULL,
-  `attendant_id` int NOT NULL,
+  `appointment_id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `service_id` int(11) NOT NULL,
+  `attendant_id` int(11) NOT NULL,
   `appointment_date` date NOT NULL,
   `appointment_time` time NOT NULL,
-  `status` enum('pending','confirmed','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'pending',
-  `notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `status` enum('pending','confirmed','completed','cancelled') DEFAULT 'pending',
+  `notes` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -69,13 +70,13 @@ CREATE TABLE `appointments` (
 --
 
 CREATE TABLE `attendants` (
-  `attendant_id` int NOT NULL,
-  `last_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `first_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `attendant_id` int(11) NOT NULL,
+  `last_name` varchar(100) NOT NULL,
+  `first_name` varchar(100) NOT NULL,
   `shift_date` date NOT NULL,
   `shift_time` time NOT NULL,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+  `updated_at` datetime DEFAULT current_timestamp(),
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -88,17 +89,99 @@ INSERT INTO `attendants` (`attendant_id`, `last_name`, `first_name`, `shift_date
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `cancellation_requests`
+--
+
+CREATE TABLE `cancellation_requests` (
+  `request_id` int(11) NOT NULL,
+  `appointment_id` int(11) NOT NULL,
+  `appointment_type` enum('regular','package') NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `reason` text DEFAULT NULL,
+  `status` enum('pending','approved','rejected') DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `closed_dates`
+--
+
+CREATE TABLE `closed_dates` (
+  `id` int(11) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `reason` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `feedback`
 --
 
 CREATE TABLE `feedback` (
-  `feedback_id` int NOT NULL,
-  `appointment_id` int NOT NULL,
-  `patient_id` int NOT NULL,
-  `rating` int NOT NULL,
-  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP
+  `feedback_id` int(11) NOT NULL,
+  `appointment_id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `rating` int(11) NOT NULL,
+  `comment` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `notification_id` int(11) NOT NULL,
+  `type` enum('appointment','confirmation','cancellation','reschedule') NOT NULL,
+  `appointment_id` int(11) DEFAULT NULL,
+  `is_read` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `owner`
+--
+
+CREATE TABLE `owner` (
+  `owner_id` int(11) NOT NULL,
+  `last_name` varchar(100) NOT NULL,
+  `first_name` varchar(100) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `owners`
+--
+
+CREATE TABLE `owners` (
+  `owner_id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `owners`
+--
+
+INSERT INTO `owners` (`owner_id`, `username`, `password`, `email`, `created_at`) VALUES
+(1, 'khi', '$2y$10$FaJhIFXf.x.qlP3zBaLQvOnTyuyBOeuHUAIB28mX77En1a8E4p2KS', 'ksreyes.chmsu@gmail.com', '2025-05-15 13:09:45');
 
 -- --------------------------------------------------------
 
@@ -107,15 +190,15 @@ CREATE TABLE `feedback` (
 --
 
 CREATE TABLE `packages` (
-  `package_id` int NOT NULL,
-  `package_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `package_id` int(11) NOT NULL,
+  `package_name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
-  `sessions` int NOT NULL,
-  `duration_days` int NOT NULL COMMENT 'Duration in days',
-  `grace_period_days` int NOT NULL COMMENT 'Grace period in days',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `sessions` int(11) NOT NULL,
+  `duration_days` int(11) NOT NULL COMMENT 'Duration in days',
+  `grace_period_days` int(11) NOT NULL COMMENT 'Grace period in days',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -132,7 +215,6 @@ INSERT INTO `packages` (`package_id`, `package_name`, `description`, `price`, `s
 (7, '3 + 1 Face Cavitation', NULL, 1397.00, 4, 120, 180, '2025-05-13 14:45:06', '2025-05-13 14:45:06'),
 (8, '3 + 1 Waist Cavitation', NULL, 1397.00, 4, 120, 180, '2025-05-13 14:45:06', '2025-05-13 14:45:06'),
 (9, '3 + 1 Thighs Cavitation', NULL, 1397.00, 4, 120, 180, '2025-05-13 14:45:06', '2025-05-13 14:45:06'),
-(10, '3 + 1 Arms Cavitation', NULL, 1397.00, 4, 120, 180, '2025-05-13 14:45:06', '2025-05-13 14:45:06'),
 (11, '3 + 1 Charcoal', NULL, 2297.00, 4, 120, 180, '2025-05-13 14:45:06', '2025-05-13 14:45:06'),
 (12, '3 + 1 Chest Infusion', NULL, 1847.00, 4, 120, 180, '2025-05-13 14:45:06', '2025-05-13 14:45:06'),
 (13, '3 + 1 Chest/Back Facial', NULL, 1997.00, 4, 120, 180, '2025-05-13 14:45:06', '2025-05-13 14:45:06'),
@@ -166,14 +248,14 @@ INSERT INTO `packages` (`package_id`, `package_name`, `description`, `price`, `s
 --
 
 CREATE TABLE `package_appointments` (
-  `package_appointment_id` int NOT NULL,
-  `booking_id` int NOT NULL,
-  `attendant_id` int NOT NULL,
+  `package_appointment_id` int(11) NOT NULL,
+  `booking_id` int(11) NOT NULL,
+  `attendant_id` int(11) NOT NULL,
   `appointment_date` date NOT NULL,
   `appointment_time` time NOT NULL,
-  `status` enum('pending','confirmed','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'pending',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `status` enum('pending','confirmed','completed','cancelled') DEFAULT 'pending',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -183,7 +265,10 @@ CREATE TABLE `package_appointments` (
 INSERT INTO `package_appointments` (`package_appointment_id`, `booking_id`, `attendant_id`, `appointment_date`, `appointment_time`, `status`, `created_at`, `updated_at`) VALUES
 (3, 5, 1, '2025-05-12', '10:00:00', 'pending', '2025-05-13 23:37:13', '2025-05-13 23:37:13'),
 (4, 6, 1, '2025-05-21', '11:00:00', 'cancelled', '2025-05-13 23:41:01', '2025-05-13 23:42:23'),
-(5, 7, 1, '2025-05-15', '14:00:00', 'pending', '2025-05-14 05:38:18', '2025-05-14 05:38:18');
+(6, 8, 1, '2025-05-14', '09:00:00', 'pending', '2025-05-15 19:18:52', '2025-05-15 19:18:52'),
+(7, 9, 1, '2025-05-19', '10:00:00', 'cancelled', '2025-05-15 20:13:39', '2025-05-15 20:22:17'),
+(8, 10, 1, '2025-05-15', '10:00:00', 'cancelled', '2025-05-15 20:33:29', '2025-05-15 22:03:47'),
+(9, 11, 1, '2025-05-21', '12:00:00', 'cancelled', '2025-05-15 23:25:48', '2025-05-15 23:25:55');
 
 -- --------------------------------------------------------
 
@@ -192,14 +277,14 @@ INSERT INTO `package_appointments` (`package_appointment_id`, `booking_id`, `att
 --
 
 CREATE TABLE `package_bookings` (
-  `booking_id` int NOT NULL,
-  `patient_id` int NOT NULL,
-  `package_id` int NOT NULL,
-  `sessions_remaining` int NOT NULL,
+  `booking_id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `package_id` int(11) NOT NULL,
+  `sessions_remaining` int(11) NOT NULL,
   `valid_until` date NOT NULL,
   `grace_period_until` date NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -209,7 +294,10 @@ CREATE TABLE `package_bookings` (
 INSERT INTO `package_bookings` (`booking_id`, `patient_id`, `package_id`, `sessions_remaining`, `valid_until`, `grace_period_until`, `created_at`, `updated_at`) VALUES
 (5, 2, 1, 4, '2025-08-11', '2025-11-09', '2025-05-13 23:37:13', '2025-05-13 23:37:13'),
 (6, 2, 1, 5, '2025-08-11', '2025-11-09', '2025-05-13 23:41:01', '2025-05-13 23:42:23'),
-(7, 1, 2, 4, '2025-09-11', '2025-11-10', '2025-05-14 05:38:18', '2025-05-14 05:38:18');
+(8, 3, 2, 4, '2025-09-12', '2025-11-11', '2025-05-15 19:18:52', '2025-05-15 19:18:52'),
+(9, 3, 7, 5, '2025-09-12', '2025-11-11', '2025-05-15 20:13:39', '2025-05-15 20:22:17'),
+(10, 3, 1, 5, '2025-08-13', '2025-11-11', '2025-05-15 20:33:29', '2025-05-15 22:03:48'),
+(11, 3, 7, 5, '2025-09-12', '2025-11-11', '2025-05-15 23:25:48', '2025-05-15 23:25:55');
 
 -- --------------------------------------------------------
 
@@ -218,24 +306,25 @@ INSERT INTO `package_bookings` (`booking_id`, `patient_id`, `package_id`, `sessi
 --
 
 CREATE TABLE `patients` (
-  `patient_id` int NOT NULL,
-  `last_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `first_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `middle_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `username` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `patient_id` int(11) NOT NULL,
+  `last_name` varchar(100) NOT NULL,
+  `first_name` varchar(100) NOT NULL,
+  `middle_name` varchar(255) DEFAULT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `phone` varchar(20) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `archived` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `patients`
 --
 
-INSERT INTO `patients` (`patient_id`, `last_name`, `first_name`, `middle_name`, `username`, `password`, `phone`, `created_at`, `updated_at`) VALUES
-(1, 'Urbano', 'Ramona', 'Magbanua', 'ramzurbano', '$2y$10$1jzEodSG/t1G9DdCyK.AeONnukZuX1TW6tWCN7GqbSY3rZknngiRu', '09496269783', '2025-05-13 15:06:45', '2025-05-13 15:06:45'),
-(2, 'Diaz', 'Emil Joaquin', 'Hinolan', 'emil123', '$2y$10$h8bfGeF7ziBPJaD7TlKQ0e3Q66r5Y/YGPwXfCe7Cs.FRZvwmqzVPu', '09695282766', '2025-05-13 22:22:40', '2025-05-13 22:22:40');
+INSERT INTO `patients` (`patient_id`, `last_name`, `first_name`, `middle_name`, `username`, `password`, `phone`, `created_at`, `updated_at`, `archived`) VALUES
+(2, 'Diaz', 'Emil Joaquin', 'Hinolan', 'emil123', '$2y$10$h8bfGeF7ziBPJaD7TlKQ0e3Q66r5Y/YGPwXfCe7Cs.FRZvwmqzVPu', '09695282766', '2025-05-13 22:22:40', '2025-05-13 22:22:40', 0),
+(3, 'Baylosis', 'Kurt', 'Iris', 'kurt', '$2y$10$vvWHCqxO3mh7VDW7G0LNm.HkO5we/28emq/.mJPFG1iGMt6Se1rIS', '12312312123', '2025-05-15 19:17:40', '2025-05-15 19:17:40', 0);
 
 -- --------------------------------------------------------
 
@@ -244,14 +333,14 @@ INSERT INTO `patients` (`patient_id`, `last_name`, `first_name`, `middle_name`, 
 --
 
 CREATE TABLE `products` (
-  `product_id` int NOT NULL,
-  `product_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `product_id` int(11) NOT NULL,
+  `product_name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
   `price` decimal(10,2) NOT NULL,
-  `stock` int NOT NULL DEFAULT '0',
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `product_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
+  `stock` int(11) NOT NULL DEFAULT 0,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `product_image` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -262,8 +351,27 @@ INSERT INTO `products` (`product_id`, `product_name`, `description`, `price`, `s
 (1, 'Yellow soap (acne)', NULL, 140.00, 0, '2025-05-13 14:39:04', '2025-05-13 14:43:21', 'assets/img/yellow_soap.png'),
 (2, 'Pore Minimizer (Toner)', NULL, 380.00, 0, '2025-05-13 14:39:04', '2025-05-13 14:43:21', 'assets/img/pore_minimizer.png'),
 (3, 'Sunscreen', NULL, 225.00, 0, '2025-05-13 14:39:04', '2025-05-13 14:43:21', 'assets/img/sunscreen.png'),
-(4, 'Kojic Soap', NULL, 180.00, 0, '2025-05-13 14:39:04', '2025-05-13 14:43:21', 'assets/img/kojic_soap.png'),
+(4, 'Kojic Soap', '', 180.00, 0, '2025-05-13 14:39:04', '2025-05-15 23:23:24', 'assets/img/kojic_soap.png'),
 (5, 'Lightening cream', NULL, 230.00, 0, '2025-05-13 14:39:04', '2025-05-13 14:43:21', 'assets/img/lightening_cream.png');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `requests`
+--
+
+CREATE TABLE `requests` (
+  `request_id` int(11) NOT NULL,
+  `appointment_id` int(11) NOT NULL,
+  `patient_id` int(11) NOT NULL,
+  `type` enum('reschedule','cancellation') NOT NULL,
+  `requested_date` date DEFAULT NULL,
+  `requested_time` time DEFAULT NULL,
+  `status` enum('pending','approved','denied') DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `admin_response_at` timestamp NULL DEFAULT NULL,
+  `admin_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -272,14 +380,14 @@ INSERT INTO `products` (`product_id`, `product_name`, `description`, `price`, `s
 --
 
 CREATE TABLE `services` (
-  `service_id` int NOT NULL,
-  `service_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  `service_id` int(11) NOT NULL,
+  `service_name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
   `price` decimal(10,2) DEFAULT NULL,
-  `duration` int NOT NULL COMMENT 'Duration in minutes',
-  `category_id` int NOT NULL,
-  `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  `duration` int(11) NOT NULL COMMENT 'Duration in minutes',
+  `category_id` int(11) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -311,7 +419,7 @@ INSERT INTO `services` (`service_id`, `service_name`, `description`, `price`, `d
 (22, 'Butt Whitening', NULL, 549.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
 (23, 'Neck Whitening', NULL, 349.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
 (24, 'Pimple Injection', 'Per Pimple', 99.00, 60, 5, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
-(25, 'Anti-Acne Treatment', 'Facial + Serum + Light', 1599.00, 60, 5, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
+(25, 'Anti-Acne Treatment', 'Facial + Serum + Light', 1599.00, 60, 5, '2025-05-13 06:03:46', '2025-05-16 08:39:17'),
 (26, 'Face Cavitation', NULL, 899.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
 (27, 'Waist Cavitation', NULL, 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
 (28, 'Thighs Cavitation', NULL, 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46'),
@@ -337,8 +445,8 @@ INSERT INTO `services` (`service_id`, `service_name`, `description`, `price`, `d
 --
 
 CREATE TABLE `service_categories` (
-  `category_id` int NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+  `category_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -354,6 +462,61 @@ INSERT INTO `service_categories` (`category_id`, `name`) VALUES
 (6, 'Body Slimming with Cavitation'),
 (7, 'IPL (Hair Removal)'),
 (8, 'Other Services');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `staff`
+--
+
+CREATE TABLE `staff` (
+  `staff_id` int(11) NOT NULL,
+  `first_name` varchar(50) NOT NULL,
+  `last_name` varchar(50) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `phone` varchar(20) NOT NULL,
+  `position` varchar(50) NOT NULL,
+  `hire_date` date NOT NULL,
+  `status` enum('active','inactive') DEFAULT 'active',
+  `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `store_hours`
+--
+
+CREATE TABLE `store_hours` (
+  `id` int(11) NOT NULL,
+  `day_of_week` enum('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday') NOT NULL,
+  `open_time` time NOT NULL,
+  `close_time` time NOT NULL,
+  `is_closed` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `store_hours`
+--
+
+INSERT INTO `store_hours` (`id`, `day_of_week`, `open_time`, `close_time`, `is_closed`, `created_at`, `updated_at`) VALUES
+(8, 'Monday', '09:00:00', '17:00:00', 0, '2025-05-15 12:09:33', '2025-05-15 12:09:33'),
+(9, 'Tuesday', '09:00:00', '17:00:00', 0, '2025-05-15 12:09:33', '2025-05-15 12:09:33'),
+(10, 'Wednesday', '09:00:00', '17:00:00', 0, '2025-05-15 12:09:33', '2025-05-15 12:09:33'),
+(11, 'Thursday', '09:00:00', '17:00:00', 0, '2025-05-15 12:09:33', '2025-05-15 12:09:33'),
+(12, 'Friday', '09:00:00', '17:00:00', 0, '2025-05-15 12:09:33', '2025-05-15 12:09:33'),
+(13, 'Saturday', '09:00:00', '17:00:00', 0, '2025-05-15 12:09:33', '2025-05-15 12:09:33'),
+(14, 'Sunday', '09:00:00', '17:00:00', 0, '2025-05-15 12:09:33', '2025-05-15 12:09:33'),
+(15, 'Monday', '09:00:00', '18:00:00', 0, '2025-05-15 12:31:22', '2025-05-15 12:31:22'),
+(16, 'Tuesday', '09:00:00', '18:00:00', 0, '2025-05-15 12:31:22', '2025-05-15 12:31:22'),
+(17, 'Wednesday', '09:00:00', '18:00:00', 0, '2025-05-15 12:31:22', '2025-05-15 12:31:22'),
+(18, 'Thursday', '09:00:00', '18:00:00', 0, '2025-05-15 12:31:22', '2025-05-15 12:31:22'),
+(19, 'Friday', '09:00:00', '18:00:00', 0, '2025-05-15 12:31:22', '2025-05-15 12:31:22'),
+(20, 'Saturday', '09:00:00', '17:00:00', 0, '2025-05-15 12:31:22', '2025-05-15 12:31:22'),
+(21, 'Sunday', '09:00:00', '17:00:00', 1, '2025-05-15 12:31:22', '2025-05-15 12:31:22');
 
 --
 -- Indexes for dumped tables
@@ -381,12 +544,47 @@ ALTER TABLE `attendants`
   ADD PRIMARY KEY (`attendant_id`);
 
 --
+-- Indexes for table `cancellation_requests`
+--
+ALTER TABLE `cancellation_requests`
+  ADD PRIMARY KEY (`request_id`),
+  ADD KEY `patient_id` (`patient_id`);
+
+--
+-- Indexes for table `closed_dates`
+--
+ALTER TABLE `closed_dates`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `feedback`
 --
 ALTER TABLE `feedback`
   ADD PRIMARY KEY (`feedback_id`),
   ADD KEY `feedback_appointment_id_fk` (`appointment_id`),
   ADD KEY `feedback_patient_id_fk` (`patient_id`);
+
+--
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`notification_id`),
+  ADD KEY `appointment_id` (`appointment_id`);
+
+--
+-- Indexes for table `owner`
+--
+ALTER TABLE `owner`
+  ADD PRIMARY KEY (`owner_id`),
+  ADD UNIQUE KEY `username` (`username`);
+
+--
+-- Indexes for table `owners`
+--
+ALTER TABLE `owners`
+  ADD PRIMARY KEY (`owner_id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Indexes for table `packages`
@@ -424,6 +622,14 @@ ALTER TABLE `products`
   ADD PRIMARY KEY (`product_id`);
 
 --
+-- Indexes for table `requests`
+--
+ALTER TABLE `requests`
+  ADD PRIMARY KEY (`request_id`),
+  ADD KEY `appointment_id` (`appointment_id`),
+  ADD KEY `patient_id` (`patient_id`);
+
+--
 -- Indexes for table `services`
 --
 ALTER TABLE `services`
@@ -437,6 +643,21 @@ ALTER TABLE `service_categories`
   ADD PRIMARY KEY (`category_id`);
 
 --
+-- Indexes for table `staff`
+--
+ALTER TABLE `staff`
+  ADD PRIMARY KEY (`staff_id`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `idx_staff_email` (`email`),
+  ADD KEY `idx_staff_status` (`status`);
+
+--
+-- Indexes for table `store_hours`
+--
+ALTER TABLE `store_hours`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -444,67 +665,115 @@ ALTER TABLE `service_categories`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `admin_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `appointment_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `appointment_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `attendants`
 --
 ALTER TABLE `attendants`
-  MODIFY `attendant_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `attendant_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `cancellation_requests`
+--
+ALTER TABLE `cancellation_requests`
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `closed_dates`
+--
+ALTER TABLE `closed_dates`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `feedback`
 --
 ALTER TABLE `feedback`
-  MODIFY `feedback_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `owner`
+--
+ALTER TABLE `owner`
+  MODIFY `owner_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `owners`
+--
+ALTER TABLE `owners`
+  MODIFY `owner_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `packages`
 --
 ALTER TABLE `packages`
-  MODIFY `package_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `package_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `package_appointments`
 --
 ALTER TABLE `package_appointments`
-  MODIFY `package_appointment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `package_appointment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `package_bookings`
 --
 ALTER TABLE `package_bookings`
-  MODIFY `booking_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `patients`
 --
 ALTER TABLE `patients`
-  MODIFY `patient_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `patient_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `requests`
+--
+ALTER TABLE `requests`
+  MODIFY `request_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `services`
 --
 ALTER TABLE `services`
-  MODIFY `service_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `service_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `service_categories`
 --
 ALTER TABLE `service_categories`
-  MODIFY `category_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `staff`
+--
+ALTER TABLE `staff`
+  MODIFY `staff_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `store_hours`
+--
+ALTER TABLE `store_hours`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- Constraints for dumped tables
@@ -519,11 +788,23 @@ ALTER TABLE `appointments`
   ADD CONSTRAINT `appointments_service_id_fk` FOREIGN KEY (`service_id`) REFERENCES `services` (`service_id`);
 
 --
+-- Constraints for table `cancellation_requests`
+--
+ALTER TABLE `cancellation_requests`
+  ADD CONSTRAINT `cancellation_requests_ibfk_1` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`patient_id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `feedback`
 --
 ALTER TABLE `feedback`
   ADD CONSTRAINT `feedback_appointment_id_fk` FOREIGN KEY (`appointment_id`) REFERENCES `appointments` (`appointment_id`),
   ADD CONSTRAINT `feedback_patient_id_fk` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`patient_id`);
+
+--
+-- Constraints for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`appointment_id`) REFERENCES `appointments` (`appointment_id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `package_appointments`
@@ -538,6 +819,13 @@ ALTER TABLE `package_appointments`
 ALTER TABLE `package_bookings`
   ADD CONSTRAINT `package_bookings_package_id_fk` FOREIGN KEY (`package_id`) REFERENCES `packages` (`package_id`),
   ADD CONSTRAINT `package_bookings_patient_id_fk` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`patient_id`);
+
+--
+-- Constraints for table `requests`
+--
+ALTER TABLE `requests`
+  ADD CONSTRAINT `requests_ibfk_1` FOREIGN KEY (`appointment_id`) REFERENCES `appointments` (`appointment_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `requests_ibfk_2` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`patient_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `services`

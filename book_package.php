@@ -43,6 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param('issi', $booking_id, $appointment_date, $appointment_time, $attendant_id);
 
         if ($stmt->execute()) {
+            // Create notification for admin
+            $package_name = $package['package_name']; // Get package name from your query
+            $title = "New Package Booking";
+            $message = "A patient has booked the package: " . $package_name;
+            createNotification($conn, 'package', $booking_id, $title, $message);
+            
             $_SESSION['success'] = 'Package booked successfully! Your first appointment has been scheduled.';
             header('Location: patient/index.php');
             exit();

@@ -8,14 +8,22 @@ if (!isset($_SESSION['patient_id'])) {
     exit();
 }
 
-// Handle incoming package selection
-$selected_package = null;
-if (isset($_GET['package_id'])) {
-    // Get package details if coming from package booking
-    $stmt = $conn->prepare('SELECT * FROM packages WHERE package_id = ?');
-    $stmt->bind_param('i', $_GET['package_id']);
+// Handle incoming service or product selection
+$selected_service = null;
+$selected_product = null;
+
+if (isset($_GET['service_id'])) {
+    // Get service details
+    $stmt = $conn->prepare('SELECT * FROM services WHERE service_id = ?');
+    $stmt->bind_param('i', $_GET['service_id']);
     $stmt->execute();
-    $selected_package = $stmt->get_result()->fetch_assoc();
+    $selected_service = $stmt->get_result()->fetch_assoc();
+} elseif (isset($_GET['product_id'])) {
+    // Get product details
+    $stmt = $conn->prepare('SELECT * FROM products WHERE product_id = ?');
+    $stmt->bind_param('i', $_GET['product_id']);
+    $stmt->execute();
+    $selected_product = $stmt->get_result()->fetch_assoc();
 }
 
 // Get admin info
@@ -146,10 +154,15 @@ while ($row = $result->fetch_assoc()) {
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <?php endif; ?>
-        <?php if ($selected_package): ?>
+        <?php if ($selected_service): ?>
         <div class="alert alert-info">
-            <h5>Selected Package: <?php echo htmlspecialchars($selected_package['package_name']); ?></h5>
-            <p>Sessions: <?php echo $selected_package['sessions']; ?> | Duration: <?php echo $selected_package['duration_days']; ?> days</p>
+            <h5>Selected Service: <?php echo htmlspecialchars($selected_service['service_name']); ?></h5>
+            <p>Duration: <?php echo $selected_service['duration']; ?> minutes | Price: ₱<?php echo number_format($selected_service['price'], 2); ?></p>
+        </div>
+        <?php elseif ($selected_product): ?>
+        <div class="alert alert-info">
+            <h5>Selected Product: <?php echo htmlspecialchars($selected_product['product_name']); ?></h5>
+            <p>Price: ₱<?php echo number_format($selected_product['price'], 2); ?></p>
         </div>
         <?php endif; ?>
 
@@ -192,8 +205,10 @@ while ($row = $result->fetch_assoc()) {
                         <input type="hidden" name="appointment_date" id="appointment_date">
                         <input type="hidden" name="appointment_time" id="appointment_time">
                         <input type="hidden" name="attendant_id" id="attendant_id">
-                        <?php if ($selected_package): ?>
-                        <input type="hidden" name="package_id" value="<?php echo htmlspecialchars($selected_package['package_id']); ?>">
+                        <?php if ($selected_service): ?>
+                        <input type="hidden" name="service_id" value="<?php echo htmlspecialchars($selected_service['service_id']); ?>">
+                        <?php elseif ($selected_product): ?>
+                        <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($selected_product['product_id']); ?>">
                         <?php endif; ?>
 
                         <div class="mb-3">
@@ -208,7 +223,12 @@ while ($row = $result->fetch_assoc()) {
                             <label class="form-label">Selected Doctor:</label>
                             <p id="selected_doctor_display" class="form-control-plaintext"></p>
                         </div>
-                        <?php if (!$selected_package): ?>
+                        <?php if ($selected_product): ?>
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Quantity:</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" min="1" value="1" required>
+                        </div>
+                        <?php elseif (!$selected_service && !$selected_product): ?>
                         <div class="mb-3">
                             <label for="service" class="form-label">Select Service:</label>
                             <select class="form-select" id="service" name="service_id" required>

@@ -1,6 +1,7 @@
 <?php
 session_start();
 include '../db.php';
+include '../config.php';
 
 // Debug logging
 $debug_log = fopen('booking_debug.log', 'a');
@@ -45,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Start transaction
-    $conn->begin_transaction();
+    $conn->beginTransaction();
 
     try {
         // Check if slot is still available
@@ -54,11 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      SELECT 1 FROM package_appointments WHERE appointment_date = ? AND appointment_time = ? AND attendant_id = ? AND status != 'cancelled'";
 
         $stmt = $conn->prepare($check_sql);
-        $stmt->bind_param('ssissi', $appointment_date, $appointment_time, $attendant_id, $appointment_date, $appointment_time, $attendant_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
+        $stmt->execute([$appointment_date, $appointment_time, $attendant_id, $appointment_date, $appointment_time, $attendant_id]);
+        
+        if ($stmt->rowCount() > 0) {
             fwrite($debug_log, "Error: Time slot no longer available\n");
             throw new Exception('This time slot is no longer available. Please choose another time.');
         }
@@ -66,9 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($package_id) {
             // Handle package booking
             $stmt = $conn->prepare('SELECT * FROM packages WHERE package_id = ?');
-            $stmt->bind_param('i', $package_id);
-            $stmt->execute();
-            $package = $stmt->get_result()->fetch_assoc();
+            $stmt->execute([$package_id]);
+            $package = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$package) {
                 fwrite($debug_log, "Error: Package not found\n");
@@ -81,24 +79,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sessions = $package['sessions'];
             $duration = $package['duration_days'];
             $grace_period = $package['grace_period_days'];
-            $stmt->bind_param('iiiii', $patient_id, $package_id, $sessions, $duration, $grace_period);
+            $stmt->execute([$patient_id, $package_id, $sessions, $duration, $grace_period]);
 
-            if (!$stmt->execute()) {
-                fwrite($debug_log, 'Error: Failed to create package booking - ' . $stmt->error . "\n");
-                throw new Exception('Failed to create package booking. Error: ' . $stmt->error);
+            if (!$stmt->rowCount()) {
+                fwrite($debug_log, 'Error: Failed to create package booking - ' . $stmt->errorInfo()[2] . "\n");
+                throw new Exception('Failed to create package booking. Error: ' . $stmt->errorInfo()[2]);
             }
 
-            $booking_id = $conn->insert_id;
-            fwrite($debug_log, "Package booking created with ID: $booking_id\n"); // Create first package appointment
+            $booking_id = $conn->lastInsertId();
+            fwrite($debug_log, "Package booking created with ID: $booking_id\n");
+
+            // Create first package appointment
             $stmt = $conn->prepare("INSERT INTO package_appointments (booking_id, appointment_date, appointment_time, attendant_id, status) 
                                   VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param('issis', $booking_id, $appointment_date, $appointment_time, $attendant_id, $status);
+            $stmt->execute([$booking_id, $appointment_date, $appointment_time, $attendant_id, $status]);
 
-            if (!$stmt->execute()) {
-                fwrite($debug_log, 'Error: Failed to create package appointment - ' . $stmt->error . "\n");
-                throw new Exception('Failed to create package appointment. Error: ' . $stmt->error);
+            if (!$stmt->rowCount()) {
+                fwrite($debug_log, 'Error: Failed to create package appointment - ' . $stmt->errorInfo()[2] . "\n");
+                throw new Exception('Failed to create package appointment. Error: ' . $stmt->errorInfo()[2]);
             }
             fwrite($debug_log, "Package appointment created successfully\n");
+
+            // Create notification for admin
+            $package_appointment_id = $conn->lastInsertId();
+            $stmt = $conn->prepare("SELECT p.package_name, pt.first_name, pt.last_name 
+                                   FROM package_appointments pa 
+                                   JOIN package_bookings pb ON pa.booking_id = pb.booking_id 
+                                   JOIN packages p ON pb.package_id = p.package_id 
+                                   JOIN patients pt ON pb.patient_id = pt.patient_id 
+                                   WHERE pa.package_appointment_id = ?");
+            $stmt->execute([$package_appointment_id]);
+            $package_info = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $title = "New Package Booking";
+            $message = $package_info['first_name'] . " " . $package_info['last_name'] . 
+                       " has booked the package: " . $package_info['package_name'];
+            createNotification($conn, 'package', $package_appointment_id, $title, $message);
         } else {
             // Handle regular appointment
             if (!$service_id) {
@@ -108,13 +124,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $stmt = $conn->prepare("INSERT INTO appointments (patient_id, service_id, attendant_id, appointment_date, appointment_time, notes, status) 
                                   VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param('iiissss', $patient_id, $service_id, $attendant_id, $appointment_date, $appointment_time, $notes, $status);
+            $stmt->execute([$patient_id, $service_id, $attendant_id, $appointment_date, $appointment_time, $notes, $status]);
 
-            if (!$stmt->execute()) {
-                fwrite($debug_log, 'Error: Failed to create appointment - ' . $stmt->error . "\n");
-                throw new Exception('Failed to create appointment. Error: ' . $stmt->error);
+            if (!$stmt->rowCount()) {
+                fwrite($debug_log, 'Error: Failed to create appointment - ' . $stmt->errorInfo()[2] . "\n");
+                throw new Exception('Failed to create appointment. Error: ' . $stmt->errorInfo()[2]);
             }
             fwrite($debug_log, "Regular appointment created successfully\n");
+
+            // Create notification for admin
+            $appointment_id = $conn->lastInsertId();
+            $stmt = $conn->prepare("SELECT s.service_name, p.first_name, p.last_name 
+                                   FROM appointments a 
+                                   JOIN services s ON a.service_id = s.service_id 
+                                   JOIN patients p ON a.patient_id = p.patient_id 
+                                   WHERE a.appointment_id = ?");
+            $stmt->execute([$appointment_id]);
+            $appointment_info = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $title = "New Appointment Booking";
+            $message = $appointment_info['first_name'] . " " . $appointment_info['last_name'] . 
+                       " has booked an appointment for: " . $appointment_info['service_name'];
+            createNotification($conn, 'appointment', $appointment_id, $title, $message);
         }
         $conn->commit();
         fwrite($debug_log, "Transaction committed successfully\n");

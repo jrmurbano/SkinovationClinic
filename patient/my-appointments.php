@@ -189,7 +189,37 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <p><strong>Price:</strong> ₱<?php echo number_format($appointment['price'], 2); ?></p>
                                     <div class="d-flex gap-2">
                                         <a href="reschedule_appointment.php?id=<?php echo $appointment['appointment_id']; ?>" class="btn btn-warning btn-sm" <?php echo (strtotime($appointment['appointment_date']) <= strtotime(date('Y-m-d'))) ? 'disabled' : ''; ?>>Reschedule</a>
-                                        <a href="cancel_appointment.php?id=<?php echo $appointment['appointment_id']; ?>" class="btn btn-danger btn-sm" <?php echo (strtotime($appointment['appointment_date']) <= strtotime('+1 day')) ? 'disabled' : ''; ?>>Cancel</a>
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#cancelModal<?php echo $appointment['appointment_id']; ?>" <?php echo (strtotime($appointment['appointment_date']) <= strtotime('+1 day')) ? 'disabled' : ''; ?>>Request Cancellation</button>
+                                    </div>
+
+                                    <!-- Cancellation Request Modal -->
+                                    <div class="modal fade" id="cancelModal<?php echo $appointment['appointment_id']; ?>" tabindex="-1" aria-labelledby="cancelModalLabel<?php echo $appointment['appointment_id']; ?>" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="cancelModalLabel<?php echo $appointment['appointment_id']; ?>">Request Appointment Cancellation</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form action="cancel_appointment.php" method="POST">
+                                                    <div class="modal-body">
+                                                        <input type="hidden" name="appointment_id" value="<?php echo $appointment['appointment_id']; ?>">
+                                                        <input type="hidden" name="appointment_type" value="<?php echo $appointment['appointment_type']; ?>">
+                                                        <p>Are you sure you want to request cancellation for this appointment?</p>
+                                                        <div class="mb-3">
+                                                            <label for="reason<?php echo $appointment['appointment_id']; ?>" class="form-label">Reason for cancellation (optional):</label>
+                                                            <textarea class="form-control" id="reason<?php echo $appointment['appointment_id']; ?>" name="reason" rows="3"></textarea>
+                                                        </div>
+                                                        <div class="alert alert-info">
+                                                            <i class="fas fa-info-circle"></i> Your cancellation request will be reviewed by the admin. You will be notified once it's approved or rejected.
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-danger">Submit Request</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             <?php endif; ?>
@@ -242,6 +272,33 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
     <?php include '../footer.php'; ?>
+    
+    <!-- Add Bootstrap JS and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Add success/error message handling -->
+    <script>
+    $(document).ready(function() {
+        // Show success message if exists
+        <?php if (isset($_SESSION['success'])): ?>
+            $('<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                '<?php echo $_SESSION['success']; ?>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                '</div>').insertAfter('.container h1').delay(5000).fadeOut();
+            <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+
+        // Show error message if exists
+        <?php if (isset($_SESSION['error'])): ?>
+            $('<div class="alert alert-danger alert-dismissible fade show" role="alert">' +
+                '<?php echo $_SESSION['error']; ?>' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                '</div>').insertAfter('.container h1').delay(5000).fadeOut();
+            <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
+    });
+    </script>
 </body>
 
 </html>

@@ -172,3 +172,227 @@ service_id:
 Package booking created with ID: 7
 Package appointment created successfully
 Transaction committed successfully
+
+
+2025-05-15 23:24:22 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-21
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [package_id] => 7
+    [notes] => 
+)
+
+SESSION data: Array
+(
+    [admin_id] => 3
+    [last_appointment_check] => 2025-05-15 22:50:12
+    [patient_id] => 3
+    [user_name] => Kurt Iris Baylosis
+    [user_username] => kurt
+)
+
+Processed form data:
+patient_id: 3
+appointment_date: 2025-05-21
+appointment_time: 12:00:00
+attendant_id: 1
+package_id: 7
+service_id: 
+
+
+2025-05-15 23:25:10 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-21
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [package_id] => 7
+    [notes] => 
+)
+
+SESSION data: Array
+(
+    [admin_id] => 3
+    [last_appointment_check] => 2025-05-15 22:50:12
+    [patient_id] => 3
+    [user_name] => Kurt Iris Baylosis
+    [user_username] => kurt
+)
+
+Processed form data:
+patient_id: 3
+appointment_date: 2025-05-21
+appointment_time: 12:00:00
+attendant_id: 1
+package_id: 7
+service_id: 
+
+
+2025-05-15 23:25:48 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-21
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [package_id] => 7
+    [notes] => 
+)
+
+SESSION data: Array
+(
+    [admin_id] => 3
+    [last_appointment_check] => 2025-05-15 22:50:12
+    [patient_id] => 3
+    [user_name] => Kurt Iris Baylosis
+    [user_username] => kurt
+)
+
+Processed form data:
+patient_id: 3
+appointment_date: 2025-05-21
+appointment_time: 12:00:00
+attendant_id: 1
+package_id: 7
+service_id: 
+Package booking created with ID: 11
+Package appointment created successfully
+Transaction committed successfully
+
+
+2025-05-17 10:58:01 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-17
+    [appointment_time] => 10:00:00
+    [attendant_id] => 1
+    [notes] => 
+)
+
+SESSION data: Array
+(
+    [patient_id] => 3
+    [user_name] => Kurt Iris Baylosis
+    [user_username] => kurt
+)
+
+Processed form data:
+patient_id: 3
+appointment_date: 2025-05-17
+appointment_time: 10:00:00
+attendant_id: 1
+package_id: 
+service_id: 
+Error: No service selected
+Transaction rolled back. Error: Please select a service.
+
+
+2025-05-17 10:58:19 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-17
+    [appointment_time] => 10:00:00
+    [attendant_id] => 1
+    [notes] => 
+)
+
+SESSION data: Array
+(
+    [patient_id] => 3
+    [user_name] => Kurt Iris Baylosis
+    [user_username] => kurt
+)
+
+Processed form data:
+patient_id: 3
+appointment_date: 2025-05-17
+appointment_time: 10:00:00
+attendant_id: 1
+package_id: 
+service_id: 
+Error: No service selected
+Transaction rolled back. Error: Please select a service.
+
+
+2025-05-17 10:59:35 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-17
+    [appointment_time] => 09:00:00
+    [attendant_id] => 1
+    [notes] => 
+)
+
+SESSION data: Array
+(
+    [patient_id] => 3
+    [user_name] => Kurt Iris Baylosis
+    [user_username] => kurt
+)
+
+Processed form data:
+patient_id: 3
+appointment_date: 2025-05-17
+appointment_time: 09:00:00
+attendant_id: 1
+package_id: 
+service_id: 
+Error: No service selected
+Transaction rolled back. Error: Please select a service.
+
+
+2025-05-17 11:01:21 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-17
+    [appointment_time] => 10:00:00
+    [attendant_id] => 1
+    [service_id] => 25
+    [notes] => 
+)
+
+SESSION data: Array
+(
+    [patient_id] => 3
+    [user_name] => Kurt Iris Baylosis
+    [user_username] => kurt
+)
+
+Processed form data:
+patient_id: 3
+appointment_date: 2025-05-17
+appointment_time: 10:00:00
+attendant_id: 1
+package_id: 
+service_id: 25
+Regular appointment created successfully
+Transaction committed successfully
+
+
+2025-05-17 11:04:46 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-27
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [service_id] => 18
+    [notes] => 
+)
+
+SESSION data: Array
+(
+    [patient_id] => 3
+    [user_name] => Kurt Iris Baylosis
+    [user_username] => kurt
+)
+
+Processed form data:
+patient_id: 3
+appointment_date: 2025-05-27
+appointment_time: 12:00:00
+attendant_id: 1
+package_id: 
+service_id: 18
+Regular appointment created successfully
+Transaction committed successfully
