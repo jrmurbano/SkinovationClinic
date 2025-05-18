@@ -1,0 +1,29 @@
+Changes (aligning to DFD):
+
+1. On patient side calendar view, there's an error in displaying selected service (works okay on package and products) but can't schedule an apointment anymore due to this error.
+- Rescheduling and Cancelling Request from patients side can only available until 1 day before the appointment. On the day of the appointment, these buttons should be disabled.
+
+2. Now, back to the Appointment Scheduler and let's add Appointment Reminders and Notification, add a notification icon across all interfaces of both admin and patient (top right of interface, icon must be font awesome). When the admin confirms appointment/reschedules, it sets a notification to be sent on both admin and patient the day before the appointment and on the day apointment. Please choose an appropriate notification sound.
+
+When the admin confirms cancellation, it must remove the notification. Don't forget the provide me the SQL query I needed to execute.
+
+The notifications table should be this
+- notification_id
+- [foreign keys]
+- message
+- is_read
+
+The patient must be able to "Mark as Read" a notification and admin can see if patient already marked as read them.
+
+3. Start applying availability limitations consdering 3 attendants only per hour. Also make the taken slot hours grey on the calendar for patients
+
+4. If all above is fixed, working, and if you still can, let's proceed to improving the Patient Profile Manager.
+On patient's interface, there should be 6 sections in the content displayed horizontally.
+- Personal Profile
+- Medical Profile
+- Availed Services
+- Availed Packages
+- Availed Products
+- Account Settings (where the patient could change their username and password)
+
+All changes shall be visible to admin, too.

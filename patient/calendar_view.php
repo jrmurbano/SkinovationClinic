@@ -190,7 +190,13 @@ $booked_slots = $filtered_booked_slots;
 
 <body>
     <div class="container mt-5">
-        <h1 class="mb-4">Book an Appointment</h1>
+        <h1 class="mb-4">
+            <?php if ($selected_product): ?>
+                Pre-Order Product
+            <?php else: ?>
+                Book an Appointment
+            <?php endif; ?>
+        </h1>
         <?php if (isset($_SESSION['error'])): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <?php
@@ -231,97 +237,55 @@ $booked_slots = $filtered_booked_slots;
                 <div id="calendar"></div>
             </div>
             <div class="col-md-4" id="timeSlotContainer" style="display: none;">
-                <div class="card">
+                <div class="card mb-3">
                     <div class="card-header">
-                        <h5 class="mb-0">Select Appointment Time</h5>
+                        <h5 class="mb-0">
+                            <?php if ($selected_product): ?>
+                                Select Claim Date
+                            <?php else: ?>
+                                Select Appointment Time
+                            <?php endif; ?>
+                        </h5>
                         <small id="selectedDate"></small>
                     </div>
                     <div class="card-body">
                         <form id="timeSelectForm">
                             <div class="mb-3">
-                                <label for="timeSelect" class="form-label">Available Time Slots</label>
+                                <label for="timeSelect" class="form-label">
+                                    <?php if ($selected_product): ?>
+                                        Claim Date
+                                    <?php else: ?>
+                                        Available Time Slots
+                                    <?php endif; ?>
+                                </label>
                                 <select class="form-select" id="timeSelect" required>
-                                    <option value="">Choose a time...</option>
+                                    <option value="">
+                                        <?php if ($selected_product): ?>
+                                            Choose a claim date...
+                                        <?php else: ?>
+                                            Choose a time...
+                                        <?php endif; ?>
+                                    </option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-primary">Continue to Booking</button>
+                            <input type="hidden" name="appointment_date" id="review_appointment_date">
+                            <input type="hidden" name="appointment_time" id="review_appointment_time">
+                            <input type="hidden" name="attendant_id" id="review_attendant_id">
+                            <input type="hidden" name="service_id" id="review_service_id" value="<?php echo isset($_GET['service_id']) ? htmlspecialchars($_GET['service_id']) : ''; ?>">
+                            <input type="hidden" name="product_id" id="review_product_id" value="<?php echo isset($_GET['product_id']) ? htmlspecialchars($_GET['product_id']) : ''; ?>">
+                            <input type="hidden" name="package_id" id="review_package_id" value="<?php echo isset($_GET['package_id']) ? htmlspecialchars($_GET['package_id']) : ''; ?>">
+                            <button type="submit" class="btn btn-primary">
+                                <?php if ($selected_product): ?>
+                                    Pre-Order Product
+                                <?php elseif ($selected_package): ?>
+                                    Book Package
+                                <?php else: ?>
+                                    Book Appointment
+                                <?php endif; ?>
+                            </button>
                         </form>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Booking Modal -->
-    <div class="modal fade" id="bookingModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Appointment</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <form id="bookingForm" method="POST" action="process_booking.php">
-                    <div class="modal-body">
-                        <input type="hidden" name="appointment_date" id="appointment_date">
-                        <input type="hidden" name="appointment_time" id="appointment_time">
-                        <input type="hidden" name="attendant_id" id="attendant_id">
-                        <?php if ($selected_service): ?>
-                        <input type="hidden" name="service_id" value="<?php echo htmlspecialchars($selected_service['service_id']); ?>">
-                        <?php elseif ($selected_product): ?>
-                        <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($selected_product['product_id']); ?>">
-                        <?php elseif ($selected_package): ?>
-                        <input type="hidden" name="package_id" value="<?php echo htmlspecialchars($selected_package['package_id']); ?>">
-                        <?php endif; ?>
-
-                        <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-calendar-alt"></i> Selected Date:</label>
-                            <p id="selected_date_display" class="form-control-plaintext" placeholder="Select a date"></p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-clock"></i> Selected Time:</label>
-                            <p id="selected_time_display" class="form-control-plaintext" placeholder="Select a time"></p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-tag"></i> <?php 
-                                if ($selected_service) echo 'Selected Service:';
-                                elseif ($selected_product) echo 'Selected Product:';
-                                elseif ($selected_package) echo 'Selected Package:';
-                                else echo 'Selected Service/Product/Package:';
-                            ?></label>
-                            <p class="form-control-plaintext" id="selected_item_display" placeholder="Select a service/product/package">
-                                <?php if ($selected_service): ?>
-                                    <?php echo htmlspecialchars($selected_service['service_name']); ?>
-                                <?php elseif ($selected_product): ?>
-                                    <?php echo htmlspecialchars($selected_product['product_name']); ?>
-                                <?php elseif ($selected_package): ?>
-                                    <?php echo htmlspecialchars($selected_package['package_name']); ?>
-                                <?php endif; ?>
-                            </p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label"><i class="fas fa-money-bill-wave"></i> Amount to be paid on clinic premises (₱):</label>
-                            <p class="form-control-plaintext" id="selected_amount_display" placeholder="Amount">
-                                <?php if ($selected_service): ?>
-                                    <?php echo number_format($selected_service['price'], 2); ?>
-                                <?php elseif ($selected_product): ?>
-                                    <?php echo number_format($selected_product['price'], 2); ?>
-                                <?php elseif ($selected_package): ?>
-                                    <?php echo number_format($selected_package['price'], 2); ?>
-                                <?php endif; ?>
-                            </p>
-                        </div>
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="policyAgree" required>
-                            <label class="form-check-label" for="policyAgree">
-                                I agree with the clinic's <a href="#" id="policyLink">policy</a> in appointments.
-                            </label>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Confirm Booking</button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
@@ -466,54 +430,39 @@ $booked_slots = $filtered_booked_slots;
                     return;
                 }
 
-                // Use the stored ISO date
-                selectTimeSlot(
-                    selectedISODate,
-                    time,
-                    '1', // Admin ID 
-                    'Skinovation Clinic'
-                );
-            });
+                // Set the values in the hidden form fields
+                document.getElementById('review_appointment_date').value = selectedISODate;
+                document.getElementById('review_appointment_time').value = time;
+                document.getElementById('review_attendant_id').value = '1'; // Admin ID
 
-            window.selectTimeSlot = function(date, time, attendantId, doctorName) {
-                // Set the values in the form with the raw date
-                document.getElementById('appointment_date').value = date;
-                document.getElementById('appointment_time').value = time;
-                document.getElementById('attendant_id').value = attendantId;
+                // Always ensure only ONE of the IDs is set, and the others are cleared
+                const urlParams = new URLSearchParams(window.location.search);
+                const serviceId = urlParams.get('service_id');
+                const productId = urlParams.get('product_id');
+                const packageId = urlParams.get('package_id');
+                if (serviceId) {
+                    document.getElementById('review_service_id').value = serviceId;
+                    document.getElementById('review_product_id').value = '';
+                    document.getElementById('review_package_id').value = '';
+                } else if (productId) {
+                    document.getElementById('review_service_id').value = '';
+                    document.getElementById('review_product_id').value = productId;
+                    document.getElementById('review_package_id').value = '';
+                } else if (packageId) {
+                    document.getElementById('review_service_id').value = '';
+                    document.getElementById('review_product_id').value = '';
+                    document.getElementById('review_package_id').value = packageId;
+                } else {
+                    // If none, clear all
+                    document.getElementById('review_service_id').value = '';
+                    document.getElementById('review_product_id').value = '';
+                    document.getElementById('review_package_id').value = '';
+                }
 
-                // Update modal with selected item info
-                document.querySelector('#selected_item_display').textContent = selectedItem.name || '';
-                document.querySelector('#selected_amount_display').textContent = selectedItem.amount || '';
-                document.querySelector('#selected_item_display').previousElementSibling.innerHTML = '<i class="fas fa-tag"></i> ' + (selectedItem.label || 'Selected Service/Product/Package:');
-
-                // Use the original Date object for display to avoid timezone issues
-                let displayDateObj = selectedDateObj;
-                document.getElementById('selected_date_display').textContent = displayDateObj.toLocaleDateString(
-                    'en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-
-                // Format the time for display
-                const displayTime = new Date('2000-01-01T' + time).toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true
-                });
-                document.getElementById('selected_time_display').textContent = displayTime;
-
-                // Show the modal
-                const modal = new bootstrap.Modal(document.getElementById('bookingModal'));
-                modal.show();
-            }
-
-            // Policy modal logic
-            document.getElementById('policyLink').addEventListener('click', function(e) {
-                e.preventDefault();
-                const policyModal = new bootstrap.Modal(document.getElementById('policyModal'));
-                policyModal.show();
+                // Submit the form to review_booking.php
+                this.action = 'review_booking.php';
+                this.method = 'POST';
+                this.submit();
             });
         });
     </script>

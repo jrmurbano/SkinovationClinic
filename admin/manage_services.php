@@ -109,14 +109,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Get all services
-$stmt = $conn->query("
-    SELECT s.*, c.name as category_name 
-    FROM services s 
-    LEFT JOIN service_categories c ON s.category_id = c.category_id 
-    ORDER BY s.service_name
-");
-$services = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Get all services, filter by category if set
+$category_filter = isset($_GET['category_id']) && $_GET['category_id'] !== '' ? (int)$_GET['category_id'] : null;
+if ($category_filter) {
+    $stmt = $conn->prepare("
+        SELECT s.*, c.name as category_name 
+        FROM services s 
+        LEFT JOIN service_categories c ON s.category_id = c.category_id 
+        WHERE s.category_id = ?
+        ORDER BY s.service_name");
+    $stmt->execute([$category_filter]);
+    $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $stmt = $conn->query("
+        SELECT s.*, c.name as category_name 
+        FROM services s 
+        LEFT JOIN service_categories c ON s.category_id = c.category_id 
+        ORDER BY s.service_name");
+    $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 // Get all categories
 $stmt = $conn->query("SELECT * FROM service_categories ORDER BY name");
@@ -170,8 +181,21 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="card">
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
+                    <!-- Category Filter Dropdown -->
+                    <form method="GET" class="mb-3 d-flex align-items-center gap-2">
+                        <label for="categoryFilter" class="form-label mb-0">Filter by Category:</label>
+                        <select class="form-select w-auto" id="categoryFilter" name="category_id" onchange="this.form.submit()">
+                            <option value="">All Categories</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?php echo $category['category_id']; ?>" <?php if (isset($_GET['category_id']) && $_GET['category_id'] == $category['category_id']) echo 'selected'; ?>>
+                                    <?php echo htmlspecialchars($category['name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+                    <!-- End Category Filter Dropdown -->
+                    <div class="table-responsive" style="min-width: 1100px;">
+                        <table class="table table-striped" style="min-width: 1000px;">
                             <thead>
                                 <tr>
                                     <th>Image</th>
@@ -348,14 +372,14 @@ function deleteService(serviceId) {
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-spa"></i> Service Name</label>
+                        <label class="form-label">Service Name</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-spa"></i></span>
                             <input type="text" class="form-control" name="service_name" id="edit_service_name" placeholder="Enter service name" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-list"></i> Category</label>
+                        <label class="form-label">Category</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-list"></i></span>
                             <select class="form-select" name="category_id" id="edit_category_id" required>
@@ -369,28 +393,28 @@ function deleteService(serviceId) {
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
+                        <label class="form-label">Description</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-align-left"></i></span>
                             <textarea class="form-control" name="description" id="edit_description" rows="3" placeholder="Enter service description"></textarea>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-tag"></i> Price (₱)</label>
+                        <label class="form-label">Price (₱)</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-peso-sign"></i></span>
                             <input type="number" class="form-control" name="price" id="edit_price" step="0.01" placeholder="Enter price" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-clock"></i> Duration (minutes)</label>
+                        <label class="form-label">Duration (minutes)</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-clock"></i></span>
                             <input type="number" class="form-control" name="duration" id="edit_duration" placeholder="Enter duration in minutes" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-image"></i> Image</label>
+                        <label class="form-label">Image</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-image"></i></span>
                             <input type="file" class="form-control" name="edit_image" id="edit_image" accept="image/*" onchange="previewEditServiceImage(event)">

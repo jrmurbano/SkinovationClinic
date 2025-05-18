@@ -140,7 +140,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1><i class="fas fa-shopping-bag"></i> Manage Products</h1>
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                <button type="button" class="btn" style="background: linear-gradient(135deg, #36c3f7 0%, #5bc6f7 100%); color: #000; border: none;" data-bs-toggle="modal" data-bs-target="#addProductModal">
                     <i class="fas fa-plus"></i> Add New Product
                 </button>
             </div>
@@ -274,35 +274,35 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-box"></i> Product Name</label>
+                        <label class="form-label">Product Name</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-box"></i></span>
                             <input type="text" class="form-control" name="product_name" id="edit_product_name" placeholder="Enter product name" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
+                        <label class="form-label">Description</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-align-left"></i></span>
                             <textarea class="form-control" name="description" id="edit_description" rows="3" placeholder="Enter product description"></textarea>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-tag"></i> Price (₱)</label>
+                        <label class="form-label">Price (₱)</label>
                         <div class="input-group">
                             <span class="input-group-text">₱</span>
                             <input type="number" class="form-control" name="price" id="edit_price" step="0.01" placeholder="Enter price" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-boxes"></i> Stock</label>
+                        <label class="form-label">Stock</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-boxes"></i></span>
                             <input type="number" class="form-control" name="stock" id="edit_stock" placeholder="Enter stock quantity" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-image"></i> Image</label>
+                        <label class="form-label">Image</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-image"></i></span>
                             <input type="file" class="form-control" name="edit_image" id="edit_image" accept="image/*" onchange="previewEditProductImage(event)">

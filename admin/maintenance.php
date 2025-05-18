@@ -77,7 +77,7 @@ $history_logs = $history_stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="card-body text-center">
                             <i class="fas fa-shopping-bag fa-3x mb-3 text-info"></i>
                             <h5 class="card-title">Manage Products</h5>
-                            <p class="card-text">Manage retail products and inventory.</p>
+                            <p class="card-text">Manage clinic products.</p>
                             <a href="manage_products.php" class="btn btn-info">
                                 <i class="fas fa-edit"></i> Manage Products
                             </a>

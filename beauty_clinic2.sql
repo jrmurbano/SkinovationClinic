@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 17, 2025 at 07:39 PM
+-- Generation Time: May 18, 2025 at 05:48 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -67,7 +67,8 @@ CREATE TABLE `appointments` (
 --
 
 INSERT INTO `appointments` (`appointment_id`, `patient_id`, `service_id`, `attendant_id`, `appointment_date`, `appointment_time`, `status`, `created_at`, `updated_at`) VALUES
-(1, 2, 8, 1, '2025-05-19', '14:00:00', 'cancelled', '2025-05-17 19:11:47', '2025-05-17 19:12:16');
+(1, 2, 8, 1, '2025-05-19', '14:00:00', 'cancelled', '2025-05-17 19:11:47', '2025-05-17 19:12:16'),
+(2, 4, 15, 1, '2025-05-20', '15:00:00', 'confirmed', '2025-05-18 08:22:46', '2025-05-18 08:25:43');
 
 -- --------------------------------------------------------
 
@@ -90,7 +91,9 @@ CREATE TABLE `attendants` (
 --
 
 INSERT INTO `attendants` (`attendant_id`, `last_name`, `first_name`, `shift_date`, `shift_time`, `updated_at`, `created_at`) VALUES
-(1, 'Reyes', 'Kranchy', '2025-05-18', '10:00:00', '2025-05-18 03:17:52', '2025-05-13 23:35:42');
+(1, 'Reyes', 'Kranchy', '2025-05-18', '10:00:00', '2025-05-18 03:17:52', '2025-05-13 23:35:42'),
+(2, 'Ynares', 'Jillian', '2025-05-18', '10:00:00', '2025-05-18 08:33:11', '2025-05-18 08:16:58'),
+(3, 'Pendon', 'Nicole', '2025-05-18', '10:00:00', '2025-05-18 11:57:08', '2025-05-18 11:57:08');
 
 -- --------------------------------------------------------
 
@@ -144,6 +147,100 @@ CREATE TABLE `feedback` (
   `comment` text COLLATE utf8mb4_general_ci,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `history_log`
+--
+
+CREATE TABLE `history_log` (
+  `id` int NOT NULL,
+  `datetime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `type` enum('Service','Product','Package') NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `action` enum('Added','Edited','Deleted','Availed') NOT NULL,
+  `performed_by` varchar(255) NOT NULL,
+  `details` text,
+  `related_id` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `history_log`
+--
+
+INSERT INTO `history_log` (`id`, `datetime`, `type`, `name`, `action`, `performed_by`, `details`, `related_id`) VALUES
+(1, '2025-05-18 08:06:05', 'Product', 'Sunscreen', 'Edited', 'Admin', 'Product updated.', NULL),
+(2, '2025-05-18 11:14:38', 'Service', 'Casmara', 'Edited', 'Admin', 'Service updated.', NULL),
+(3, '2025-05-18 11:22:49', 'Product', 'Derm Options Kojic Soap', 'Edited', 'Admin', 'Product updated.', NULL),
+(4, '2025-05-18 11:24:38', 'Product', 'Lightening Cream', 'Edited', 'Admin', 'Product updated.', NULL),
+(5, '2025-05-18 11:25:04', 'Product', 'Derm Options Pore Minimizer (Toner)', 'Edited', 'Admin', 'Product updated.', NULL),
+(6, '2025-05-18 11:25:22', 'Product', 'Sunscreen Cream', 'Edited', 'Admin', 'Product updated.', NULL),
+(7, '2025-05-18 11:26:11', 'Product', 'Derm Options Yellow Soap (Anti-Acne)', 'Edited', 'Admin', 'Product updated.', NULL),
+(8, '2025-05-18 11:31:13', 'Service', 'Diamond Peel', 'Edited', 'Admin', 'Service updated.', NULL),
+(9, '2025-05-18 11:36:32', 'Service', 'Chest/Back', 'Edited', 'Admin', 'Service updated.', NULL),
+(10, '2025-05-18 11:36:46', 'Service', 'Neck', 'Edited', 'Admin', 'Service updated.', NULL),
+(11, '2025-05-18 11:37:03', 'Service', 'Charcoal', 'Edited', 'Admin', 'Service updated.', NULL),
+(12, '2025-05-18 11:37:16', 'Service', 'Collagen', 'Edited', 'Admin', 'Service updated.', NULL),
+(13, '2025-05-18 11:37:32', 'Service', 'Snow White', 'Edited', 'Admin', 'Service updated.', NULL),
+(14, '2025-05-18 11:37:43', 'Service', 'Casmara', 'Edited', 'Admin', 'Service updated.', NULL),
+(15, '2025-05-18 11:38:07', 'Service', 'Radio Frequency', 'Edited', 'Admin', 'Service updated.', NULL),
+(16, '2025-05-18 11:38:17', 'Service', 'Geneo Infusion', 'Edited', 'Admin', 'Service updated.', NULL),
+(17, '2025-05-18 11:38:33', 'Service', 'Oxygeneo', 'Edited', 'Admin', 'Service updated.', NULL),
+(18, '2025-05-18 11:39:08', 'Service', 'Skin Rejuvenation', 'Edited', 'Admin', 'Service updated.', NULL),
+(19, '2025-05-18 11:39:27', 'Service', 'Galvanic Therapy', 'Edited', 'Admin', 'Service updated.', NULL),
+(20, '2025-05-18 11:39:48', 'Service', 'Platelet-Rich Plasma (PRP) therapy', 'Edited', 'Admin', 'Service updated.', NULL),
+(21, '2025-05-18 11:40:01', 'Service', 'Carbon Doll Laser', 'Edited', 'Admin', 'Service updated.', NULL),
+(22, '2025-05-18 11:40:13', 'Service', 'Pico Glow', 'Edited', 'Admin', 'Service updated.', NULL),
+(23, '2025-05-18 11:40:39', 'Service', 'Tattoo Removal', 'Edited', 'Admin', 'Service updated.', NULL),
+(24, '2025-05-18 11:40:51', 'Service', 'Vitamin C Infusion', 'Edited', 'Admin', 'Service updated.', NULL),
+(25, '2025-05-18 11:41:03', 'Service', 'Underarm Whitening', 'Edited', 'Admin', 'Service updated.', NULL),
+(26, '2025-05-18 11:41:13', 'Service', 'Back Whitening', 'Edited', 'Admin', 'Service updated.', NULL),
+(27, '2025-05-18 11:41:23', 'Service', 'Chest Whitening', 'Edited', 'Admin', 'Service updated.', NULL),
+(28, '2025-05-18 11:41:32', 'Service', 'Butt Whitening', 'Edited', 'Admin', 'Service updated.', NULL),
+(29, '2025-05-18 11:41:46', 'Service', 'Neck Whitening', 'Edited', 'Admin', 'Service updated.', NULL),
+(30, '2025-05-18 11:43:40', 'Service', 'Pimple Injection', 'Edited', 'Admin', 'Service updated.', NULL),
+(31, '2025-05-18 11:43:47', 'Service', 'Anti-Acne Treatment', 'Edited', 'Admin', 'Service updated.', NULL),
+(32, '2025-05-18 11:44:01', 'Service', 'Face Cavitation', 'Edited', 'Admin', 'Service updated.', NULL),
+(33, '2025-05-18 11:44:11', 'Service', 'Waist Cavitation', 'Edited', 'Admin', 'Service updated.', NULL),
+(34, '2025-05-18 11:44:22', 'Service', 'Thighs Cavitation', 'Edited', 'Admin', 'Service updated.', NULL),
+(35, '2025-05-18 11:44:32', 'Service', 'Arms Cavitation', 'Edited', 'Admin', 'Service updated.', NULL),
+(36, '2025-05-18 11:45:22', 'Service', 'IPL Face', 'Edited', 'Admin', 'Service updated.', NULL),
+(37, '2025-05-18 11:45:38', 'Service', 'IPL Arm', 'Edited', 'Admin', 'Service updated.', NULL),
+(38, '2025-05-18 11:46:22', 'Service', 'IPL Back', 'Edited', 'Admin', 'Service updated.', NULL),
+(39, '2025-05-18 11:46:48', 'Service', 'IPL Upperlip', 'Edited', 'Admin', 'Service updated.', NULL),
+(40, '2025-05-18 11:47:16', 'Service', 'IPL Underarms', 'Edited', 'Admin', 'Service updated.', NULL),
+(41, '2025-05-18 11:47:43', 'Service', 'IPL Bikini', 'Edited', 'Admin', 'Service updated.', NULL),
+(42, '2025-05-18 11:49:19', 'Service', 'IPL Brazilian', 'Edited', 'Admin', 'Service updated.', NULL),
+(43, '2025-05-18 11:49:58', 'Service', 'IPL Legs', 'Edited', 'Admin', 'Service updated.', NULL),
+(44, '2025-05-18 11:50:36', 'Service', 'IPL Chest', 'Edited', 'Admin', 'Service updated.', NULL),
+(45, '2025-05-18 11:50:48', 'Service', 'Warts Removal', 'Edited', 'Admin', 'Service updated.', NULL),
+(46, '2025-05-18 11:51:03', 'Service', 'Korean Lash Lift with Tint', 'Edited', 'Admin', 'Service updated.', NULL),
+(47, '2025-05-18 11:51:12', 'Service', 'Korean Lash Lift without Tint', 'Edited', 'Admin', 'Service updated.', NULL),
+(48, '2025-05-18 13:04:38', 'Service', 'Anti-Acne Treatment', 'Edited', 'Admin', 'Service updated.', NULL),
+(49, '2025-05-18 13:05:27', 'Service', 'Arms Cavitation', 'Edited', 'Admin', 'Service updated.', NULL),
+(50, '2025-05-18 13:18:26', 'Service', 'Galvanic Therapy', 'Edited', 'Admin', 'Service updated.', NULL),
+(51, '2025-05-18 13:19:59', 'Service', 'Back Whitening', 'Edited', 'Admin', 'Service updated.', NULL),
+(52, '2025-05-18 13:23:23', 'Service', 'Carbon Doll Laser', 'Edited', 'Admin', 'Service updated.', NULL),
+(53, '2025-05-18 13:24:05', 'Service', 'Charcoal', 'Edited', 'Admin', 'Service updated.', NULL),
+(54, '2025-05-18 13:26:30', 'Service', 'Collagen', 'Edited', 'Admin', 'Service updated.', NULL),
+(55, '2025-05-18 13:27:36', 'Service', 'Warts Removal', 'Edited', 'Admin', 'Service updated.', NULL),
+(56, '2025-05-18 13:28:25', 'Service', 'Geneo Infusion', 'Edited', 'Admin', 'Service updated.', NULL),
+(57, '2025-05-18 13:29:07', 'Service', 'Oxygeneo', 'Edited', 'Admin', 'Service updated.', NULL),
+(58, '2025-05-18 13:30:25', 'Service', 'Platelet-Rich Plasma (PRP) therapy', 'Edited', 'Admin', 'Service updated.', NULL),
+(59, '2025-05-18 13:31:18', 'Service', 'Face Cavitation', 'Edited', 'Admin', 'Service updated.', NULL),
+(60, '2025-05-18 13:32:12', 'Service', 'Chest/Back', 'Edited', 'Admin', 'Service updated.', NULL),
+(61, '2025-05-18 13:34:55', 'Service', 'IPL Underarms', 'Edited', 'Admin', 'Service updated.', NULL),
+(62, '2025-05-18 13:35:26', 'Service', 'IPL Back', 'Edited', 'Admin', 'Service updated.', NULL),
+(63, '2025-05-18 13:36:03', 'Service', 'IPL Upperlip', 'Edited', 'Admin', 'Service updated.', NULL),
+(64, '2025-05-18 13:37:02', 'Service', 'Waist Cavitation', 'Edited', 'Admin', 'Service updated.', NULL),
+(65, '2025-05-18 13:39:21', 'Service', 'IPL Brazilian', 'Edited', 'Admin', 'Service updated.', NULL),
+(66, '2025-05-18 13:40:36', 'Service', 'IPL Bikini', 'Edited', 'Admin', 'Service updated.', NULL),
+(67, '2025-05-18 13:41:05', 'Service', 'Vitamin C Infusion', 'Edited', 'Admin', 'Service updated.', NULL),
+(68, '2025-05-18 13:44:08', 'Service', 'Radio Frequency', 'Edited', 'Admin', 'Service updated.', NULL),
+(69, '2025-05-18 13:45:02', 'Service', 'Skin Rejuvenation', 'Edited', 'Admin', 'Service updated.', NULL),
+(70, '2025-05-18 13:45:41', 'Service', 'Primary Facial (Face)', 'Edited', 'Admin', 'Service updated.', NULL),
+(71, '2025-05-18 13:46:30', 'Service', 'IPL Legs', 'Edited', 'Admin', 'Service updated.', NULL);
 
 -- --------------------------------------------------------
 
@@ -337,7 +434,8 @@ CREATE TABLE `patients` (
 
 INSERT INTO `patients` (`patient_id`, `last_name`, `first_name`, `middle_name`, `username`, `password`, `phone`, `created_at`, `updated_at`, `archived`) VALUES
 (2, 'Diaz', 'Emil Joaquin', 'Hinolan', 'emil123', '$2y$10$h8bfGeF7ziBPJaD7TlKQ0e3Q66r5Y/YGPwXfCe7Cs.FRZvwmqzVPu', '09695282766', '2025-05-13 22:22:40', '2025-05-13 22:22:40', 0),
-(3, 'Baylosis', 'Kurt', 'Iris', 'kurt', '$2y$10$vvWHCqxO3mh7VDW7G0LNm.HkO5we/28emq/.mJPFG1iGMt6Se1rIS', '12312312123', '2025-05-15 19:17:40', '2025-05-15 19:17:40', 0);
+(3, 'Baylosis', 'Kurt', 'Iris', 'kurt', '$2y$10$vvWHCqxO3mh7VDW7G0LNm.HkO5we/28emq/.mJPFG1iGMt6Se1rIS', '12312312123', '2025-05-15 19:17:40', '2025-05-15 19:17:40', 0),
+(4, 'Rodrigo', 'Olivia', 'Isabel', 'oliviarodrigo', '$2y$10$.hSmvd1s62e3uF6zfOlqROBmIXDt2Ab481jY5seLSgzxPB9LxITo6', '09011282021', '2025-05-18 08:19:19', '2025-05-18 12:29:04', 0);
 
 -- --------------------------------------------------------
 
@@ -361,11 +459,11 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`product_id`, `product_name`, `description`, `price`, `stock`, `created_at`, `updated_at`, `product_image`) VALUES
-(1, 'Yellow soap (acne)', '', 140.00, 100, '2025-05-13 14:39:04', '2025-05-17 19:14:02', 'assets/img/yellow_soap.png'),
-(2, 'Pore Minimizer (Toner)', '', 380.00, 100, '2025-05-13 14:39:04', '2025-05-17 19:13:53', 'assets/img/pore_minimizer.png'),
-(3, 'Sunscreen', '', 225.00, 100, '2025-05-13 14:39:04', '2025-05-17 19:13:57', 'assets/img/sunscreen.png'),
-(4, 'Kojic Soap', '', 180.00, 100, '2025-05-13 14:39:04', '2025-05-17 19:13:42', 'assets/img/kojic_soap.png'),
-(5, 'Lightening cream', '', 230.00, 100, '2025-05-13 14:39:04', '2025-05-17 19:13:48', 'assets/img/lightening_cream.png');
+(1, 'Derm Options Yellow Soap (Anti-Acne)', 'Anti-Acne Soap', 140.00, 100, '2025-05-13 14:39:04', '2025-05-18 11:26:11', 'assets/img/product_68295353a24516.52836979.jpg'),
+(2, 'Derm Options Pore Minimizer (Toner)', 'AB Astringent', 380.00, 100, '2025-05-13 14:39:04', '2025-05-18 11:25:04', 'assets/img/product_6829531078cf74.08364219.jpg'),
+(3, 'Sunscreen Cream', 'Apply to help skin fight UV rays.', 225.00, 100, '2025-05-13 14:39:04', '2025-05-18 11:25:22', 'assets/img/product_682953229ab053.06402532.jpg'),
+(4, 'Derm Options Kojic Soap', 'Soap to whiten skin effectively', 180.00, 100, '2025-05-13 14:39:04', '2025-05-18 11:22:49', 'assets/img/product_68295289ea2f16.96311967.jpg'),
+(5, 'Lightening Cream', 'For night use.', 230.00, 100, '2025-05-13 14:39:04', '2025-05-18 11:24:38', 'assets/img/product_682952f691b149.18795681.jpg');
 
 -- --------------------------------------------------------
 
@@ -409,48 +507,48 @@ CREATE TABLE `services` (
 --
 
 INSERT INTO `services` (`service_id`, `service_name`, `description`, `price`, `duration`, `category_id`, `created_at`, `updated_at`, `image`) VALUES
-(1, 'Primary Facial (Face)', NULL, 499.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(2, 'Chest/Back', NULL, 649.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(3, 'Neck', NULL, 449.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(4, 'Charcoal', 'Facial with Diamond Peel + Charcoal', 699.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(5, 'Collagen', 'Facial with Diamond Peel + Collagen Mask', 699.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(6, 'Snow White', 'Facial with Diamond Peel + Vitamin C serum & mask', 799.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(7, 'Casmara', 'Facial with Diamond Peel + Casmara Mask', 1000.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(8, 'Diamond Peel', NULL, 499.00, 60, 1, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(9, 'Radio Frequency', 'With Facial', 999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(10, 'Geneo Infusion', 'Rejuvenation & Brightening', 999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(11, 'Oxygeneo', 'Facial + RF + Infusion', 1999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(12, 'Skin Rejuvenation', 'Facial + Serum + PDT Light', 999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(13, 'Galvanic Therapy', 'Facial + Serum Infusion', 799.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(14, 'PRP', 'Facial + PRP + PDT Light', 1899.00, 60, 2, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(15, 'Carbon Doll Laser', NULL, 999.00, 60, 3, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(16, 'Pico Glow', 'Melasma/Freckles', 999.00, 60, 3, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(17, 'Tattoo Removal', 'Depends on size', 999.00, 60, 3, '2025-05-13 06:03:46', '2025-05-13 14:30:47', NULL),
-(18, 'Vitamin C Infusion', 'Face', 349.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(19, 'Underarm Whitening', NULL, 549.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(20, 'Back Whitening', NULL, 649.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(21, 'Chest Whitening', NULL, 549.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(22, 'Butt Whitening', NULL, 549.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(23, 'Neck Whitening', NULL, 349.00, 15, 4, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(24, 'Pimple Injection', 'Per Pimple', 99.00, 60, 5, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(25, 'Anti-Acne Treatment', 'Facial + Serum + Light', 1599.00, 60, 5, '2025-05-13 06:03:46', '2025-05-16 08:39:17', NULL),
-(26, 'Face Cavitation', NULL, 899.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(27, 'Waist Cavitation', NULL, 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(28, 'Thighs Cavitation', NULL, 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(29, 'Arms Cavitation', NULL, 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(30, 'IPL Face', NULL, 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
+(1, 'Primary Facial (Face)', '', 499.00, 60, 1, '2025-05-13 06:03:46', '2025-05-18 13:45:41', 'assets/img/service_682974058dd1e3.98457666.jpg'),
+(2, 'Chest/Back', 'A facial treatment specifically for the chest or back area.', 649.00, 60, 1, '2025-05-13 06:03:46', '2025-05-18 13:32:12', 'assets/img/service_682970dc9d4552.80214440.jpg'),
+(3, 'Neck', 'A facial treatment targeting the neck area. ', 449.00, 60, 1, '2025-05-13 06:03:46', '2025-05-18 11:36:46', NULL),
+(4, 'Charcoal', 'A facial that includes a Diamond Peel and a Charcoal mask for deep cleansing and purification. ', 699.00, 60, 1, '2025-05-13 06:03:46', '2025-05-18 13:24:05', 'assets/img/service_68296ef5dc8551.89673092.jpg'),
+(5, 'Collagen', 'This facial combines a Diamond Peel with a Collagen mask to help improve skin elasticity and firmness. ', 699.00, 60, 1, '2025-05-13 06:03:46', '2025-05-18 13:26:30', 'assets/img/service_68296f86202a35.75352874.jpg'),
+(6, 'Snow White', 'Features a Diamond Peel along with a Vitamin C serum and mask to brighten and even out skin tone. ', 799.00, 60, 1, '2025-05-13 06:03:46', '2025-05-18 11:37:32', NULL),
+(7, 'Casmara', 'A premium facial that includes a Diamond Peel and a specialized Casmara mask for targeted skin concerns. ', 1000.00, 60, 1, '2025-05-13 06:03:46', '2025-05-18 11:37:43', 'assets/img/service_6829509e8684b3.32845245.jpg'),
+(8, 'Diamond Peel', 'An exfoliating treatment to remove dead skin cells and reveal smoother skin. ', 499.00, 60, 1, '2025-05-13 06:03:46', '2025-05-18 11:31:13', 'assets/img/service_68295481ef5d45.56517721.jpg'),
+(9, 'Radio Frequency', 'A treatment that uses radiofrequency energy to tighten skin and reduce the appearance of wrinkles, combined with a facial. ', 999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-18 13:44:08', 'assets/img/service_682973a8541c62.46097733.png'),
+(10, 'Geneo Infusion', 'A treatment that infuses the skin with active ingredients for rejuvenation and brightening effects. ', 999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-18 13:28:25', 'assets/img/service_68296ff8f3f665.74137706.png'),
+(11, 'Oxygeneo', 'A comprehensive treatment combining a facial, radiofrequency, and infusion for enhanced oxygenation, skin tightening, and nourishment.', 1999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-18 13:29:07', 'assets/img/service_682970238ee6a6.30687018.jpg'),
+(12, 'Skin Rejuvenation', 'This treatment combines a facial, serum application, and Photodynamic therapy (PDT) light therapy to promote skin renewal. ', 999.00, 60, 2, '2025-05-13 06:03:46', '2025-05-18 13:45:02', 'assets/img/service_682973de853147.02259351.webp'),
+(13, 'Galvanic Therapy', 'Uses gentle electrical currents to enhance the absorption of serums into the skin, paired with a facial.', 799.00, 60, 2, '2025-05-13 06:03:46', '2025-05-18 13:18:26', 'assets/img/service_68296da2147359.39605132.jpg'),
+(14, 'Platelet-Rich Plasma (PRP) therapy', 'Platelet-Rich Plasma (PRP) therapy combined with a facial and PDT light to stimulate collagen production and skin regeneration.', 1899.00, 60, 2, '2025-05-13 06:03:46', '2025-05-18 13:30:25', 'assets/img/service_68297071cbe637.07989830.jpg'),
+(15, 'Carbon Doll Laser', 'A laser treatment that uses a carbon mask to exfoliate, minimize pores, and improve skin texture. ', 999.00, 60, 3, '2025-05-13 06:03:46', '2025-05-18 13:23:23', 'assets/img/service_68296ecb6e42c3.25325927.jpg'),
+(16, 'Pico Glow', 'A laser treatment designed to target and reduce the appearance of melasma and freckles. ', 999.00, 60, 3, '2025-05-13 06:03:46', '2025-05-18 11:40:13', NULL),
+(17, 'Tattoo Removal', 'Laser treatment to remove unwanted tattoos (price depends on size).', 999.00, 60, 3, '2025-05-13 06:03:46', '2025-05-18 11:40:39', NULL),
+(18, 'Vitamin C Infusion', 'A treatment that infuses Vitamin C into the facial skin for a brighter complexion. ', 349.00, 15, 4, '2025-05-13 06:03:46', '2025-05-18 13:41:05', 'assets/img/service_682972f1b47736.15464392.webp'),
+(19, 'Underarm Whitening', 'A treatment to lighten the skin in the underarm area. ', 549.00, 15, 4, '2025-05-13 06:03:46', '2025-05-18 11:41:03', NULL),
+(20, 'Back Whitening', 'A treatment focused on lightening the skin on the back. ', 649.00, 15, 4, '2025-05-13 06:03:46', '2025-05-18 13:19:59', 'assets/img/service_68296dffed12e2.89401796.jpg'),
+(21, 'Chest Whitening', 'A treatment to lighten the skin on the chest area. ', 549.00, 15, 4, '2025-05-13 06:03:46', '2025-05-18 11:41:23', NULL),
+(22, 'Butt Whitening', 'A treatment aimed at lightening the skin on the buttocks. ', 549.00, 15, 4, '2025-05-13 06:03:46', '2025-05-18 11:41:32', NULL),
+(23, 'Neck Whitening', 'A treatment to lighten the skin on the neck. ', 349.00, 15, 4, '2025-05-13 06:03:46', '2025-05-18 11:41:46', NULL),
+(24, 'Pimple Injection', 'A direct injection to reduce inflammation and size of individual pimples. ', 99.00, 60, 5, '2025-05-13 06:03:46', '2025-05-18 11:43:40', NULL),
+(25, 'Anti-Acne Treatment', 'A comprehensive treatment involving a facial, anti-acne serum, and light therapy to combat acne. ', 1599.00, 60, 5, '2025-05-13 06:03:46', '2025-05-18 13:04:38', 'assets/img/service_68296a663424c6.44351006.webp'),
+(26, 'Face Cavitation', 'Cavitation treatment to help slim and contour the face. ', 899.00, 60, 6, '2025-05-13 06:03:46', '2025-05-18 13:31:18', 'assets/img/service_682970a638d196.48295171.jpg'),
+(27, 'Waist Cavitation', 'Cavitation treatment targeting fat reduction and contouring of the waist area. ', 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-18 13:37:02', 'assets/img/service_682971fecdeb09.17194132.jpg'),
+(28, 'Thighs Cavitation', 'Cavitation treatment aimed at slimming and contouring the thighs. ', 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-18 11:44:22', NULL),
+(29, 'Arms Cavitation', 'Cavitation treatment to help reduce fat and contour the arms. ', 999.00, 60, 6, '2025-05-13 06:03:46', '2025-05-18 13:05:27', 'assets/img/service_68296a9719a224.45641582.webp'),
+(30, 'IPL Face', 'Intense Pulsed Light (IPL) treatment for hair removal on the face. ', 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-18 11:45:22', NULL),
 (31, 'IPL Neck', NULL, 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(32, 'IPL Arm', NULL, 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(33, 'IPL Brazilian', NULL, 699.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(34, 'IPL Legs', 'Lower/Upper', 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(35, 'IPL Upperlip', NULL, 299.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(36, 'IPL Underarms', NULL, 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(37, 'IPL Bikini', NULL, 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(38, 'IPL Chest', NULL, 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(39, 'IPL Back', 'Lower/Upper', 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(40, 'Warts Removal', 'Minimum price per area', 1500.00, 60, 8, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(41, 'Korean Lash Lift with Tint', NULL, 699.00, 30, 8, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL),
-(42, 'Korean Lash Lift without Tint', NULL, 499.00, 30, 8, '2025-05-13 06:03:46', '2025-05-13 06:03:46', NULL);
+(32, 'IPL Arm', 'Intense Pulsed Light (IPL) hair removal for the arms. ', 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-18 11:45:38', NULL),
+(33, 'IPL Brazilian', 'Intense Pulsed Light (IPL) Brazilian hair removal on the bikini area. ', 699.00, 15, 7, '2025-05-13 06:03:46', '2025-05-18 13:39:21', 'assets/img/service_682972899df284.28425790.jpg'),
+(34, 'IPL Legs', 'Intense Pulsed Light (IPL) hair removal for either the lower or upper legs. ', 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-18 13:46:30', 'assets/img/service_68297436d4b9c0.74762067.jpg'),
+(35, 'IPL Upperlip', 'Intense Pulsed Light (IPL) removal for the upper lip area. ', 299.00, 15, 7, '2025-05-13 06:03:46', '2025-05-18 13:36:03', 'assets/img/service_682971c3bf7dc4.13615735.webp'),
+(36, 'IPL Underarms', 'Intense Pulsed Light (IPL) hair removal for the underarms.', 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-18 13:34:55', 'assets/img/service_6829717fc05b75.51679548.jpg'),
+(37, 'IPL Bikini', 'Intense Pulsed Light (IPL) hair removal for the bikini line. ', 499.00, 15, 7, '2025-05-13 06:03:46', '2025-05-18 13:40:36', 'assets/img/service_682972d4249411.25368167.png'),
+(38, 'IPL Chest', 'Intense Pulsed Light (IPL) hair removal for the chest area. ', 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-18 11:50:36', NULL),
+(39, 'IPL Back', 'Intense Pulsed Light (IPL) hair removal for either the lower or upper back.', 999.00, 15, 7, '2025-05-13 06:03:46', '2025-05-18 13:35:26', 'assets/img/service_6829719e9ba5d2.02481982.webp'),
+(40, 'Warts Removal', 'Treatment for removing warts (minimum price per area applies). ', 1500.00, 60, 8, '2025-05-13 06:03:46', '2025-05-18 13:27:36', 'assets/img/service_68296fc81aad77.47065882.jpg'),
+(41, 'Korean Lash Lift with Tint', 'A treatment to curl and lift lashes, with an option for tinting.', 699.00, 30, 8, '2025-05-13 06:03:46', '2025-05-18 11:51:03', NULL),
+(42, 'Korean Lash Lift without Tint', 'A treatment to curl and lift lashes.', 499.00, 30, 8, '2025-05-13 06:03:46', '2025-05-18 11:51:12', NULL);
 
 -- --------------------------------------------------------
 
@@ -474,7 +572,7 @@ INSERT INTO `service_categories` (`category_id`, `name`) VALUES
 (4, 'Lightening Treatments'),
 (5, 'Pimple Treatments'),
 (6, 'Body Slimming with Cavitation'),
-(7, 'IPL (Hair Removal)'),
+(7, 'Intense Pulsed Light (IPL) Hair Removal'),
 (8, 'Other Services');
 
 -- --------------------------------------------------------
@@ -577,6 +675,12 @@ ALTER TABLE `feedback`
   ADD PRIMARY KEY (`feedback_id`),
   ADD KEY `feedback_appointment_id_fk` (`appointment_id`),
   ADD KEY `feedback_patient_id_fk` (`patient_id`);
+
+--
+-- Indexes for table `history_log`
+--
+ALTER TABLE `history_log`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `notifications`
@@ -685,13 +789,13 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `appointment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `appointment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `attendants`
 --
 ALTER TABLE `attendants`
-  MODIFY `attendant_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `attendant_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `cancellation_requests`
@@ -710,6 +814,12 @@ ALTER TABLE `closed_dates`
 --
 ALTER TABLE `feedback`
   MODIFY `feedback_id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `history_log`
+--
+ALTER TABLE `history_log`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
 -- AUTO_INCREMENT for table `notifications`
@@ -751,7 +861,7 @@ ALTER TABLE `package_bookings`
 -- AUTO_INCREMENT for table `patients`
 --
 ALTER TABLE `patients`
-  MODIFY `patient_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `patient_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `products`
