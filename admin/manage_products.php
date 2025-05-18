@@ -32,6 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_POST['stock'],
                     $imagePath
                 ]);
+                // Log history
+                $adminName = isset($_SESSION['admin_name']) ? $_SESSION['admin_name'] : 'Admin';
+                logHistory($conn, 'Product', $_POST['product_name'], 'Added', $adminName, 'New product added to the system.');
                 $_SESSION['success'] = "Product added successfully!";
                 break;
 
@@ -43,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $target = '../assets/img/' . $filename;
                     if (move_uploaded_file($_FILES['edit_image']['tmp_name'], $target)) {
                         $imagePath = 'assets/img/' . $filename;
-                        
                         // Delete old image if exists
                         $stmt = $conn->prepare("SELECT product_image FROM products WHERE product_id = ?");
                         $stmt->execute([$_POST['product_id']]);
@@ -53,7 +55,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
                 }
-
                 if ($imagePath !== null) {
                     $stmt = $conn->prepare("UPDATE products SET product_name = ?, description = ?, price = ?, stock = ?, product_image = ? WHERE product_id = ?");
                     $stmt->execute([
@@ -74,6 +75,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_POST['product_id']
                     ]);
                 }
+                // Log history
+                $adminName = isset($_SESSION['admin_name']) ? $_SESSION['admin_name'] : 'Admin';
+                logHistory($conn, 'Product', $_POST['product_name'], 'Edited', $adminName, 'Product updated.');
                 $_SESSION['success'] = "Product updated successfully!";
                 break;
 
@@ -85,9 +89,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($image && file_exists('../' . $image)) {
                     unlink('../' . $image);
                 }
-
+                // Get product name for log
+                $stmt = $conn->prepare("SELECT product_name FROM products WHERE product_id = ?");
+                $stmt->execute([$_POST['product_id']]);
+                $productName = $stmt->fetchColumn();
                 $stmt = $conn->prepare("DELETE FROM products WHERE product_id = ?");
                 $stmt->execute([$_POST['product_id']]);
+                // Log history
+                $adminName = isset($_SESSION['admin_name']) ? $_SESSION['admin_name'] : 'Admin';
+                logHistory($conn, 'Product', $productName, 'Deleted', $adminName, 'Product deleted.');
                 $_SESSION['success'] = "Product deleted successfully!";
                 break;
         }
@@ -206,35 +216,35 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-box"></i> Product Name</label>
+                        <label class="form-label">Product Name</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-box"></i></span>
                             <input type="text" class="form-control" name="product_name" placeholder="Enter product name" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
+                        <label class="form-label">Description</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-align-left"></i></span>
                             <textarea class="form-control" name="description" rows="3" placeholder="Enter product description"></textarea>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-tag"></i> Price (₱)</label>
+                        <label class="form-label">Price (₱)</label>
                         <div class="input-group">
                             <span class="input-group-text">₱</span>
                             <input type="number" class="form-control" name="price" step="0.01" placeholder="Enter price" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-boxes"></i> Stock</label>
+                        <label class="form-label">Stock</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-boxes"></i></span>
                             <input type="number" class="form-control" name="stock" placeholder="Enter stock quantity" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-image"></i> Image</label>
+                        <label class="form-label">Image</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-image"></i></span>
                             <input type="file" class="form-control" name="image" accept="image/*" onchange="previewProductImage(event)">

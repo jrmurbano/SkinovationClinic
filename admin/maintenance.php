@@ -7,6 +7,10 @@ if (!isset($_SESSION['admin_id'])) {
     header('Location: admin_login.php');
     exit();
 }
+
+// Fetch history log entries
+$history_stmt = $conn->query("SELECT * FROM history_log ORDER BY datetime DESC LIMIT 100");
+$history_logs = $history_stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -101,28 +105,23 @@ if (!isset($_SESSION['admin_id'])) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- Example static row, replace with dynamic PHP later -->
-                                    <tr>
-                                        <td>2025-05-18 14:30</td>
-                                        <td>Service</td>
-                                        <td>Facial Treatment</td>
-                                        <td>Added</td>
-                                        <td>Admin Jane</td>
-                                        <td>New service added to the system.</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2025-05-18 15:00</td>
-                                        <td>Product</td>
-                                        <td>Skin Cleanser</td>
-                                        <td>Availed</td>
-                                        <td>Maria Santos</td>
-                                        <td>Product purchased by customer.</td>
-                                    </tr>
-                                    <!-- End example rows -->
+                                    <?php if (!empty($history_logs)): ?>
+                                        <?php foreach ($history_logs as $log): ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars($log['datetime']) ?></td>
+                                                <td><?= htmlspecialchars($log['type']) ?></td>
+                                                <td><?= htmlspecialchars($log['name']) ?></td>
+                                                <td><?= htmlspecialchars($log['action']) ?></td>
+                                                <td><?= htmlspecialchars($log['performed_by']) ?></td>
+                                                <td><?= htmlspecialchars($log['details']) ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr><td colspan="6" class="text-center text-muted">No history log entries found.</td></tr>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>
-                        <div class="text-muted small mt-2">* This log will display all add, edit, delete, and availed actions for services, packages, and products.</div>
                     </div>
                 </div>
             </div>

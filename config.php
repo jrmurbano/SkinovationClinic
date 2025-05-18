@@ -107,3 +107,16 @@ if (!function_exists('formatCurrency')) {
         return '₱' . number_format($amount, 2);
     }
 }
+
+// Function to log history actions
+if (!function_exists('logHistory')) {
+    function logHistory($conn, $type, $name, $action, $performed_by, $details = '', $related_id = null) {
+        try {
+            $stmt = $conn->prepare("INSERT INTO history_log (type, name, action, performed_by, details, related_id) VALUES (?, ?, ?, ?, ?, ?)");
+            return $stmt->execute([$type, $name, $action, $performed_by, $details, $related_id]);
+        } catch (PDOException $e) {
+            error_log('History Log Error: ' . $e->getMessage());
+            return false;
+        }
+    }
+}

@@ -33,6 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_POST['category_id'],
                     $imagePath
                 ]);
+                // Log history
+                $adminName = isset($_SESSION['admin_name']) ? $_SESSION['admin_name'] : 'Admin';
+                logHistory($conn, 'Service', $_POST['service_name'], 'Added', $adminName, 'New service added to the system.');
                 $_SESSION['success'] = "Service added successfully!";
                 break;
 
@@ -44,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $target = '../assets/img/' . $filename;
                     if (move_uploaded_file($_FILES['edit_image']['tmp_name'], $target)) {
                         $imagePath = 'assets/img/' . $filename;
-                        
                         // Delete old image if exists
                         $stmt = $conn->prepare("SELECT image FROM services WHERE service_id = ?");
                         $stmt->execute([$_POST['service_id']]);
@@ -54,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
                 }
-
                 if ($imagePath !== null) {
                     $stmt = $conn->prepare("UPDATE services SET service_name = ?, description = ?, price = ?, duration = ?, category_id = ?, image = ? WHERE service_id = ?");
                     $stmt->execute([
@@ -77,6 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_POST['service_id']
                     ]);
                 }
+                // Log history
+                $adminName = isset($_SESSION['admin_name']) ? $_SESSION['admin_name'] : 'Admin';
+                logHistory($conn, 'Service', $_POST['service_name'], 'Edited', $adminName, 'Service updated.');
                 $_SESSION['success'] = "Service updated successfully!";
                 break;
 
@@ -88,9 +92,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($image && file_exists('../' . $image)) {
                     unlink('../' . $image);
                 }
-
+                // Get service name for log
+                $stmt = $conn->prepare("SELECT service_name FROM services WHERE service_id = ?");
+                $stmt->execute([$_POST['service_id']]);
+                $serviceName = $stmt->fetchColumn();
                 $stmt = $conn->prepare("DELETE FROM services WHERE service_id = ?");
                 $stmt->execute([$_POST['service_id']]);
+                // Log history
+                $adminName = isset($_SESSION['admin_name']) ? $_SESSION['admin_name'] : 'Admin';
+                logHistory($conn, 'Service', $serviceName, 'Deleted', $adminName, 'Service deleted.');
                 $_SESSION['success'] = "Service deleted successfully!";
                 break;
         }
@@ -219,14 +229,14 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-spa"></i> Service Name</label>
+                        <label class="form-label">Service Name</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-spa"></i></span>
                             <input type="text" class="form-control" name="service_name" placeholder="Enter service name" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-list"></i> Category</label>
+                        <label class="form-label">Category</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-list"></i></span>
                             <select class="form-select" name="category_id" required>
@@ -240,28 +250,28 @@ $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
+                        <label class="form-label">Description</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-align-left"></i></span>
                             <textarea class="form-control" name="description" rows="3" placeholder="Enter service description"></textarea>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-tag"></i> Price (₱)</label>
+                        <label class="form-label">Price (₱)</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-peso-sign"></i></span>
                             <input type="number" class="form-control" name="price" step="0.01" placeholder="Enter price" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-clock"></i> Duration (minutes)</label>
+                        <label class="form-label">Duration (minutes)</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-clock"></i></span>
                             <input type="number" class="form-control" name="duration" placeholder="Enter duration in minutes" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-image"></i> Image</label>
+                        <label class="form-label">Image</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-image"></i></span>
                             <input type="file" class="form-control" name="image" accept="image/*" onchange="previewServiceImage(event)">

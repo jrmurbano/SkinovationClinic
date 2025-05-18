@@ -280,42 +280,42 @@ $packages = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-box-open"></i> Package Name</label>
+                        <label class="form-label">Package Name</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-box-open"></i></span>
                             <input type="text" class="form-control" name="package_name" placeholder="Enter package name" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-align-left"></i> Description</label>
+                        <label class="form-label">Description</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-align-left"></i></span>
                             <textarea class="form-control" name="description" rows="3" placeholder="Enter package description"></textarea>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-tag"></i> Price (₱)</label>
+                        <label class="form-label">Price (₱)</label>
                         <div class="input-group">
                             <span class="input-group-text">₱</span>
                             <input type="number" class="form-control" name="price" step="0.01" placeholder="Enter price" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-list-ol"></i> Number of Sessions</label>
+                        <label class="form-label">Number of Sessions</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-list-ol"></i></span>
                             <input type="number" class="form-control" name="sessions" placeholder="Enter number of sessions" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-calendar-day"></i> Duration (days)</label>
+                        <label class="form-label">Duration (days)</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-calendar-day"></i></span>
                             <input type="number" class="form-control" name="duration_days" placeholder="Enter duration in days" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><i class="fas fa-hourglass-half"></i> Grace Period (days)</label>
+                        <label class="form-label">Grace Period (days)</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-hourglass-half"></i></span>
                             <input type="number" class="form-control" name="grace_period_days" placeholder="Enter grace period in days" required>
