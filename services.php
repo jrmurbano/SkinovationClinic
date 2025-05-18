@@ -151,8 +151,8 @@ $categoryName = getCategoryName($category);
                                 </p>
                             </div>
                             <a href="<?php echo isset($_SESSION['patient_id']) 
-                                ? 'patient/calendar_view.php?service_id=' . htmlspecialchars($service['id'] ?? '0') 
-                                : 'login.php?redirect=booking&service_id=' . htmlspecialchars($service['id'] ?? '0'); ?>" class="btn btn-purple">
+                                ? 'patient/calendar_view.php?service_id=' . htmlspecialchars($service['service_id']) 
+                                : 'login.php?redirect=booking&service_id=' . htmlspecialchars($service['service_id']); ?>" class="btn btn-purple">
                                 <i class="bi bi-calendar-plus me-1"></i>Book Now
                             </a>
                         </div>

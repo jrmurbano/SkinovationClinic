@@ -6,9 +6,15 @@ include '../db.php';
 $appointment_date = $_POST['appointment_date'] ?? '';
 $appointment_time = $_POST['appointment_time'] ?? '';
 $attendant_id = $_POST['attendant_id'] ?? '';
-$service_id = $_POST['service_id'] ?? null;
-$product_id = $_POST['product_id'] ?? null;
-$package_id = $_POST['package_id'] ?? null;
+$service_id = isset($_POST['service_id']) && is_numeric($_POST['service_id']) && $_POST['service_id'] > 0 ? (int)$_POST['service_id'] : 
+             (isset($_SESSION['selected_service_id']) && is_numeric($_SESSION['selected_service_id']) && $_SESSION['selected_service_id'] > 0 ? (int)$_SESSION['selected_service_id'] : null);
+$product_id = isset($_POST['product_id']) && is_numeric($_POST['product_id']) && $_POST['product_id'] > 0 ? (int)$_POST['product_id'] : null;
+$package_id = isset($_POST['package_id']) && is_numeric($_POST['package_id']) && $_POST['package_id'] > 0 ? (int)$_POST['package_id'] : null;
+
+// Debug logging
+error_log("POST data: " . print_r($_POST, true));
+error_log("SESSION data: " . print_r($_SESSION, true));
+error_log("Service ID: " . $service_id);
 
 // Fetch selected item details
 $selected_item = null;
@@ -16,16 +22,18 @@ $amount = null;
 $label = '';
 // Debug: Dump POST data if nothing is found
 if (
-    (empty($_POST['service_id']) || !is_numeric($_POST['service_id'])) &&
-    (empty($_POST['product_id']) || !is_numeric($_POST['product_id'])) &&
-    (empty($_POST['package_id']) || !is_numeric($_POST['package_id']))
+    (empty($service_id) || !is_numeric($service_id)) &&
+    (empty($product_id) || !is_numeric($product_id)) &&
+    (empty($package_id) || !is_numeric($package_id))
 ) {
     echo '<div class="alert alert-danger">No valid service, product, or package ID was sent. Please go back and try again.<br>Debug POST: <pre>';
     print_r($_POST);
+    echo '</pre><br>Debug SESSION: <pre>';
+    print_r($_SESSION);
     echo '</pre></div>';
+    exit();
 }
-if (!empty($_POST['service_id']) && is_numeric($_POST['service_id'])) {
-    $service_id = $_POST['service_id'];
+if (!empty($service_id) && is_numeric($service_id)) {
     $stmt = $conn->prepare('SELECT * FROM services WHERE service_id = ?');
     $stmt->bind_param('i', $service_id);
     $stmt->execute();
@@ -33,8 +41,7 @@ if (!empty($_POST['service_id']) && is_numeric($_POST['service_id'])) {
     $amount = $selected_item ? $selected_item['price'] : null;
     $label = 'Selected Service:';
     $product_id = $package_id = null;
-} elseif (!empty($_POST['product_id']) && is_numeric($_POST['product_id'])) {
-    $product_id = $_POST['product_id'];
+} elseif (!empty($product_id) && is_numeric($product_id)) {
     $stmt = $conn->prepare('SELECT * FROM products WHERE product_id = ?');
     $stmt->bind_param('i', $product_id);
     $stmt->execute();
@@ -42,8 +49,7 @@ if (!empty($_POST['service_id']) && is_numeric($_POST['service_id'])) {
     $amount = $selected_item ? $selected_item['price'] : null;
     $label = 'Selected Product:';
     $service_id = $package_id = null;
-} elseif (!empty($_POST['package_id']) && is_numeric($_POST['package_id'])) {
-    $package_id = $_POST['package_id'];
+} elseif (!empty($package_id) && is_numeric($package_id)) {
     $stmt = $conn->prepare('SELECT * FROM packages WHERE package_id = ?');
     $stmt->bind_param('i', $package_id);
     $stmt->execute();

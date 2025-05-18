@@ -157,9 +157,9 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="card">
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
+                    <div class="table-responsive" style="min-width: 1100px;">
+                        <table class="table table-striped table-bordered" style="min-width: 900px;">
+                            <thead class="table-primary" style="position: sticky; top: 0; z-index: 2;">
                                 <tr>
                                     <th>Image</th>
                                     <th>Product Name</th>

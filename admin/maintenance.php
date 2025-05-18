@@ -8,6 +8,37 @@ if (!isset($_SESSION['admin_id'])) {
     exit();
 }
 
+// Create history_log table if it doesn't exist
+try {
+    $conn->query("
+        CREATE TABLE IF NOT EXISTS history_log (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            datetime DATETIME DEFAULT CURRENT_TIMESTAMP,
+            type VARCHAR(50) NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            action VARCHAR(50) NOT NULL,
+            performed_by VARCHAR(255) NOT NULL,
+            details TEXT
+        )
+    ");
+} catch (PDOException $e) {
+    // Log error but continue execution
+    error_log("Error creating history_log table: " . $e->getMessage());
+}
+
+// Function to log history entries
+function logHistory($conn, $type, $name, $action, $performed_by, $details = '') {
+    try {
+        $stmt = $conn->prepare("
+            INSERT INTO history_log (type, name, action, performed_by, details)
+            VALUES (?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([$type, $name, $action, $performed_by, $details]);
+    } catch (PDOException $e) {
+        error_log("Error logging history: " . $e->getMessage());
+    }
+}
+
 // Fetch history log entries
 $history_stmt = $conn->query("SELECT * FROM history_log ORDER BY datetime DESC LIMIT 100");
 $history_logs = $history_stmt->fetchAll(PDO::FETCH_ASSOC);

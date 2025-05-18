@@ -161,26 +161,36 @@ $packages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="card">
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
+                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                        <table class="table table-striped table-bordered" style="min-width: 900px;">
+                            <thead class="table-primary" style="position: sticky; top: 0; z-index: 2;">
                                 <tr>
+                                    <th>Image</th>
                                     <th>Package Name</th>
+                                    <th>Description</th>
                                     <th>Price</th>
                                     <th>Sessions</th>
-                                    <th>Duration</th>
-                                    <th>Grace Period</th>
+                                    <th>Duration (days)</th>
+                                    <th>Grace Period (days)</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($packages as $package): ?>
                                 <tr>
-                                    <td><?php echo clean($package['package_name']); ?></td>
-                                    <td>₱<?php echo number_format($package['price'], 2); ?></td>
-                                    <td><?php echo $package['sessions']; ?></td>
-                                    <td><?php echo $package['duration_days']; ?> days</td>
-                                    <td><?php echo $package['grace_period_days']; ?> days</td>
+                                    <td>
+                                        <?php if (!empty($package['package_image'])): ?>
+                                            <img src="../<?php echo htmlspecialchars($package['package_image']); ?>" alt="Package Image" style="max-width:60px;max-height:60px;object-fit:cover;">
+                                        <?php else: ?>
+                                            <span class="text-muted"><i class="fas fa-image"></i> No Image</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?php echo htmlspecialchars($package['package_name'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($package['description'] ?? ''); ?></td>
+                                    <td>₱<?php echo number_format($package['price'] ?? 0, 2); ?></td>
+                                    <td><?php echo $package['sessions'] ?? ''; ?></td>
+                                    <td><?php echo $package['duration_days'] ?? ''; ?></td>
+                                    <td><?php echo $package['grace_period_days'] ?? ''; ?></td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-primary" 
                                                 onclick="editPackage(<?php echo htmlspecialchars(json_encode($package)); ?>)">
@@ -204,7 +214,7 @@ $packages = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <h5 class="mb-0"><i class="fas fa-clock"></i> Pending Package Appointments</h5>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
+                    <div class="table-responsive" style="min-width: 1100px;">
                         <?php
                         $stmt = $conn->query("
                             SELECT pa.*, pb.patient_id, p.package_name, pt.first_name, pt.last_name, att.first_name as attendant_first_name, att.last_name as attendant_last_name
@@ -423,4 +433,4 @@ function deletePackage(packageId) {
 }
 </script>
 </body>
-</html> 
+</html>

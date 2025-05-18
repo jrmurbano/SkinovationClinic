@@ -13,12 +13,15 @@ $selected_service = null;
 $selected_product = null;
 $selected_package = null;
 
-if (isset($_GET['service_id'])) {
+if (isset($_GET['service_id']) && is_numeric($_GET['service_id']) && $_GET['service_id'] > 0) {
     // Get service details
     $stmt = $conn->prepare('SELECT * FROM services WHERE service_id = ?');
     $stmt->bind_param('i', $_GET['service_id']);
     $stmt->execute();
     $selected_service = $stmt->get_result()->fetch_assoc();
+    
+    // Store service ID in session
+    $_SESSION['selected_service_id'] = $_GET['service_id'];
 } elseif (isset($_GET['product_id'])) {
     // Get product details
     $stmt = $conn->prepare('SELECT * FROM products WHERE product_id = ?');
@@ -271,9 +274,9 @@ $booked_slots = $filtered_booked_slots;
                             <input type="hidden" name="appointment_date" id="review_appointment_date">
                             <input type="hidden" name="appointment_time" id="review_appointment_time">
                             <input type="hidden" name="attendant_id" id="review_attendant_id">
-                            <input type="hidden" name="service_id" id="review_service_id" value="<?php echo isset($_GET['service_id']) ? htmlspecialchars($_GET['service_id']) : ''; ?>">
-                            <input type="hidden" name="product_id" id="review_product_id" value="<?php echo isset($_GET['product_id']) ? htmlspecialchars($_GET['product_id']) : ''; ?>">
-                            <input type="hidden" name="package_id" id="review_package_id" value="<?php echo isset($_GET['package_id']) ? htmlspecialchars($_GET['package_id']) : ''; ?>">
+                            <input type="hidden" name="service_id" id="review_service_id" value="<?php echo isset($_GET['service_id']) && is_numeric($_GET['service_id']) ? htmlspecialchars($_GET['service_id']) : ''; ?>">
+                            <input type="hidden" name="product_id" id="review_product_id" value="<?php echo isset($_GET['product_id']) && is_numeric($_GET['product_id']) ? htmlspecialchars($_GET['product_id']) : ''; ?>">
+                            <input type="hidden" name="package_id" id="review_package_id" value="<?php echo isset($_GET['package_id']) && is_numeric($_GET['package_id']) ? htmlspecialchars($_GET['package_id']) : ''; ?>">
                             <button type="submit" class="btn btn-primary">
                                 <?php if ($selected_product): ?>
                                     Pre-Order Product
@@ -440,23 +443,44 @@ $booked_slots = $filtered_booked_slots;
                 const serviceId = urlParams.get('service_id');
                 const productId = urlParams.get('product_id');
                 const packageId = urlParams.get('package_id');
-                if (serviceId) {
+
+                // Validate service ID
+                if (serviceId && (!isNaN(serviceId) && parseInt(serviceId) > 0)) {
                     document.getElementById('review_service_id').value = serviceId;
                     document.getElementById('review_product_id').value = '';
                     document.getElementById('review_package_id').value = '';
-                } else if (productId) {
+                } else if (productId && (!isNaN(productId) && parseInt(productId) > 0)) {
                     document.getElementById('review_service_id').value = '';
                     document.getElementById('review_product_id').value = productId;
                     document.getElementById('review_package_id').value = '';
-                } else if (packageId) {
+                } else if (packageId && (!isNaN(packageId) && parseInt(packageId) > 0)) {
                     document.getElementById('review_service_id').value = '';
                     document.getElementById('review_product_id').value = '';
                     document.getElementById('review_package_id').value = packageId;
                 } else {
-                    // If none, clear all
-                    document.getElementById('review_service_id').value = '';
-                    document.getElementById('review_product_id').value = '';
-                    document.getElementById('review_package_id').value = '';
+                    alert('Invalid service, product, or package selection. Please try again.');
+                    return;
+                }
+
+                // Log the values before submission
+                console.log('Submitting form with values:');
+                console.log('Service ID:', document.getElementById('review_service_id').value);
+                console.log('Date:', document.getElementById('review_appointment_date').value);
+                console.log('Time:', document.getElementById('review_appointment_time').value);
+                console.log('Attendant ID:', document.getElementById('review_attendant_id').value);
+
+                // Validate all required fields
+                if (!document.getElementById('review_appointment_date').value ||
+                    !document.getElementById('review_appointment_time').value ||
+                    !document.getElementById('review_attendant_id').value ||
+                    (
+                        !document.getElementById('review_service_id').value &&
+                        !document.getElementById('review_product_id').value &&
+                        !document.getElementById('review_package_id').value
+                    )
+                ) {
+                    alert('Please fill in all required fields');
+                    return;
                 }
 
                 // Submit the form to review_booking.php

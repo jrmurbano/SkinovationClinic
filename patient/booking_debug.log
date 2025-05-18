@@ -593,3 +593,1361 @@ package_id:
 service_id: 
 Error: No service selected
 Transaction rolled back. Error: Please select a service.
+
+
+2025-05-19 01:43:40 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-23
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [admin_id] => 3
+)
+
+Processed form data:
+patient_id: 0
+appointment_date: 2025-05-23
+appointment_time: 12:00:00
+attendant_id: 1
+package_id: 
+service_id: 
+Error: No service selected
+Transaction rolled back. Error: Please select a service.
+
+
+2025-05-19 01:45:29 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-19
+    [appointment_time] => 11:00:00
+    [attendant_id] => 1
+    [service_id] => 25
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [admin_id] => 3
+    [selected_service_id] => 25
+)
+
+Processed form data:
+patient_id: 0
+appointment_date: 2025-05-19
+appointment_time: 11:00:00
+attendant_id: 1
+package_id: 
+service_id: 25
+Regular appointment created successfully
+Transaction committed successfully
+
+
+2025-05-19 01:46:38 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-20
+    [appointment_time] => 11:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 7
+)
+
+Processed form data:
+patient_id: 0
+appointment_date: 2025-05-20
+appointment_time: 11:00:00
+attendant_id: 1
+package_id: 
+service_id: 7
+Transaction rolled back. Error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '0' for key 'PRIMARY'
+
+
+2025-05-19 01:47:24 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-20
+    [appointment_time] => 11:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 7
+)
+
+Processed form data:
+patient_id: 0
+appointment_date: 2025-05-20
+appointment_time: 11:00:00
+attendant_id: 1
+package_id: 
+service_id: 7
+Transaction rolled back. Error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '0' for key 'PRIMARY'
+
+
+2025-05-18 19:50:21 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-21
+    [appointment_time] => 11:00:00
+    [attendant_id] => 1
+    [service_id] => 25
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 25
+)
+
+
+
+2025-05-18 19:50:42 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-20
+    [appointment_time] => 11:00:00
+    [attendant_id] => 1
+    [package_id] => 1
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 25
+)
+
+
+
+2025-05-18 19:50:49 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-20
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [product_id] => 4
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 25
+)
+
+
+
+2025-05-18 19:51:17 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-20
+    [appointment_time] => 10:00:00
+    [attendant_id] => 1
+    [service_id] => 25
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 25
+)
+
+
+
+2025-05-18 19:56:44 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-19
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [service_id] => 25
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 25
+)
+
+
+
+2025-05-18 19:59:32 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-20
+    [appointment_time] => 11:00:00
+    [attendant_id] => 1
+    [service_id] => 25
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 25
+)
+
+
+
+2025-05-18 19:59:40 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-20
+    [appointment_time] => 13:00:00
+    [attendant_id] => 1
+    [package_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 25
+)
+
+
+
+2025-05-18 20:02:27 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-20
+    [appointment_time] => 11:00:00
+    [attendant_id] => 1
+    [service_id] => 25
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 25
+)
+
+Invalid values:
+Patient ID: 0
+Service ID: 25
+Attendant ID: 1
+Date: 2025-05-20
+Time: 11:00:00
+
+
+2025-05-18 20:02:40 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-20
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [service_id] => 25
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 25
+)
+
+Invalid values:
+Patient ID: 0
+Service ID: 25
+Attendant ID: 1
+Date: 2025-05-20
+Time: 12:00:00
+
+
+2025-05-18 20:03:44 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-22
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [service_id] => 25
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 25
+)
+
+Invalid values:
+Patient ID: 0
+Service ID: 25
+Attendant ID: 1
+Date: 2025-05-22
+Time: 12:00:00
+
+
+2025-05-18 20:08:31 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-19
+    [appointment_time] => 11:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 29
+)
+
+Validating input:
+Patient ID: 0
+Service ID: 29
+Attendant ID: 1
+Date: 2025-05-19
+Time: 11:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-19
+    [appointment_time] => 11:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [selected_service_id] => 29
+)
+
+
+
+2025-05-18 20:13:20 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-19
+    [appointment_time] => 11:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 3
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [last_appointment_check] => 2025-05-19 02:11:35
+    [selected_service_id] => 29
+)
+
+Validating input:
+Patient ID: 0
+Service ID: 29
+Attendant ID: 1
+Date: 2025-05-19
+Time: 11:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-19
+    [appointment_time] => 11:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 3
+    [patient_id] => 0
+    [user_name] => khi s seyer
+    [user_username] => khi
+    [last_appointment_check] => 2025-05-19 02:11:35
+    [selected_service_id] => 29
+)
+
+
+
+2025-05-18 20:38:01 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-22
+    [appointment_time] => 15:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+Validating input:
+Patient ID: 4
+Service ID: 29
+Attendant ID: 1
+Date: 2025-05-22
+Time: 15:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-22
+    [appointment_time] => 15:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+Created appointment with ID: 3
+
+
+2025-05-18 20:48:23 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+Validating input:
+Patient ID: 4
+Service ID: 29
+Attendant ID: 1
+Date: 2025-05-30
+Time: 14:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+Created appointment with ID: 4
+
+
+2025-05-19 04:49:13 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+
+
+2025-05-19 04:52:51 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 15:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+
+
+2025-05-18 21:10:51 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 7
+)
+
+Validating input:
+Patient ID: 4
+Service ID: 7
+Attendant ID: 1
+Date: 2025-05-29
+Time: 14:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 7
+)
+
+Created appointment with ID: 5
+
+
+2025-05-18 21:11:13 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 7
+)
+
+Validating input:
+Patient ID: 4
+Service ID: 7
+Attendant ID: 1
+Date: 2025-05-29
+Time: 12:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 7
+)
+
+Created appointment with ID: 6
+
+
+2025-05-18 21:12:09 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 15:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+Validating input:
+Patient ID: 4
+Service ID: 29
+Attendant ID: 1
+Date: 2025-05-29
+Time: 15:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 15:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+Created appointment with ID: 7
+
+
+2025-05-18 21:13:30 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-28
+    [appointment_time] => 15:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+Validating input:
+Patient ID: 4
+Service ID: 29
+Attendant ID: 1
+Date: 2025-05-28
+Time: 15:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-28
+    [appointment_time] => 15:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+Created appointment with ID: 8
+
+
+2025-05-18 21:14:56 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [product_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+)
+
+Validating input:
+Patient ID: 4
+Service ID: 
+Attendant ID: 1
+Date: 2025-05-29
+Time: 14:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [product_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+)
+
+
+
+2025-05-18 21:15:17 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 13:00:00
+    [attendant_id] => 1
+    [product_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+)
+
+Validating input:
+Patient ID: 4
+Service ID: 
+Attendant ID: 1
+Date: 2025-05-29
+Time: 13:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 13:00:00
+    [attendant_id] => 1
+    [product_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+)
+
+
+
+2025-05-18 21:15:40 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 16:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+Validating input:
+Patient ID: 4
+Service ID: 29
+Attendant ID: 1
+Date: 2025-05-30
+Time: 16:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 16:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+Created appointment with ID: 9
+
+
+2025-05-18 21:16:56 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+Validating input:
+Patient ID: 4
+Service ID: 29
+Attendant ID: 1
+Date: 2025-05-30
+Time: 12:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+    [selected_service_id] => 29
+)
+
+Created appointment with ID: 10
+
+
+2025-05-18 22:40:43 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 13:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+    [selected_service_id] => 7
+)
+
+Validating input:
+Patient ID: 5
+Service ID: 7
+Attendant ID: 1
+Date: 2025-05-29
+Time: 13:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 13:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+    [selected_service_id] => 7
+)
+
+Created appointment with ID: 11
+
+
+2025-05-18 22:44:24 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 15:00:00
+    [attendant_id] => 1
+    [package_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+)
+
+Validating input:
+Patient ID: 5
+Service ID: 
+Attendant ID: 1
+Date: 2025-05-30
+Time: 15:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 15:00:00
+    [attendant_id] => 1
+    [package_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+)
+
+
+
+2025-05-18 22:45:28 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [product_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+)
+
+Validating input:
+Patient ID: 5
+Service ID: 
+Attendant ID: 1
+Date: 2025-05-29
+Time: 12:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [product_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+)
+
+
+
+2025-05-18 22:46:46 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [package_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+)
+
+Validating input:
+Patient ID: 5
+Service ID: 
+Attendant ID: 1
+Date: 2025-05-29
+Time: 14:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [package_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+)
+
+
+
+2025-05-18 22:48:41 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-06-04
+    [appointment_time] => 15:00:00
+    [attendant_id] => 1
+    [package_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+)
+
+Validating input:
+Patient ID: 5
+Service ID: 
+Attendant ID: 1
+Date: 2025-06-04
+Time: 15:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-06-04
+    [appointment_time] => 15:00:00
+    [attendant_id] => 1
+    [package_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+)
+
+
+
+2025-05-18 22:53:21 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-06-02
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+    [selected_service_id] => 7
+)
+
+Validating input:
+Patient ID: 5
+Service ID: 7
+Attendant ID: 1
+Date: 2025-06-02
+Time: 14:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-06-02
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+    [selected_service_id] => 7
+)
+
+Created appointment with ID: 12
+
+
+2025-05-18 22:54:39 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-06-06
+    [appointment_time] => 16:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+    [selected_service_id] => 7
+    [admin_id] => 2
+    [last_appointment_check] => 2025-05-19 06:54:32
+)
+
+Validating input:
+Patient ID: 5
+Service ID: 7
+Attendant ID: 1
+Date: 2025-06-06
+Time: 16:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-06-06
+    [appointment_time] => 16:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+    [selected_service_id] => 7
+    [admin_id] => 2
+    [last_appointment_check] => 2025-05-19 06:54:32
+)
+
+Created appointment with ID: 13
+
+
+2025-05-18 22:54:59 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 16:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+    [selected_service_id] => 7
+    [admin_id] => 2
+    [last_appointment_check] => 2025-05-19 06:54:32
+)
+
+Validating input:
+Patient ID: 5
+Service ID: 7
+Attendant ID: 1
+Date: 2025-05-30
+Time: 16:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 16:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+    [selected_service_id] => 7
+    [admin_id] => 2
+    [last_appointment_check] => 2025-05-19 06:54:32
+)
+
+Created appointment with ID: 14
+
+
+2025-05-18 22:55:25 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+    [selected_service_id] => 7
+    [admin_id] => 2
+    [last_appointment_check] => 2025-05-19 06:55:02
+)
+
+Validating input:
+Patient ID: 5
+Service ID: 7
+Attendant ID: 1
+Date: 2025-05-29
+Time: 14:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+    [selected_service_id] => 7
+    [admin_id] => 2
+    [last_appointment_check] => 2025-05-19 06:55:02
+)
+
+Created appointment with ID: 15
+
+
+2025-05-18 23:03:27 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 16:00:00
+    [attendant_id] => 1
+    [service_id] => 21
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+    [selected_service_id] => 21
+    [admin_id] => 2
+    [last_appointment_check] => 2025-05-19 06:58:18
+)
+
+Validating input:
+Patient ID: 5
+Service ID: 21
+Attendant ID: 1
+Date: 2025-05-30
+Time: 16:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 16:00:00
+    [attendant_id] => 1
+    [service_id] => 21
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+    [selected_service_id] => 21
+    [admin_id] => 2
+    [last_appointment_check] => 2025-05-19 06:58:18
+)
+
+Created appointment with ID: 16

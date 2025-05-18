@@ -1,7 +1,6 @@
 <?php
 session_start();
 include '../db.php';
-include '../config.php';
 
 // Debug logging
 $debug_log = fopen('booking_debug.log', 'a');
@@ -9,162 +8,309 @@ fwrite($debug_log, "\n\n" . date('Y-m-d H:i:s') . " - New booking attempt\n");
 fwrite($debug_log, 'POST data: ' . print_r($_POST, true) . "\n");
 fwrite($debug_log, 'SESSION data: ' . print_r($_SESSION, true) . "\n");
 
-// Check if patient is logged in
+// Check if user is logged in
 if (!isset($_SESSION['patient_id'])) {
-    fwrite($debug_log, "Error: No patient_id in session\n");
-    fclose($debug_log);
+    $_SESSION['error'] = 'Please log in to book an appointment.';
     header('Location: ../login.php');
     exit();
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get form data
+// Define createNotification if not already defined (must be before any calls)
+if (!function_exists('createNotification')) {
+    function createNotification($conn, $type, $appointment_id, $title, $message, $patient_id = null) {
+        // The notifications table does NOT have title, message, or patient_id columns.
+        // Only insert into columns that exist: type, appointment_id, is_read, created_at
+        $stmt = $conn->prepare("INSERT INTO notifications (type, appointment_id, is_read, created_at) VALUES (?, ?, 0, NOW())");
+        $stmt->bind_param('si', $type, $appointment_id);
+        $stmt->execute();
+    }
+}
+
+// Use correct transaction handling for mysqli
+$conn->autocommit(false);
+$conn->begin_transaction(); // Use this for mysqli, not PDO
+
+try {
+    // Get and validate input
     $patient_id = $_SESSION['patient_id'];
     $appointment_date = $_POST['appointment_date'] ?? '';
     $appointment_time = $_POST['appointment_time'] ?? '';
     $attendant_id = $_POST['attendant_id'] ?? '';
-    $package_id = isset($_POST['package_id']) ? $_POST['package_id'] : null;
-    $service_id = isset($_POST['service_id']) ? $_POST['service_id'] : null;
-    $notes = '';
-    $status = 'pending';
+    // Only use POST data for booking type selection
+    $service_id = isset($_POST['service_id']) && is_numeric($_POST['service_id']) && $_POST['service_id'] > 0 ? (int)$_POST['service_id'] : null;
+    $product_id = isset($_POST['product_id']) && is_numeric($_POST['product_id']) && $_POST['product_id'] > 0 ? (int)$_POST['product_id'] : null;
+    $package_id = isset($_POST['package_id']) && is_numeric($_POST['package_id']) && $_POST['package_id'] > 0 ? (int)$_POST['package_id'] : null;
 
-    fwrite($debug_log, "Processed form data:\n");
-    fwrite($debug_log, "patient_id: $patient_id\n");
-    fwrite($debug_log, "appointment_date: $appointment_date\n");
-    fwrite($debug_log, "appointment_time: $appointment_time\n");
-    fwrite($debug_log, "attendant_id: $attendant_id\n");
-    fwrite($debug_log, "package_id: $package_id\n");
-    fwrite($debug_log, "service_id: $service_id\n");
+    // Debug logging
+    fwrite($debug_log, "Validating input:\n");
+    fwrite($debug_log, "Patient ID: " . $patient_id . "\n");
+    fwrite($debug_log, "Service ID: " . $service_id . "\n");
+    fwrite($debug_log, "Attendant ID: " . $attendant_id . "\n");
+    fwrite($debug_log, "Date: " . $appointment_date . "\n");
+    fwrite($debug_log, "Time: " . $appointment_time . "\n");
+    fwrite($debug_log, "POST data: " . print_r($_POST, true) . "\n");
+    fwrite($debug_log, "SESSION data: " . print_r($_SESSION, true) . "\n");
 
     // Validate required fields
     if (!$appointment_date || !$appointment_time || !$attendant_id) {
-        fwrite($debug_log, "Error: Missing required fields\n");
-        $_SESSION['error'] = 'Please fill in all required fields';
-        fclose($debug_log);
-        header('Location: ' . getRedirectUrl($package_id));
-        exit();
+        fwrite($debug_log, "Missing required fields\n");
+        throw new Exception('Missing required booking information.');
     }
 
-    // Start transaction
-    $conn->beginTransaction();
-
-    try {
-        // Check if slot is still available
-        $check_sql = "SELECT 1 FROM appointments WHERE appointment_date = ? AND appointment_time = ? AND attendant_id = ? AND status != 'cancelled'
-                     UNION ALL
-                     SELECT 1 FROM package_appointments WHERE appointment_date = ? AND appointment_time = ? AND attendant_id = ? AND status != 'cancelled'";
-
-        $stmt = $conn->prepare($check_sql);
-        $stmt->execute([$appointment_date, $appointment_time, $attendant_id, $appointment_date, $appointment_time, $attendant_id]);
-        
-        if ($stmt->rowCount() > 0) {
-            fwrite($debug_log, "Error: Time slot no longer available\n");
-            throw new Exception('This time slot is no longer available. Please choose another time.');
-        }
-
-        if ($package_id) {
-            // Handle package booking
-            $stmt = $conn->prepare('SELECT * FROM packages WHERE package_id = ?');
-            $stmt->execute([$package_id]);
-            $package = $stmt->fetch();
-
-            if (!$package) {
-                fwrite($debug_log, "Error: Package not found\n");
-                throw new Exception('Selected package not found.');
-            }
-
-            // Create package booking
-            $stmt = $conn->prepare("INSERT INTO package_bookings (patient_id, package_id, sessions_remaining, valid_until, grace_period_until) 
-                                  VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL ? DAY), DATE_ADD(NOW(), INTERVAL ? DAY))");
-            $sessions = $package['sessions'];
-            $duration = $package['duration_days'];
-            $grace_period = $package['grace_period_days'];
-            $stmt->execute([$patient_id, $package_id, $sessions, $duration, $grace_period]);
-
-            if (!$stmt->rowCount()) {
-                fwrite($debug_log, 'Error: Failed to create package booking - ' . $stmt->errorInfo()[2] . "\n");
-                throw new Exception('Failed to create package booking. Error: ' . $stmt->errorInfo()[2]);
-            }
-
-            $booking_id = $conn->lastInsertId();
-            fwrite($debug_log, "Package booking created with ID: $booking_id\n");
-
-            // Create first package appointment
-            $stmt = $conn->prepare("INSERT INTO package_appointments (booking_id, appointment_date, appointment_time, attendant_id, status) 
-                                  VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$booking_id, $appointment_date, $appointment_time, $attendant_id, $status]);
-
-            if (!$stmt->rowCount()) {
-                fwrite($debug_log, 'Error: Failed to create package appointment - ' . $stmt->errorInfo()[2] . "\n");
-                throw new Exception('Failed to create package appointment. Error: ' . $stmt->errorInfo()[2]);
-            }
-            fwrite($debug_log, "Package appointment created successfully\n");
-
-            // Create notification for admin
-            $package_appointment_id = $conn->lastInsertId();
-            $stmt = $conn->prepare("SELECT p.package_name, pt.first_name, pt.last_name 
-                                   FROM package_appointments pa 
-                                   JOIN package_bookings pb ON pa.booking_id = pb.booking_id 
-                                   JOIN packages p ON pb.package_id = p.package_id 
-                                   JOIN patients pt ON pb.patient_id = pt.patient_id 
-                                   WHERE pa.package_appointment_id = ?");
-            $stmt->execute([$package_appointment_id]);
-            $package_info = $stmt->fetch();
-
-            $title = "New Package Booking";
-            $message = $package_info['first_name'] . " " . $package_info['last_name'] . 
-                       " has booked the package: " . $package_info['package_name'];
-            createNotification($conn, 'package', $package_appointment_id, $title, $message);
-        } else {
-            // Handle regular appointment
-            if (!$service_id) {
-                fwrite($debug_log, "Error: No service selected\n");
-                throw new Exception('Please select a service.');
-            }
-
-            $stmt = $conn->prepare("INSERT INTO appointments (patient_id, service_id, attendant_id, appointment_date, appointment_time, status) 
-                                  VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$patient_id, $service_id, $attendant_id, $appointment_date, $appointment_time, $status]);
-
-            if (!$stmt->rowCount()) {
-                fwrite($debug_log, 'Error: Failed to create appointment - ' . $stmt->errorInfo()[2] . "\n");
-                throw new Exception('Failed to create appointment. Error: ' . $stmt->errorInfo()[2]);
-            }
-            fwrite($debug_log, "Regular appointment created successfully\n");
-
-            // Create notification for admin
-            $appointment_id = $conn->lastInsertId();
-            $stmt = $conn->prepare("SELECT s.service_name, p.first_name, p.last_name 
-                                   FROM appointments a 
-                                   JOIN services s ON a.service_id = s.service_id 
-                                   JOIN patients p ON a.patient_id = p.patient_id 
-                                   WHERE a.appointment_id = ?");
-            $stmt->execute([$appointment_id]);
-            $appointment_info = $stmt->fetch();
-
-            $title = "New Appointment Booking";
-            $message = $appointment_info['first_name'] . " " . $appointment_info['last_name'] . 
-                       " has booked an appointment for: " . $appointment_info['service_name'];
-            createNotification($conn, 'appointment', $appointment_id, $title, $message);
-        }
-        $conn->commit();
-        fwrite($debug_log, "Transaction committed successfully\n");
-        $_SESSION['success'] = 'Your appointment request has been successfully sent! Please wait for confirmation. It will not take long and will be reflected in your appointment history.';
-        fclose($debug_log);
-        header('Location: my-appointments.php');
-        exit();
-    } catch (Exception $e) {
-        $conn->rollback();
-        fwrite($debug_log, 'Transaction rolled back. Error: ' . $e->getMessage() . "\n");
-        $_SESSION['error'] = $e->getMessage();
-        fclose($debug_log);
-        header('Location: ' . getRedirectUrl($package_id));
-        exit();
+    // Validate service/product/package selection
+    if (!$service_id && !$product_id && !$package_id) {
+        fwrite($debug_log, "No valid service/product/package selected\n");
+        throw new Exception('No valid service, product, or package selected.');
     }
-} else {
-    fwrite($debug_log, "Error: Not a POST request\n");
-    fclose($debug_log);
-    header('Location: calendar_view.php');
+
+    // Ensure only one booking type is selected
+    $booking_types_selected = 0;
+    if ($service_id) $booking_types_selected++;
+    if ($product_id) $booking_types_selected++;
+    if ($package_id) $booking_types_selected++;
+    if ($booking_types_selected !== 1) {
+        fwrite($debug_log, "Invalid booking type selection: more than one or none selected\n");
+        throw new Exception('Please select only one booking type (service, product, or package).');
+    }
+
+    // Validate date and time
+    $appointment_datetime = strtotime($appointment_date . ' ' . $appointment_time);
+    if ($appointment_datetime < time()) {
+        fwrite($debug_log, "Invalid date/time: " . date('Y-m-d H:i:s', $appointment_datetime) . "\n");
+        throw new Exception('Cannot book appointments in the past.');
+    }
+
+    // Check if slot is available
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) as count 
+        FROM appointments 
+        WHERE appointment_date = ? 
+        AND appointment_time = ? 
+        AND attendant_id = ? 
+        AND status != 'cancelled'
+    ");
+    $stmt->bind_param('ssi', $appointment_date, $appointment_time, $attendant_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $count = $result->fetch_assoc()['count'];
+
+    if ($count >= 3) {
+        throw new Exception('This time slot is fully booked. Please choose another time.');
+    }
+
+    // Check if patient already has an appointment at this time
+    $stmt = $conn->prepare("
+        SELECT COUNT(*) as count 
+        FROM appointments 
+        WHERE patient_id = ? 
+        AND appointment_date = ? 
+        AND appointment_time = ? 
+        AND status != 'cancelled'
+    ");
+    $stmt->bind_param('iss', $patient_id, $appointment_date, $appointment_time);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $count = $result->fetch_assoc()['count'];
+
+    if ($count > 0) {
+        throw new Exception('You already have an appointment scheduled at this time.');
+    }
+
+    // Process based on booking type
+    if ($service_id) {
+        // Handle service booking
+        $stmt = $conn->prepare("
+            INSERT INTO appointments (
+                patient_id, service_id, attendant_id, 
+                appointment_date, appointment_time, status, 
+                created_at
+            ) VALUES (?, ?, ?, ?, ?, 'pending', NOW())
+        ");
+        if (!$stmt) {
+            fwrite($debug_log, "Prepare Error: " . $conn->error . "\n");
+            throw new Exception('Database error: ' . $conn->error);
+        }
+        $stmt->bind_param('iiiss', $patient_id, $service_id, $attendant_id, $appointment_date, $appointment_time);
+        if (!$stmt->execute()) {
+            fwrite($debug_log, "SQL Error: " . $stmt->error . "\n");
+            throw new Exception('Failed to create appointment: ' . $stmt->error);
+        }
+        $appointment_id = $conn->insert_id;
+        fwrite($debug_log, "Created appointment with ID: " . $appointment_id . "\n");
+        if (!$appointment_id) {
+            fwrite($debug_log, "No appointment ID returned\n");
+            throw new Exception('Failed to create appointment: No ID returned');
+        }
+        // Schedule reminders
+        scheduleAppointmentReminders($conn, $appointment_id);
+        // Create notifications
+        $stmt = $conn->prepare("
+            SELECT s.service_name, p.first_name, p.last_name 
+            FROM appointments a 
+            JOIN services s ON a.service_id = s.service_id 
+            JOIN patients p ON a.patient_id = p.patient_id 
+            WHERE a.appointment_id = ?
+        ");
+        $stmt->bind_param('i', $appointment_id);
+        $stmt->execute();
+        $appointment_info = $stmt->get_result()->fetch_assoc();
+        // Create notification for patient
+        createNotification(
+            $conn,
+            'appointment',
+            $appointment_id,
+            "Your appointment for {$appointment_info['service_name']} on " . 
+            date('F d, Y', strtotime($appointment_date)) . " at " . 
+            date('h:i A', strtotime($appointment_time)) . " has been booked. Please wait for confirmation.",
+            '',
+            $patient_id
+        );
+        // Create notification for admin
+        createNotification(
+            $conn,
+            'appointment',
+            $appointment_id,
+            "New appointment request from {$appointment_info['first_name']} {$appointment_info['last_name']} for {$appointment_info['service_name']} on " .
+            date('F d, Y', strtotime($appointment_date)) . " at " .
+            date('h:i A', strtotime($appointment_time)),
+            '',
+            1
+        );
+    } elseif ($package_id) {
+        // Handle package booking as an appointment
+        $stmt = $conn->prepare("
+            INSERT INTO appointments (
+                patient_id, package_id, attendant_id, 
+                appointment_date, appointment_time, status, 
+                created_at
+            ) VALUES (?, ?, ?, ?, ?, 'pending', NOW())
+        ");
+        if (!$stmt) {
+            fwrite($debug_log, "Prepare Error: " . $conn->error . "\n");
+            throw new Exception('Database error: ' . $conn->error);
+        }
+        $stmt->bind_param('iiiss', $patient_id, $package_id, $attendant_id, $appointment_date, $appointment_time);
+        if (!$stmt->execute()) {
+            fwrite($debug_log, "SQL Error: " . $stmt->error . "\n");
+            throw new Exception('Failed to create package appointment: ' . $stmt->error);
+        }
+        $appointment_id = $conn->insert_id;
+        fwrite($debug_log, "Created package appointment with ID: " . $appointment_id . "\n");
+        // Schedule reminders
+        scheduleAppointmentReminders($conn, $appointment_id);
+        // Create notifications
+        $stmt = $conn->prepare("
+            SELECT pk.package_name, p.first_name, p.last_name 
+            FROM appointments a 
+            JOIN packages pk ON a.package_id = pk.package_id 
+            JOIN patients p ON a.patient_id = p.patient_id 
+            WHERE a.appointment_id = ?
+        ");
+        $stmt->bind_param('i', $appointment_id);
+        $stmt->execute();
+        $appointment_info = $stmt->get_result()->fetch_assoc();
+        createNotification(
+            $conn,
+            'appointment',
+            $appointment_id,
+            "Your package booking for {$appointment_info['package_name']} on " .
+            date('F d, Y', strtotime($appointment_date)) . " at " .
+            date('h:i A', strtotime($appointment_time)) . " has been booked. Please wait for confirmation.",
+            '',
+            $patient_id
+        );
+        createNotification(
+            $conn,
+            'appointment',
+            $appointment_id,
+            "New package booking from {$appointment_info['first_name']} {$appointment_info['last_name']} for {$appointment_info['package_name']} on " .
+            date('F d, Y', strtotime($appointment_date)) . " at " .
+            date('h:i A', strtotime($appointment_time)),
+            '',
+            1
+        );
+    } elseif ($product_id) {
+        // Handle product pre-order as an appointment
+        $stmt = $conn->prepare("
+            INSERT INTO appointments (
+                patient_id, product_id, attendant_id, 
+                appointment_date, appointment_time, status, 
+                created_at
+            ) VALUES (?, ?, ?, ?, ?, 'pending', NOW())
+        ");
+        if (!$stmt) {
+            fwrite($debug_log, "Prepare Error: " . $conn->error . "\n");
+            throw new Exception('Database error: ' . $conn->error);
+        }
+        $stmt->bind_param('iiiss', $patient_id, $product_id, $attendant_id, $appointment_date, $appointment_time);
+        if (!$stmt->execute()) {
+            fwrite($debug_log, "SQL Error: " . $stmt->error . "\n");
+            throw new Exception('Failed to create product pre-order: ' . $stmt->error);
+        }
+        $appointment_id = $conn->insert_id;
+        fwrite($debug_log, "Created product pre-order appointment with ID: " . $appointment_id . "\n");
+        // Schedule reminders
+        scheduleAppointmentReminders($conn, $appointment_id);
+        // Create notifications
+        $stmt = $conn->prepare("
+            SELECT pr.product_name, p.first_name, p.last_name 
+            FROM appointments a 
+            JOIN products pr ON a.product_id = pr.product_id 
+            JOIN patients p ON a.patient_id = p.patient_id 
+            WHERE a.appointment_id = ?
+        ");
+        $stmt->bind_param('i', $appointment_id);
+        $stmt->execute();
+        $appointment_info = $stmt->get_result()->fetch_assoc();
+        createNotification(
+            $conn,
+            'appointment',
+            $appointment_id,
+            "Your product pre-order for {$appointment_info['product_name']} on " .
+            date('F d, Y', strtotime($appointment_date)) . " at " .
+            date('h:i A', strtotime($appointment_time)) . " has been booked. Please wait for confirmation.",
+            '',
+            $patient_id
+        );
+        createNotification(
+            $conn,
+            'appointment',
+            $appointment_id,
+            "New product pre-order from {$appointment_info['first_name']} {$appointment_info['last_name']} for {$appointment_info['product_name']} on " .
+            date('F d, Y', strtotime($appointment_date)) . " at " .
+            date('h:i A', strtotime($appointment_time)),
+            '',
+            1
+        );
+    }
+
+    // Commit transaction
+    $conn->commit();
+
+    // Clear any session variables related to booking type
+    unset($_SESSION['selected_service_id']);
+
+    // Set success message
+    $_SESSION['success'] = 'Your booking request has been submitted successfully! Please wait for confirmation.';
+
+    // Redirect to appointments page
+    header('Location: my-appointments.php');
+    exit();
+
+} catch (Exception $e) {
+    // Rollback transaction on error
+    $conn->rollback();
+    
+    // Set error message
+    $_SESSION['error'] = $e->getMessage();
+    
+    // Redirect back to calendar view
+    $redirect_url = 'calendar_view.php';
+    if ($service_id) $redirect_url .= "?service_id=$service_id";
+    elseif ($product_id) $redirect_url .= "?product_id=$product_id";
+    elseif ($package_id) $redirect_url .= "?package_id=$package_id";
+    
+    header("Location: $redirect_url");
     exit();
 }
 
@@ -178,5 +324,33 @@ function getRedirectUrl($package_id = null)
         $url .= (strpos($url, '?') !== false ? '&' : '?') . 'date=' . $_POST['date'];
     }
     return $url;
+}
+
+// Minimal scheduleAppointmentReminders implementation
+function scheduleAppointmentReminders($conn, $appointment_id) {
+    // Fetch appointment details
+    $stmt = $conn->prepare("
+        SELECT a.appointment_id, a.patient_id, a.appointment_date, a.appointment_time, s.service_name, p.first_name, p.last_name
+        FROM appointments a
+        JOIN services s ON a.service_id = s.service_id
+        JOIN patients p ON a.patient_id = p.patient_id
+        WHERE a.appointment_id = ?
+    ");
+    $stmt->bind_param('i', $appointment_id);
+    $stmt->execute();
+    $appointment = $stmt->get_result()->fetch_assoc();
+    if (!$appointment) return;
+
+    $title = "Appointment Reminder";
+    $message = "Reminder: Your appointment for {$appointment['service_name']} is on " .
+        date('F d, Y', strtotime($appointment['appointment_date'])) . " at " .
+        date('h:i A', strtotime($appointment['appointment_time'])) . ".";
+    // Patient notification
+    createNotification($conn, 'appointment', $appointment_id, $title, $message, $appointment['patient_id']);
+    // Admin notification
+    $adminMessage = "Upcoming appointment for {$appointment['first_name']} {$appointment['last_name']} ({$appointment['service_name']}) on " .
+        date('F d, Y', strtotime($appointment['appointment_date'])) . " at " .
+        date('h:i A', strtotime($appointment['appointment_time'])) . ".";
+    createNotification($conn, 'appointment', $appointment_id, $title, $adminMessage, 1);
 }
 ?>

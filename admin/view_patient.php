@@ -116,10 +116,6 @@ $total_spent = array_sum(array_map(function($a) { return $a['price']; }, $appoin
                                     <td><?php echo clean($patient['username']); ?></td>
                                 </tr>
                                 <tr>
-                                    <th>Email:</th>
-                                    <td><?php echo clean($patient['email'] ?? 'N/A'); ?></td>
-                                </tr>
-                                <tr>
                                     <th>Phone:</th>
                                     <td><?php echo clean($patient['phone']); ?></td>
                                 </tr>
