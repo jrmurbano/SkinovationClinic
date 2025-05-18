@@ -326,3 +326,9 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </body>
 
 </html>
+
+<?php
+function clean($data) {
+    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+}
+?>

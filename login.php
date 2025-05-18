@@ -36,8 +36,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $_SESSION['user_username'] = $user['username'];
 
                 // Redirect based on booking flow
-                if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking' && isset($_GET['type']) && isset($_GET['id'])) {
-                    header('Location: patient/booking_redirect.php?type=' . $_GET['type'] . '&id=' . $_GET['id']);
+                if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking') {
+                    if (isset($_GET['service_id'])) {
+                        header('Location: patient/calendar_view.php?service_id=' . urlencode($_GET['service_id']));
+                        exit();
+                    } elseif (isset($_GET['product_id'])) {
+                        header('Location: patient/calendar_view.php?product_id=' . urlencode($_GET['product_id']));
+                        exit();
+                    } elseif (isset($_GET['package_id'])) {
+                        header('Location: patient/calendar_view.php?package_id=' . urlencode($_GET['package_id']));
+                        exit();
+                    } elseif (isset($_GET['type']) && isset($_GET['id'])) {
+                        header('Location: patient/booking_redirect.php?type=' . urlencode($_GET['type']) . '&id=' . urlencode($_GET['id']));
+                        exit();
+                    }
                 } else {
                     header('Location: patient/my-appointments.php');
                 }
@@ -56,13 +68,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking') {
     echo "<script>alert('Please log-in or register first to book');</script>";
 }
-// Ensure proper redirection for booking flow
-if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking' && isset($_GET['type']) && isset($_GET['id'])) {
-    header('Location: patient/booking_redirect.php?type=' . urlencode($_GET['type']) . '&id=' . urlencode($_GET['id']));
-    exit();
-} else if (isset($_GET['redirect']) && $_GET['redirect'] === 'booking' && isset($_SESSION['pending_booking'])) {
-    header('Location: booking.php?service_id=' . $_SESSION['pending_booking']['service_id']);
-    exit();
+// Enhanced booking redirect logic for all types (GET only, not after POST)
+if (!empty($_GET['redirect']) && $_GET['redirect'] === 'booking' && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    // Service
+    if (!empty($_GET['service_id'])) {
+        header('Location: patient/calendar_view.php?service_id=' . urlencode($_GET['service_id']));
+        exit();
+    }
+    // Product
+    if (!empty($_GET['product_id'])) {
+        header('Location: patient/calendar_view.php?product_id=' . urlencode($_GET['product_id']));
+        exit();
+    }
+    // Package
+    if (!empty($_GET['package_id'])) {
+        header('Location: patient/calendar_view.php?package_id=' . urlencode($_GET['package_id']));
+        exit();
+    }
+    // Fallback: if type/id pattern is used
+    if (!empty($_GET['type']) && !empty($_GET['id'])) {
+        header('Location: patient/booking_redirect.php?type=' . urlencode($_GET['type']) . '&id=' . urlencode($_GET['id']));
+        exit();
+    }
 }
 
 // Debugging log to trace redirection flow

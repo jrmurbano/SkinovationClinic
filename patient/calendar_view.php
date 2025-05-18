@@ -11,6 +11,7 @@ if (!isset($_SESSION['patient_id'])) {
 // Handle incoming service or product selection
 $selected_service = null;
 $selected_product = null;
+$selected_package = null;
 
 if (isset($_GET['service_id'])) {
     // Get service details
@@ -24,6 +25,12 @@ if (isset($_GET['service_id'])) {
     $stmt->bind_param('i', $_GET['product_id']);
     $stmt->execute();
     $selected_product = $stmt->get_result()->fetch_assoc();
+} elseif (isset($_GET['package_id'])) {
+    // Get package details
+    $stmt = $conn->prepare('SELECT * FROM packages WHERE package_id = ?');
+    $stmt->bind_param('i', $_GET['package_id']);
+    $stmt->execute();
+    $selected_package = $stmt->get_result()->fetch_assoc();
 }
 
 // Get admin info
@@ -212,6 +219,11 @@ $booked_slots = $filtered_booked_slots;
             <h5>Selected Product: <?php echo htmlspecialchars($selected_product['product_name']); ?></h5>
             <p>Price: ₱<?php echo number_format($selected_product['price'], 2); ?></p>
         </div>
+        <?php elseif ($selected_package): ?>
+        <div class="alert alert-info">
+            <h5>Selected Package: <?php echo htmlspecialchars($selected_package['package_name']); ?></h5>
+            <p>Price: ₱<?php echo number_format($selected_package['price'], 2); ?></p>
+        </div>
         <?php endif; ?>
 
         <div class="row">
@@ -257,44 +269,52 @@ $booked_slots = $filtered_booked_slots;
                         <input type="hidden" name="service_id" value="<?php echo htmlspecialchars($selected_service['service_id']); ?>">
                         <?php elseif ($selected_product): ?>
                         <input type="hidden" name="product_id" value="<?php echo htmlspecialchars($selected_product['product_id']); ?>">
+                        <?php elseif ($selected_package): ?>
+                        <input type="hidden" name="package_id" value="<?php echo htmlspecialchars($selected_package['package_id']); ?>">
                         <?php endif; ?>
 
                         <div class="mb-3">
-                            <label class="form-label">Selected Date:</label>
-                            <p id="selected_date_display" class="form-control-plaintext"></p>
+                            <label class="form-label"><i class="fas fa-calendar-alt"></i> Selected Date:</label>
+                            <p id="selected_date_display" class="form-control-plaintext" placeholder="Select a date"></p>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Selected Time:</label>
-                            <p id="selected_time_display" class="form-control-plaintext"></p>
+                            <label class="form-label"><i class="fas fa-clock"></i> Selected Time:</label>
+                            <p id="selected_time_display" class="form-control-plaintext" placeholder="Select a time"></p>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Selected Doctor:</label>
-                            <p id="selected_doctor_display" class="form-control-plaintext"></p>
+                            <label class="form-label"><i class="fas fa-tag"></i> <?php 
+                                if ($selected_service) echo 'Selected Service:';
+                                elseif ($selected_product) echo 'Selected Product:';
+                                elseif ($selected_package) echo 'Selected Package:';
+                                else echo 'Selected Service/Product/Package:';
+                            ?></label>
+                            <p class="form-control-plaintext" id="selected_item_display" placeholder="Select a service/product/package">
+                                <?php if ($selected_service): ?>
+                                    <?php echo htmlspecialchars($selected_service['service_name']); ?>
+                                <?php elseif ($selected_product): ?>
+                                    <?php echo htmlspecialchars($selected_product['product_name']); ?>
+                                <?php elseif ($selected_package): ?>
+                                    <?php echo htmlspecialchars($selected_package['package_name']); ?>
+                                <?php endif; ?>
+                            </p>
                         </div>
-                        <?php if ($selected_product): ?>
                         <div class="mb-3">
-                            <label for="quantity" class="form-label">Quantity:</label>
-                            <input type="number" class="form-control" id="quantity" name="quantity" min="1" value="1" required>
+                            <label class="form-label"><i class="fas fa-money-bill-wave"></i> Amount to be paid on clinic premises (₱):</label>
+                            <p class="form-control-plaintext" id="selected_amount_display" placeholder="Amount">
+                                <?php if ($selected_service): ?>
+                                    <?php echo number_format($selected_service['price'], 2); ?>
+                                <?php elseif ($selected_product): ?>
+                                    <?php echo number_format($selected_product['price'], 2); ?>
+                                <?php elseif ($selected_package): ?>
+                                    <?php echo number_format($selected_package['price'], 2); ?>
+                                <?php endif; ?>
+                            </p>
                         </div>
-                        <?php elseif (!$selected_service && !$selected_product): ?>
-                        <div class="mb-3">
-                            <label for="service" class="form-label">Select Service:</label>
-                            <select class="form-select" id="service" name="service_id" required>
-                                <option value="">Choose a service...</option>
-                                <?php
-                                $stmt = $conn->prepare('SELECT service_id, service_name FROM services');
-                                $stmt->execute();
-                                $result = $stmt->get_result();
-                                while ($service = $result->fetch_assoc()) {
-                                    echo '<option value="' . $service['service_id'] . '">' . htmlspecialchars($service['service_name']) . '</option>';
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <?php endif; ?>
-                        <div class="mb-3">
-                            <label for="notes" class="form-label">Additional Notes:</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="policyAgree" required>
+                            <label class="form-check-label" for="policyAgree">
+                                I agree with the clinic's <a href="#" id="policyLink">policy</a> in appointments.
+                            </label>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -306,9 +326,51 @@ $booked_slots = $filtered_booked_slots;
         </div>
     </div>
 
+    <!-- Policy Modal -->
+    <div class="modal fade" id="policyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Clinic Appointment Policy</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul>
+                        <li>Appointments must be rescheduled or cancelled at least 1 day before the scheduled date.</li>
+                        <li>Failure to attend without prior notice may result in forfeiture of your slot and/or payment.</li>
+                        <li>Please arrive at least 10 minutes before your scheduled appointment.</li>
+                        <li>Late arrivals may result in reduced service time or rescheduling.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Store selected item info from PHP for JS use
+            const selectedItem = {
+                name: <?php
+                    if ($selected_service) echo json_encode($selected_service['service_name']);
+                    elseif ($selected_product) echo json_encode($selected_product['product_name']);
+                    elseif ($selected_package) echo json_encode($selected_package['package_name']);
+                    else echo 'null';
+                ?>,
+                amount: <?php
+                    if ($selected_service) echo json_encode(number_format($selected_service['price'], 2));
+                    elseif ($selected_product) echo json_encode(number_format($selected_product['price'], 2));
+                    elseif ($selected_package) echo json_encode(number_format($selected_package['price'], 2));
+                    else echo 'null';
+                ?>,
+                label: <?php
+                    if ($selected_service) echo json_encode('Selected Service:');
+                    elseif ($selected_product) echo json_encode('Selected Product:');
+                    elseif ($selected_package) echo json_encode('Selected Package:');
+                    else echo json_encode('Selected Service/Product/Package:');
+                ?>
+            };
+
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
@@ -350,12 +412,17 @@ $booked_slots = $filtered_booked_slots;
 
             // Store the booked slots in JavaScript
             const bookedSlots = <?php echo json_encode($booked_slots); ?>;
+            let selectedISODate = null;
+            let selectedDateObj = null; // Store the original JS Date object
 
             function showTimeSlots(date) {
+                // Always use ISO string for date
                 const formattedDate = date.toISOString().split('T')[0];
+                selectedISODate = formattedDate;
+                selectedDateObj = date; // Save the original Date object
                 const timeSelect = document.getElementById('timeSelect');
                 const timeSlotContainer = document.getElementById('timeSlotContainer');
-                document.getElementById('selectedDate').textContent = new Date(formattedDate).toLocaleDateString(
+                document.getElementById('selectedDate').textContent = date.toLocaleDateString(
                     'en-US', {
                         weekday: 'long',
                         year: 'numeric',
@@ -366,13 +433,13 @@ $booked_slots = $filtered_booked_slots;
                 // Clear existing options except the first default one
                 timeSelect.innerHTML = '<option value="">Choose a time...</option>';
 
-                // Generate time slots from 9 AM to 5 PM
-                for (let hour = 9; hour <= 17; hour++) {
+                // Generate time slots from 10 AM to 5 PM
+                for (let hour = 10; hour <= 17; hour++) {
                     const time = `${hour.toString().padStart(2, '0')}:00:00`;
                     const isBooked = bookedSlots[1]?.[formattedDate]?.includes(time);
 
                     if (!isBooked) {
-                        const displayTime = new Date(`2000-01-01 ${time}`).toLocaleTimeString('en-US', {
+                        const displayTime = new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
                             hour: 'numeric',
                             minute: 'numeric',
                             hour12: true
@@ -391,7 +458,6 @@ $booked_slots = $filtered_booked_slots;
             // Handle form submission
             document.getElementById('timeSelectForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                const selectedDateStr = document.getElementById('selectedDate').textContent;
                 const timeSelect = document.getElementById('timeSelect');
                 const time = timeSelect.value;
 
@@ -400,12 +466,9 @@ $booked_slots = $filtered_booked_slots;
                     return;
                 }
 
-                // Convert the formatted date back to ISO format
-                const selectedDate = new Date(selectedDateStr);
-                const isoDate = selectedDate.toISOString().split('T')[0];
-
+                // Use the stored ISO date
                 selectTimeSlot(
-                    isoDate,
+                    selectedISODate,
                     time,
                     '1', // Admin ID 
                     'Skinovation Clinic'
@@ -418,9 +481,14 @@ $booked_slots = $filtered_booked_slots;
                 document.getElementById('appointment_time').value = time;
                 document.getElementById('attendant_id').value = attendantId;
 
-                // Format the date for display
-                const displayDate = new Date(date + 'T00:00:00');
-                document.getElementById('selected_date_display').textContent = displayDate.toLocaleDateString(
+                // Update modal with selected item info
+                document.querySelector('#selected_item_display').textContent = selectedItem.name || '';
+                document.querySelector('#selected_amount_display').textContent = selectedItem.amount || '';
+                document.querySelector('#selected_item_display').previousElementSibling.innerHTML = '<i class="fas fa-tag"></i> ' + (selectedItem.label || 'Selected Service/Product/Package:');
+
+                // Use the original Date object for display to avoid timezone issues
+                let displayDateObj = selectedDateObj;
+                document.getElementById('selected_date_display').textContent = displayDateObj.toLocaleDateString(
                     'en-US', {
                         weekday: 'long',
                         year: 'numeric',
@@ -435,12 +503,18 @@ $booked_slots = $filtered_booked_slots;
                     hour12: true
                 });
                 document.getElementById('selected_time_display').textContent = displayTime;
-                document.getElementById('selected_doctor_display').textContent = doctorName;
 
                 // Show the modal
                 const modal = new bootstrap.Modal(document.getElementById('bookingModal'));
                 modal.show();
             }
+
+            // Policy modal logic
+            document.getElementById('policyLink').addEventListener('click', function(e) {
+                e.preventDefault();
+                const policyModal = new bootstrap.Modal(document.getElementById('policyModal'));
+                policyModal.show();
+            });
         });
     </script>
 </body>

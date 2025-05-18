@@ -9,9 +9,9 @@ if (!isset($_SESSION['admin_id'])) {
 // Get all attendants
 $stmt = $conn->query("SELECT * FROM attendants ORDER BY shift_date, shift_time");
 $attendants = $stmt->fetchAll(PDO::FETCH_ASSOC);
-// Get all time slots (9:00 to 18:00)
+// Get all time slots (10:00 to 18:00)
 $time_slots = [];
-for ($h = 9; $h <= 18; $h++) {
+for ($h = 10; $h <= 18; $h++) {
     $time_slots[] = sprintf('%02d:00:00', $h);
 }
 // Get today's date

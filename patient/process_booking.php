@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $attendant_id = $_POST['attendant_id'] ?? '';
     $package_id = isset($_POST['package_id']) ? $_POST['package_id'] : null;
     $service_id = isset($_POST['service_id']) ? $_POST['service_id'] : null;
-    $notes = $_POST['notes'] ?? '';
+    $notes = '';
     $status = 'pending';
 
     fwrite($debug_log, "Processed form data:\n");
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Handle package booking
             $stmt = $conn->prepare('SELECT * FROM packages WHERE package_id = ?');
             $stmt->execute([$package_id]);
-            $package = $stmt->fetch(PDO::FETCH_ASSOC);
+            $package = $stmt->fetch();
 
             if (!$package) {
                 fwrite($debug_log, "Error: Package not found\n");
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                    JOIN patients pt ON pb.patient_id = pt.patient_id 
                                    WHERE pa.package_appointment_id = ?");
             $stmt->execute([$package_appointment_id]);
-            $package_info = $stmt->fetch(PDO::FETCH_ASSOC);
+            $package_info = $stmt->fetch();
 
             $title = "New Package Booking";
             $message = $package_info['first_name'] . " " . $package_info['last_name'] . 
@@ -122,9 +122,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception('Please select a service.');
             }
 
-            $stmt = $conn->prepare("INSERT INTO appointments (patient_id, service_id, attendant_id, appointment_date, appointment_time, notes, status) 
-                                  VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$patient_id, $service_id, $attendant_id, $appointment_date, $appointment_time, $notes, $status]);
+            $stmt = $conn->prepare("INSERT INTO appointments (patient_id, service_id, attendant_id, appointment_date, appointment_time, status) 
+                                  VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$patient_id, $service_id, $attendant_id, $appointment_date, $appointment_time, $status]);
 
             if (!$stmt->rowCount()) {
                 fwrite($debug_log, 'Error: Failed to create appointment - ' . $stmt->errorInfo()[2] . "\n");
@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                    JOIN patients p ON a.patient_id = p.patient_id 
                                    WHERE a.appointment_id = ?");
             $stmt->execute([$appointment_id]);
-            $appointment_info = $stmt->fetch(PDO::FETCH_ASSOC);
+            $appointment_info = $stmt->fetch();
 
             $title = "New Appointment Booking";
             $message = $appointment_info['first_name'] . " " . $appointment_info['last_name'] . 
@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $conn->commit();
         fwrite($debug_log, "Transaction committed successfully\n");
-        $_SESSION['success'] = 'Your appointment has been successfully booked! Please wait for confirmation.';
+        $_SESSION['success'] = 'Your appointment request has been successfully sent! Please wait for confirmation. It will not take long and will be reflected in your appointment history.';
         fclose($debug_log);
         header('Location: my-appointments.php');
         exit();

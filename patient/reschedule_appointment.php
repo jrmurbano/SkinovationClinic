@@ -18,7 +18,7 @@ $stmt = $conn->prepare('SELECT appointment_date FROM appointments WHERE appointm
 $stmt->bindValue(':appointment_id', $appointment_id, PDO::PARAM_INT);
 $stmt->bindValue(':patient_id', $_SESSION['patient_id'], PDO::PARAM_INT);
 $stmt->execute();
-$appointment = $stmt->fetch(PDO::FETCH_ASSOC);
+$appointment = $stmt->fetch();
 
 if ($appointment) {
     $appointment_date = strtotime($appointment['appointment_date']);
@@ -37,14 +37,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_time = $_POST['appointment_time'] ?? null;
 
     if ($new_date && $new_time) {
-        $stmt = $conn->prepare('UPDATE appointments SET appointment_date = :new_date, appointment_time = :new_time WHERE appointment_id = :appointment_id AND patient_id = :patient_id');
+        $stmt = $conn->prepare('UPDATE appointments SET appointment_date = :new_date, appointment_time = :new_time, status = :status WHERE appointment_id = :appointment_id AND patient_id = :patient_id');
         $stmt->bindValue(':new_date', $new_date, PDO::PARAM_STR);
         $stmt->bindValue(':new_time', $new_time, PDO::PARAM_STR);
+        $stmt->bindValue(':status', 'pending', PDO::PARAM_STR); // Set status to pending for admin confirmation
         $stmt->bindValue(':appointment_id', $appointment_id, PDO::PARAM_INT);
         $stmt->bindValue(':patient_id', $_SESSION['patient_id'], PDO::PARAM_INT);
 
         if ($stmt->execute()) {
-            header('Location: my-appointments.php?message=Appointment rescheduled successfully.');
+            header('Location: my-appointments.php?message=Appointment reschedule request sent. Please wait for admin confirmation.');
             exit();
         } else {
             $error = 'Failed to reschedule appointment. Please try again.';
@@ -58,7 +59,7 @@ $stmt = $conn->prepare('SELECT appointment_date, appointment_time FROM appointme
 $stmt->bindValue(':appointment_id', $appointment_id, PDO::PARAM_INT);
 $stmt->bindValue(':patient_id', $_SESSION['patient_id'], PDO::PARAM_INT);
 $stmt->execute();
-$appointment = $stmt->fetch(PDO::FETCH_ASSOC);
+$appointment = $stmt->fetch();
 
 if (!$appointment) {
     die('Appointment not found.');

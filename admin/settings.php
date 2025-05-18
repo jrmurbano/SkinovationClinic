@@ -18,6 +18,10 @@ if (isset($_POST['add_attendant'])) {
     $last_name = trim($_POST['attendant_last_name']);
     $shift_date = $_POST['shift_date'];
     $shift_time = $_POST['shift_time'];
+    // Force shift time to start at 10:00 AM
+    if (strtotime($shift_time) < strtotime('10:00')) {
+        $shift_time = '10:00';
+    }
     if ($first_name && $last_name && $shift_date && $shift_time) {
         $stmt = $conn->prepare("INSERT INTO attendants (first_name, last_name, shift_date, shift_time, created_at, updated_at) VALUES (?, ?, ?, ?, NOW(), NOW())");
         $stmt->execute([$first_name, $last_name, $shift_date, $shift_time]);
@@ -101,9 +105,11 @@ if (isset($_POST['edit_attendant']) && isset($_POST['attendant_id'])) {
             <h4 class="mb-3"><i class="fas fa-user-nurse"></i> Manage Attendants</h4>
             <form method="POST" action="settings.php" class="row g-3 mb-4">
                 <div class="col-md-3">
+                    <label class="form-label">First Name</label>
                     <input type="text" name="attendant_first_name" class="form-control" placeholder="First Name" required>
                 </div>
                 <div class="col-md-3">
+                    <label class="form-label">Last Name</label>
                     <input type="text" name="attendant_last_name" class="form-control" placeholder="Last Name" required>
                 </div>
                 <div class="col-md-3">
@@ -112,7 +118,7 @@ if (isset($_POST['edit_attendant']) && isset($_POST['attendant_id'])) {
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Shift Time</label>
-                    <input type="time" name="shift_time" class="form-control" required>
+                    <input type="time" name="shift_time" class="form-control" min="10:00" step="3600" required onkeydown="return false;" oninput="if(this.value < '10:00'){this.value='10:00'}">
                 </div>
                 <div class="col-12">
                     <button type="submit" name="add_attendant" class="btn btn-success"><i class="fas fa-plus"></i> Add Attendant</button>
