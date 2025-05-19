@@ -84,6 +84,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_
         // Redirect to prevent form resubmission
         header('Location: appointments.php');
         exit();
+    } else if ($action === 'approve_cancellation' || $action === 'reject_cancellation') {
+        $conn->beginTransaction();
+        try {
+            // Get cancellation request details
+            $stmt = $conn->prepare("
+                SELECT cr.*, 
+                    CASE 
+                        WHEN cr.appointment_type = 'regular' THEN a.appointment_date
+                        ELSE pa.appointment_date
+                    END as appointment_date,
+                    CASE 
+                        WHEN cr.appointment_type = 'regular' THEN a.appointment_time
+                        ELSE pa.appointment_time
+                    END as appointment_time,
+                    CASE 
+                        WHEN cr.appointment_type = 'regular' THEN s.service_name
+                        ELSE p.package_name
+                    END as name,
+                    pt.first_name, pt.last_name
+                FROM cancellation_requests cr
+                LEFT JOIN appointments a ON cr.appointment_id = a.appointment_id AND cr.appointment_type = 'regular'
+                LEFT JOIN services s ON a.service_id = s.service_id
+                LEFT JOIN package_appointments pa ON cr.appointment_id = pa.package_appointment_id AND cr.appointment_type = 'package'
+                LEFT JOIN package_bookings pb ON pa.booking_id = pb.booking_id
+                LEFT JOIN packages p ON pb.package_id = p.package_id
+                LEFT JOIN patients pt ON cr.patient_id = pt.patient_id
+                WHERE cr.appointment_id = ? AND cr.appointment_type = ? AND cr.status = 'pending'
+            ");
+            $stmt->execute([$appointment_id, $type]);
+            $request = $stmt->fetch();
+
+            if (!$request) {
+                throw new Exception('Cancellation request not found');
+            }
+
+            if ($action === 'approve_cancellation') {
+                // Update appointment status to cancelled
+                if ($type === 'regular') {
+                    $stmt = $conn->prepare("UPDATE appointments SET status = 'cancelled' WHERE appointment_id = ?");
+                } else {
+                    $stmt = $conn->prepare("UPDATE package_appointments SET status = 'cancelled' WHERE package_appointment_id = ?");
+                }
+                $stmt->execute([$appointment_id]);
+
+                // Update cancellation request status
+                $stmt = $conn->prepare("UPDATE cancellation_requests SET status = 'approved' WHERE appointment_id = ? AND appointment_type = ?");
+                $stmt->execute([$appointment_id, $type]);
+
+                $status = 'approved';
+            } else {
+                // Update cancellation request status to rejected
+                $stmt = $conn->prepare("UPDATE cancellation_requests SET status = 'rejected' WHERE appointment_id = ? AND appointment_type = ?");
+                $stmt->execute([$appointment_id, $type]);
+
+                $status = 'rejected';
+            }
+
+            // Create notification for patient
+            $title = "Cancellation Request " . ucfirst($status);
+            $message = sprintf(
+                "Your cancellation request for %s on %s at %s has been %s.",
+                $request['name'],
+                date('F j, Y', strtotime($request['appointment_date'])),
+                date('g:i A', strtotime($request['appointment_time'])),
+                $status
+            );
+
+            createNotification($conn, 'cancellation', $appointment_id, $title, $message, $request['patient_id']);
+
+            $conn->commit();
+            $_SESSION['success'] = "Cancellation request has been " . $status . " successfully.";
+        } catch (Exception $e) {
+            $conn->rollback();
+            $_SESSION['error'] = $e->getMessage();
+        }
+        
+        // Redirect to prevent form resubmission
+        header('Location: appointments.php');
+        exit();
     }
 }
 
@@ -548,6 +627,45 @@ $cancelled_appointments = count(array_filter($appointments, function($a) { retur
                                                     <i class="fas fa-times"></i> Cancel
                                                 </button>
                                             </form>
+                                        <?php elseif ($appointment['status'] === 'confirmed'): ?>
+                                            <?php
+                                            // Check if there's a pending cancellation request
+                                            $check_stmt = $conn->prepare("
+                                                SELECT * FROM cancellation_requests 
+                                                WHERE appointment_id = ? AND appointment_type = ? AND status = 'pending'
+                                            ");
+                                            $check_stmt->execute([$appointment['id'], $appointment['type']]);
+                                            $cancellation_request = $check_stmt->fetch();
+                                            
+                                            if ($cancellation_request): ?>
+                                                <div class="d-flex gap-2">
+                                                    <form method="POST" class="d-inline">
+                                                        <input type="hidden" name="action" value="approve_cancellation">
+                                                        <input type="hidden" name="appointment_id" value="<?php echo $appointment['id']; ?>">
+                                                        <input type="hidden" name="type" value="<?php echo $appointment['type']; ?>">
+                                                        <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Are you sure you want to approve this cancellation request?')">
+                                                            <i class="fas fa-check"></i> Approve
+                                                        </button>
+                                                    </form>
+                                                    <form method="POST" class="d-inline">
+                                                        <input type="hidden" name="action" value="reject_cancellation">
+                                                        <input type="hidden" name="appointment_id" value="<?php echo $appointment['id']; ?>">
+                                                        <input type="hidden" name="type" value="<?php echo $appointment['type']; ?>">
+                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to reject this cancellation request?')">
+                                                            <i class="fas fa-times"></i> Reject
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            <?php else: ?>
+                                                <form method="POST" class="d-inline">
+                                                    <input type="hidden" name="action" value="cancel">
+                                                    <input type="hidden" name="appointment_id" value="<?php echo $appointment['id']; ?>">
+                                                    <input type="hidden" name="type" value="<?php echo $appointment['type']; ?>">
+                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                                                        <i class="fas fa-times"></i> Cancel
+                                                    </button>
+                                                </form>
+                                            <?php endif; ?>
                                         <?php elseif ($appointment['type'] === 'product'): ?>
                                             <span>-</span>
                                         <?php endif; ?>

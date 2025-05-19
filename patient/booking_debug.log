@@ -3705,3 +3705,227 @@ SESSION data: Array
 )
 
 Created appointment with ID: 35
+
+
+2025-05-19 07:00:19 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-23
+    [appointment_time] => 13:00:00
+    [attendant_id] => 1
+    [package_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 6
+    [user_name] => Charles Andre Alde
+    [user_username] => charlesalde
+    [admin_id] => 2
+)
+
+Validating input:
+Patient ID: 6
+Service ID: 
+Attendant ID: 1
+Date: 2025-05-23
+Time: 13:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-23
+    [appointment_time] => 13:00:00
+    [attendant_id] => 1
+    [package_id] => 7
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 6
+    [user_name] => Charles Andre Alde
+    [user_username] => charlesalde
+    [admin_id] => 2
+)
+
+Created package booking with ID: 22
+Created package appointment with ID: 20
+
+
+2025-05-19 07:01:22 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-21
+    [appointment_time] => 15:00:00
+    [attendant_id] => 1
+    [product_id] => 1
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 6
+    [user_name] => Charles Andre Alde
+    [user_username] => charlesalde
+    [admin_id] => 2
+)
+
+Validating input:
+Patient ID: 6
+Service ID: 
+Attendant ID: 1
+Date: 2025-05-21
+Time: 15:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-21
+    [appointment_time] => 15:00:00
+    [attendant_id] => 1
+    [product_id] => 1
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 6
+    [user_name] => Charles Andre Alde
+    [user_username] => charlesalde
+    [admin_id] => 2
+)
+
+Created product pre-order appointment with ID: 36
+
+
+2025-05-19 07:35:55 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-23
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 7
+    [user_name] => Gary Ferrer Baylosis
+    [user_username] => garybaylosis
+    [selected_service_id] => 2
+)
+
+Validating input:
+Patient ID: 7
+Service ID: 2
+Attendant ID: 1
+Date: 2025-05-23
+Time: 14:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-23
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 7
+    [user_name] => Gary Ferrer Baylosis
+    [user_username] => garybaylosis
+    [selected_service_id] => 2
+)
+
+Created appointment with ID: 37
+
+
+2025-05-19 07:38:50 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 13:00:00
+    [attendant_id] => 1
+    [package_id] => 11
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 7
+    [user_name] => Gary Ferrer Baylosis
+    [user_username] => garybaylosis
+    [admin_id] => 2
+)
+
+Validating input:
+Patient ID: 7
+Service ID: 
+Attendant ID: 1
+Date: 2025-05-29
+Time: 13:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-29
+    [appointment_time] => 13:00:00
+    [attendant_id] => 1
+    [package_id] => 11
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 7
+    [user_name] => Gary Ferrer Baylosis
+    [user_username] => garybaylosis
+    [admin_id] => 2
+)
+
+Created package booking with ID: 23
+Created package appointment with ID: 21
+
+
+2025-05-19 07:42:24 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-22
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [product_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 7
+    [user_name] => Gary Ferrer Baylosis
+    [user_username] => garybaylosis
+    [admin_id] => 2
+    [last_appointment_check] => 2025-05-19 15:41:22
+)
+
+Validating input:
+Patient ID: 7
+Service ID: 
+Attendant ID: 1
+Date: 2025-05-22
+Time: 14:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-22
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [product_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 7
+    [user_name] => Gary Ferrer Baylosis
+    [user_username] => garybaylosis
+    [admin_id] => 2
+    [last_appointment_check] => 2025-05-19 15:41:22
+)
+
+Created product pre-order appointment with ID: 38

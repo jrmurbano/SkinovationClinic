@@ -20,53 +20,63 @@ $appointment_type = $_POST['appointment_type'];
 $reason = $_POST['reason'] ?? '';
 $patient_id = $_SESSION['patient_id'];
 
+// Debug values
+error_log("Appointment ID: " . $appointment_id);
+error_log("Patient ID: " . $patient_id);
+error_log("Appointment Type: " . $appointment_type);
+
 // Start transaction
 $conn->beginTransaction();
 
 try {
-    // First check if it's a regular appointment
+    // First, let's check if the appointment exists at all
+    $check_stmt = $conn->prepare("
+        SELECT a.*, s.service_name, CONCAT(p.first_name, ' ', p.last_name) as patient_name
+        FROM appointments a
+        JOIN services s ON a.service_id = s.service_id
+        JOIN patients p ON a.patient_id = p.patient_id
+        WHERE a.appointment_id = ? AND a.patient_id = ?
+    ");
+    $check_stmt->execute([$appointment_id, $patient_id]);
+    $check_appointment = $check_stmt->fetch();
+    
+    error_log("Checking appointment - ID: " . $appointment_id . ", Patient: " . $patient_id);
+    error_log("Appointment found: " . ($check_appointment ? "Yes" : "No"));
+    if ($check_appointment) {
+        error_log("Current status: " . $check_appointment['status']);
+    }
+
+    // Check if it's a regular appointment or package appointment
     if ($appointment_type === 'regular') {
         $stmt = $conn->prepare("
-            SELECT a.*, s.service_name, CONCAT(p.first_name, ' ', p.last_name) as patient_name
+            SELECT a.*, s.service_name as name, CONCAT(p.first_name, ' ', p.last_name) as patient_name
             FROM appointments a
             JOIN services s ON a.service_id = s.service_id
             JOIN patients p ON a.patient_id = p.patient_id
-            WHERE a.appointment_id = ? AND a.patient_id = ? AND a.status = 'pending'
+            WHERE a.appointment_id = ? AND a.patient_id = ? AND a.status IN ('pending', 'confirmed')
         ");
-        $stmt->execute([$appointment_id, $patient_id]);
-        $appointment = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$appointment) {
-            throw new Exception('Appointment not found or already cancelled');
-        }
-
-        // Check if appointment is at least 24 hours away
-        $appointment_datetime = strtotime($appointment['appointment_date'] . ' ' . $appointment['appointment_time']);
-        if ($appointment_datetime <= strtotime('+1 day')) {
-            throw new Exception('Appointments can only be cancelled at least 24 hours in advance');
-        }
     } else {
-        // Check if it's a package appointment
         $stmt = $conn->prepare("
-            SELECT pa.*, pb.patient_id, p.package_name, CONCAT(pt.first_name, ' ', pt.last_name) as patient_name
+            SELECT pa.*, p.package_name as name, CONCAT(pt.first_name, ' ', pt.last_name) as patient_name
             FROM package_appointments pa 
             JOIN package_bookings pb ON pa.booking_id = pb.booking_id 
             JOIN packages p ON pb.package_id = p.package_id
             JOIN patients pt ON pb.patient_id = pt.patient_id
-            WHERE pa.package_appointment_id = ? AND pb.patient_id = ? AND pa.status = 'pending'
+            WHERE pa.package_appointment_id = ? AND pb.patient_id = ? AND pa.status IN ('pending', 'confirmed')
         ");
-        $stmt->execute([$appointment_id, $patient_id]);
-        $appointment = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+    
+    $stmt->execute([$appointment_id, $patient_id]);
+    $appointment = $stmt->fetch();
 
-        if (!$appointment) {
-            throw new Exception('Appointment not found or already cancelled');
-        }
+    if (!$appointment) {
+        throw new Exception('Appointment not found or already cancelled');
+    }
 
-        // Check if appointment is at least 24 hours away
-        $appointment_datetime = strtotime($appointment['appointment_date'] . ' ' . $appointment['appointment_time']);
-        if ($appointment_datetime <= strtotime('+1 day')) {
-            throw new Exception('Appointments can only be cancelled at least 24 hours in advance');
-        }
+    // Check if appointment is at least 24 hours away
+    $appointment_datetime = strtotime($appointment['appointment_date'] . ' ' . $appointment['appointment_time']);
+    if ($appointment_datetime <= strtotime('+1 day')) {
+        throw new Exception('Appointments can only be cancelled at least 24 hours in advance');
     }
 
     // Check if there's already a pending cancellation request
@@ -91,8 +101,8 @@ try {
     $message = sprintf(
         "%s has requested to cancel their %s appointment for %s on %s at %s.",
         $appointment['patient_name'],
-        $appointment_type === 'regular' ? $appointment['service_name'] : $appointment['package_name'],
-        $appointment_type === 'regular' ? $appointment['service_name'] : $appointment['package_name'],
+        $appointment_type === 'regular' ? 'service' : 'package',
+        $appointment['name'],
         date('F j, Y', strtotime($appointment['appointment_date'])),
         date('g:i A', strtotime($appointment['appointment_time']))
     );
