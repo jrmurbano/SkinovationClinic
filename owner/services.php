@@ -11,12 +11,16 @@ if (!isset($_SESSION['owner_id'])) {
 // Fetch all services
 $stmt = $conn->query("
     SELECT 
-        s.*,
+        s.service_id,
+        s.service_name,
+        s.description,
+        s.price,
+        s.image,
         COUNT(a.appointment_id) as total_bookings,
         COALESCE(SUM(CASE WHEN a.status = 'completed' THEN 1 ELSE 0 END), 0) as completed_bookings
     FROM services s
     LEFT JOIN appointments a ON s.service_id = a.service_id
-    GROUP BY s.service_id
+    GROUP BY s.service_id, s.service_name, s.description, s.price, s.image
     ORDER BY s.service_name
 ");
 $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -32,6 +36,14 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
+        body {
+            background-image: url('https://cdn.vectorstock.com/i/500p/99/24/molecules-inside-bubbles-on-blue-background-water-vector-53889924.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
         .service-card {
             border: none;
             border-radius: 10px;
@@ -93,7 +105,7 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php foreach ($services as $service): ?>
             <div class="col-md-4 col-lg-3">
                 <div class="service-card p-3">
-                    <img src="<?php echo htmlspecialchars($service['image_path']); ?>" 
+                    <img src="../<?php echo htmlspecialchars($service['image'] ?? 'assets/img/default-service.jpg'); ?>" 
                          alt="<?php echo htmlspecialchars($service['service_name']); ?>" 
                          class="img-fluid service-image mb-3">
                     

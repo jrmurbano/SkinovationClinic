@@ -71,7 +71,6 @@ foreach ($appointments as $a) {
             </tbody>
         </table>
     </div>
-    <a href="settings.php" class="btn btn-secondary mt-3"><i class="fas fa-cogs"></i> Back to Settings</a>
 </div>
 </body>
 </html>

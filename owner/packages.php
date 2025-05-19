@@ -32,6 +32,20 @@ $packages = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
+        body {
+            background-image: url('https://cdn.vectorstock.com/i/500p/99/24/molecules-inside-bubbles-on-blue-background-water-vector-53889924.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
         .package-card {
             border: none;
             border-radius: 10px;
@@ -93,19 +107,13 @@ $packages = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php foreach ($packages as $package): ?>
             <div class="col-md-4 col-lg-3">
                 <div class="package-card p-3">
-                    <?php if (!empty($package['image_path'])): ?>
-                    <img src="<?php echo htmlspecialchars($package['image_path']); ?>" 
-                         alt="<?php echo htmlspecialchars($package['package_name']); ?>" 
-                         class="img-fluid package-image mb-3">
-                    <?php else: ?>
                     <div class="package-image mb-3 bg-light d-flex align-items-center justify-content-center">
                         <i class="fas fa-box fa-3x text-muted"></i>
                     </div>
-                    <?php endif; ?>
                     
-                    <h5 class="mb-2"><?php echo htmlspecialchars($package['package_name']); ?></h5>
-                    <p class="package-description"><?php echo htmlspecialchars($package['description']); ?></p>
-                    <p class="package-price mb-2">₱<?php echo number_format($package['price'], 2); ?></p>
+                    <h5 class="mb-2"><?php echo htmlspecialchars($package['package_name'] ?? ''); ?></h5>
+                    <p class="package-description"><?php echo htmlspecialchars($package['description'] ?? ''); ?></p>
+                    <p class="package-price mb-2">₱<?php echo number_format($package['price'] ?? 0, 2); ?></p>
                     
                     <div class="package-stats">
                         <div class="stat-item">

@@ -3655,3 +3655,53 @@ SESSION data: Array
 )
 
 Created appointment with ID: 34
+
+
+2025-05-19 06:03:01 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-23
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 22
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [owner_id] => 1
+    [owner_username] => kranchypolvorido
+    [owner_name] => Kranchy Polvorido
+    [patient_id] => 6
+    [user_name] => Charles Andre Alde
+    [user_username] => charlesalde
+    [selected_service_id] => 22
+)
+
+Validating input:
+Patient ID: 6
+Service ID: 22
+Attendant ID: 1
+Date: 2025-05-23
+Time: 14:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-23
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [service_id] => 22
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [owner_id] => 1
+    [owner_username] => kranchypolvorido
+    [owner_name] => Kranchy Polvorido
+    [patient_id] => 6
+    [user_name] => Charles Andre Alde
+    [user_username] => charlesalde
+    [selected_service_id] => 22
+)
+
+Created appointment with ID: 35

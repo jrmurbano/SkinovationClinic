@@ -96,10 +96,6 @@ if (isset($_POST['edit_attendant']) && isset($_POST['attendant_id'])) {
             <h1><i class="fas fa-cogs"></i> Settings</h1>
             <p>UI for settings will go here.</p>
         </div>
-        <div class="container mt-5 border border-2 border-primary rounded p-4 mb-5">
-            <label>Create account for admin: </label> <br>
-            <a href="register_admin.php" class="btn btn-secondary">Create Account</a>
-        </div>
         <!-- Attendant Management -->
         <div class="container mt-4 border border-2 border-success rounded p-4 mb-5 bg-white bg-opacity-75">
             <h4 class="mb-3"><i class="fas fa-user-nurse"></i> Manage Attendants</h4>

@@ -13,21 +13,15 @@ $stmt = $conn->query("
     SELECT 
         p.*,
         COUNT(DISTINCT a.appointment_id) as total_appointments,
-        COALESCE(SUM(CASE WHEN a.status = 'completed' THEN 1 ELSE 0 END), 0) as completed_appointments,
-        COALESCE(SUM(CASE WHEN a.status = 'completed' THEN 
-            CASE 
-                WHEN a.service_id IS NOT NULL THEN s.price
-                WHEN a.product_id IS NOT NULL THEN pr.price
-                WHEN a.package_id IS NOT NULL THEN pk.price
-            END
-        ELSE 0 END), 0) as total_spent
+        COUNT(DISTINCT pb.booking_id) as total_packages,
+        SUM(CASE WHEN a.status = 'completed' THEN 1 ELSE 0 END) as completed_appointments,
+        SUM(CASE WHEN a.status = 'cancelled' THEN 1 ELSE 0 END) as cancelled_appointments,
+        MAX(COALESCE(a.appointment_date, pb.created_at)) as last_visit
     FROM patients p
     LEFT JOIN appointments a ON p.patient_id = a.patient_id
-    LEFT JOIN services s ON a.service_id = s.service_id
-    LEFT JOIN products pr ON a.product_id = pr.product_id
-    LEFT JOIN packages pk ON a.package_id = pk.package_id
+    LEFT JOIN package_bookings pb ON p.patient_id = pb.patient_id
     GROUP BY p.patient_id
-    ORDER BY p.last_name, p.first_name
+    ORDER BY p.created_at DESC
 ");
 $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -53,17 +47,19 @@ $stats = $stmt->fetch(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        .patient-card {
+        body {
+            background-image: url('https://cdn.vectorstock.com/i/500p/99/24/molecules-inside-bubbles-on-blue-background-water-vector-53889924.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .card {
             border: none;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
             background: white;
-            margin-bottom: 1rem;
-        }
-        .patient-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
         .stat-card {
             border: none;
@@ -82,28 +78,15 @@ $stats = $stmt->fetch(PDO::FETCH_ASSOC);
             color: #666;
             font-size: 0.9rem;
         }
-        .patient-info {
-            color: #666;
-            font-size: 0.9rem;
+        .patient-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
         }
-        .patient-stats {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-top: 1px solid #eee;
-            margin-top: 10px;
-        }
-        .stat-item {
-            text-align: center;
-        }
-        .stat-value-small {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #4a148c;
-        }
-        .stat-label-small {
-            font-size: 0.8rem;
-            color: #666;
+        .status-active {
+            background-color: #28a745;
         }
     </style>
 </head>
@@ -111,8 +94,15 @@ $stats = $stmt->fetch(PDO::FETCH_ASSOC);
     <?php include 'owner_header.php'; ?>
     
     <div class="container-fluid py-4">
-        <h1 class="mb-4">Patients Overview</h1>
-        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1><i class="fas fa-users"></i> Patients Overview</h1>
+            <div>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exportModal">
+                    <i class="fas fa-file-export"></i> Export Data
+                </button>
+            </div>
+        </div>
+
         <!-- Statistics Cards -->
         <div class="row mb-4">
             <div class="col-md-4">
@@ -134,48 +124,127 @@ $stats = $stmt->fetch(PDO::FETCH_ASSOC);
                 </div>
             </div>
         </div>
-        
-        <!-- Patients List -->
-        <div class="row">
-            <div class="col-12">
-                <?php foreach ($patients as $patient): ?>
-                <div class="patient-card p-3">
-                    <div class="row align-items-center">
-                        <div class="col-md-3">
-                            <h5 class="mb-1"><?php echo htmlspecialchars($patient['first_name'] . ' ' . $patient['last_name']); ?></h5>
-                            <p class="patient-info mb-0">
-                                <i class="fas fa-phone me-2"></i><?php echo htmlspecialchars($patient['phone']); ?><br>
-                                <?php if (!empty($patient['email'])): ?>
-                                <i class="fas fa-envelope me-2"></i><?php echo htmlspecialchars($patient['email']); ?>
-                                <?php endif; ?>
-                            </p>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Appointments</th>
+                                <th>Packages</th>
+                                <th>Last Visit</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($patients)): ?>
+                            <tr>
+                                <td colspan="7" class="text-center">No patients found</td>
+                            </tr>
+                            <?php else: ?>
+                            <?php foreach ($patients as $patient): ?>
+                            <tr>
+                                <td><?php echo $patient['patient_id']; ?></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-user-circle fa-2x text-primary me-2"></i>
+                                        <div>
+                                            <div class="fw-bold">
+                                                <?php 
+                                                echo htmlspecialchars($patient['first_name'] . ' ' . 
+                                                    ($patient['middle_name'] ? $patient['middle_name'] . ' ' : '') . 
+                                                    $patient['last_name']); 
+                                                ?>
+                                            </div>
+                                            <small class="text-muted"><?php echo htmlspecialchars($patient['username']); ?></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div><i class="fas fa-phone text-muted me-2"></i><?php echo htmlspecialchars($patient['phone']); ?></div>
+                                    <?php if (!empty($patient['email'])): ?>
+                                    <div><i class="fas fa-envelope text-muted me-2"></i><?php echo htmlspecialchars($patient['email']); ?></div>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="badge bg-primary mb-1">
+                                            Total: <?php echo $patient['total_appointments']; ?>
+                                        </span>
+                                        <span class="badge bg-success mb-1">
+                                            Completed: <?php echo $patient['completed_appointments']; ?>
+                                        </span>
+                                        <span class="badge bg-danger">
+                                            Cancelled: <?php echo $patient['cancelled_appointments']; ?>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        <?php echo $patient['total_packages']; ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <?php 
+                                    if ($patient['last_visit']) {
+                                        echo date('M d, Y', strtotime($patient['last_visit']));
+                                    } else {
+                                        echo '<span class="text-muted">No visits yet</span>';
+                                    }
+                                    ?>
+                                </td>
+                                <td>
+                                    <a href="view_patient.php?id=<?php echo $patient['patient_id']; ?>" 
+                                       class="btn btn-info btn-sm" 
+                                       title="View Details">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal fade" id="exportModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Export Patient Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="export_patients.php" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Export Format</label>
+                            <select name="format" class="form-select">
+                                <option value="csv">CSV</option>
+                                <option value="excel">Excel</option>
+                            </select>
                         </div>
-                        <div class="col-md-3">
-                            <p class="patient-info mb-0">
-                                <?php if (!empty($patient['address'])): ?>
-                                <i class="fas fa-map-marker-alt me-2"></i><?php echo htmlspecialchars($patient['address']); ?>
-                                <?php endif; ?>
-                            </p>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="patient-stats">
-                                <div class="stat-item">
-                                    <div class="stat-value-small"><?php echo $patient['total_appointments']; ?></div>
-                                    <div class="stat-label-small">Total Appointments</div>
+                        <div class="mb-3">
+                            <label class="form-label">Date Range</label>
+                            <div class="row">
+                                <div class="col">
+                                    <input type="date" name="start_date" class="form-control" required>
                                 </div>
-                                <div class="stat-item">
-                                    <div class="stat-value-small"><?php echo $patient['completed_appointments']; ?></div>
-                                    <div class="stat-label-small">Completed</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-value-small">₱<?php echo number_format($patient['total_spent'], 2); ?></div>
-                                    <div class="stat-label-small">Total Spent</div>
+                                <div class="col">
+                                    <input type="date" name="end_date" class="form-control" required>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        <button type="submit" class="btn btn-primary">Export</button>
+                    </form>
                 </div>
-                <?php endforeach; ?>
             </div>
         </div>
     </div>

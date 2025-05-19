@@ -33,6 +33,20 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
+        body {
+            background-image: url('https://cdn.vectorstock.com/i/500p/99/24/molecules-inside-bubbles-on-blue-background-water-vector-53889924.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
         .product-card {
             border: none;
             border-radius: 10px;
@@ -112,15 +126,9 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php foreach ($products as $product): ?>
             <div class="col-md-4 col-lg-3">
                 <div class="product-card p-3">
-                    <?php if (!empty($product['image_path'])): ?>
-                    <img src="<?php echo htmlspecialchars($product['image_path']); ?>" 
+                    <img src="../<?php echo htmlspecialchars($product['product_image'] ?? 'assets/img/default-product.jpg'); ?>" 
                          alt="<?php echo htmlspecialchars($product['product_name']); ?>" 
                          class="img-fluid product-image mb-3">
-                    <?php else: ?>
-                    <div class="product-image mb-3 bg-light d-flex align-items-center justify-content-center">
-                        <i class="fas fa-shopping-bag fa-3x text-muted"></i>
-                    </div>
-                    <?php endif; ?>
                     
                     <h5 class="mb-2"><?php echo htmlspecialchars($product['product_name']); ?></h5>
                     <p class="product-description"><?php echo htmlspecialchars($product['description']); ?></p>

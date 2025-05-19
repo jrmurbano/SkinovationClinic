@@ -49,6 +49,14 @@ $stats = $stmt->fetch(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
+        body {
+            background-image: url('https://cdn.vectorstock.com/i/500p/99/24/molecules-inside-bubbles-on-blue-background-water-vector-53889924.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
         .appointment-card {
             border: none;
             border-radius: 10px;
@@ -160,13 +168,9 @@ $stats = $stmt->fetch(PDO::FETCH_ASSOC);
                                 ?>
                             </p>
                         </div>
-                        <div class="col-md-2">
-                            <h6 class="mb-1">Staff</h6>
-                            <p class="mb-0"><?php echo htmlspecialchars($appointment['staff_first_name'] . ' ' . $appointment['staff_last_name']); ?></p>
-                        </div>
-                        <div class="col-md-2 text-end">
-                            <span class="status-badge status-<?php echo strtolower($appointment['status']); ?>">
-                                <?php echo ucfirst($appointment['status']); ?>
+                        <div class="col-md-3 text-end">
+                            <span class="status-badge status-<?php echo strtolower($appointment['status'] ?? 'pending'); ?>">
+                                <?php echo ucfirst($appointment['status'] ?? 'pending'); ?>
                             </span>
                         </div>
                     </div>
