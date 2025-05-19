@@ -26,25 +26,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_
 
 // Fetch notifications for the patient
 $stmt = $conn->prepare("
-    SELECT n.*, 
-           CASE 
-               WHEN n.type = 'appointment' THEN a.appointment_date
-               WHEN n.type = 'package' THEN pa.appointment_date
-           END as appointment_date,
-           CASE 
-               WHEN n.type = 'appointment' THEN a.appointment_time
-               WHEN n.type = 'package' THEN pa.appointment_time
-           END as appointment_time,
-           CASE 
-               WHEN n.type = 'appointment' THEN s.service_name
-               WHEN n.type = 'package' THEN p.package_name
-           END as service_name
+    SELECT 
+        n.*,
+        CASE 
+            WHEN n.type = 'appointment' THEN a.appointment_date
+            WHEN n.type = 'package' THEN pa.appointment_date
+        END as appointment_date,
+        CASE 
+            WHEN n.type = 'appointment' THEN a.appointment_time
+            WHEN n.type = 'package' THEN pa.appointment_time
+        END as appointment_time,
+        CASE 
+            WHEN n.type = 'appointment' AND a.service_id IS NOT NULL THEN s.service_name
+            WHEN n.type = 'appointment' AND a.product_id IS NOT NULL THEN pr.product_name
+            WHEN n.type = 'package' THEN p.package_name
+        END as item_name,
+        CASE 
+            WHEN n.type = 'appointment' THEN CONCAT(pt1.first_name, ' ', pt1.last_name)
+            WHEN n.type = 'package' THEN CONCAT(pt2.first_name, ' ', pt2.last_name)
+        END as patient_name
     FROM notifications n
     LEFT JOIN appointments a ON n.appointment_id = a.appointment_id AND n.type = 'appointment'
     LEFT JOIN package_appointments pa ON n.appointment_id = pa.package_appointment_id AND n.type = 'package'
     LEFT JOIN services s ON a.service_id = s.service_id
+    LEFT JOIN products pr ON a.product_id = pr.product_id
     LEFT JOIN package_bookings pb ON pa.booking_id = pb.booking_id
     LEFT JOIN packages p ON pb.package_id = p.package_id
+    LEFT JOIN patients pt1 ON a.patient_id = pt1.patient_id
+    LEFT JOIN patients pt2 ON pb.patient_id = pt2.patient_id
     WHERE n.patient_id = ?
     ORDER BY n.created_at DESC
 ");
@@ -89,6 +98,14 @@ $unread_count = count(array_filter($notifications, function($n) { return !$n['is
             border-left-color: #6f42c1;
         }
 
+        .notification-item.package {
+            border-left-color: #28a745;
+        }
+
+        .notification-item.appointment {
+            border-left-color: #007bff;
+        }
+
         .notification-item .time {
             font-size: 0.85em;
             color: #6c757d;
@@ -105,7 +122,7 @@ $unread_count = count(array_filter($notifications, function($n) { return !$n['is
             margin-bottom: 10px;
         }
 
-        .notification-item .service-name {
+        .notification-item .item-name {
             color: #28a745;
             font-weight: 500;
         }
@@ -147,14 +164,14 @@ $unread_count = count(array_filter($notifications, function($n) { return !$n['is
                 <?php else: ?>
                     <div class="notifications-list">
                         <?php foreach ($notifications as $notification): ?>
-                            <div class="notification-item <?php echo !$notification['is_read'] ? 'unread' : ''; ?>">
+                            <div class="notification-item <?php echo !$notification['is_read'] ? 'unread' : ''; ?> <?php echo $notification['type']; ?>">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
                                         <h5 class="title"><?php echo clean($notification['title']); ?></h5>
                                         <p class="message"><?php echo clean($notification['message']); ?></p>
-                                        <?php if ($notification['service_name']): ?>
-                                            <p class="service-name mb-2">
-                                                <?php echo clean($notification['service_name']); ?>
+                                        <?php if ($notification['item_name']): ?>
+                                            <p class="item-name mb-2">
+                                                <?php echo clean($notification['item_name']); ?>
                                                 <?php if ($notification['appointment_date']): ?>
                                                     on <?php echo date('F j, Y', strtotime($notification['appointment_date'])); ?>
                                                     at <?php echo date('g:i A', strtotime($notification['appointment_time'])); ?>

@@ -12,35 +12,61 @@ if (!isset($_SESSION['admin_id'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_POST['appointment_id'])) {
     $appointment_id = clean($_POST['appointment_id']);
     $action = clean($_POST['action']);
+    $type = clean($_POST['type']);
     
     if ($action === 'confirm' || $action === 'cancel') {
         $conn->beginTransaction();
         try {
-            // Get appointment details
-            $stmt = $conn->prepare("
-                SELECT a.*, p.patient_id, p.first_name, p.last_name, s.service_name
-                FROM appointments a
-                JOIN patients p ON a.patient_id = p.patient_id
-                JOIN services s ON a.service_id = s.service_id
-                WHERE a.appointment_id = ?
-            ");
-            $stmt->execute([$appointment_id]);
-            $appointment = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Get appointment details based on type
+            if ($type === 'service') {
+                $stmt = $conn->prepare("
+                    SELECT a.*, p.patient_id, p.first_name, p.last_name, s.service_name as name
+                    FROM appointments a
+                    JOIN patients p ON a.patient_id = p.patient_id
+                    JOIN services s ON a.service_id = s.service_id
+                    WHERE a.appointment_id = ?
+                ");
+                $stmt->execute([$appointment_id]);
+                $appointment = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (!$appointment) {
-                throw new Exception('Appointment not found');
+                if (!$appointment) {
+                    throw new Exception('Appointment not found');
+                }
+
+                // Update appointment status
+                $status = ($action === 'confirm') ? 'confirmed' : 'cancelled';
+                $stmt = $conn->prepare("UPDATE appointments SET status = ? WHERE appointment_id = ?");
+                $stmt->execute([$status, $appointment_id]);
+            } else if ($type === 'package') {
+                $stmt = $conn->prepare("
+                    SELECT pa.*, pb.patient_id, p.first_name, p.last_name, pk.package_name as name
+                    FROM package_appointments pa
+                    JOIN package_bookings pb ON pa.booking_id = pb.booking_id
+                    JOIN packages pk ON pb.package_id = pk.package_id
+                    JOIN patients p ON pb.patient_id = p.patient_id
+                    WHERE pa.package_appointment_id = ?
+                ");
+                $stmt->execute([$appointment_id]);
+                $appointment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$appointment) {
+                    throw new Exception('Package appointment not found');
+                }
+
+                // Update package appointment status
+                $status = ($action === 'confirm') ? 'confirmed' : 'cancelled';
+                $stmt = $conn->prepare("UPDATE package_appointments SET status = ? WHERE package_appointment_id = ?");
+                $stmt->execute([$status, $appointment_id]);
+            } else {
+                throw new Exception('Invalid appointment type');
             }
 
-            // Update appointment status
-            $status = ($action === 'confirm') ? 'confirmed' : 'cancelled';
-            $stmt = $conn->prepare("UPDATE appointments SET status = ? WHERE appointment_id = ?");
-            $stmt->execute([$status, $appointment_id]);
-
             // Create notification for patient
-            $title = "Appointment " . ucfirst($status);
+            $title = ucfirst($type) . " Appointment " . ucfirst($status);
             $message = sprintf(
-                "Your appointment for %s on %s at %s has been %s.",
-                $appointment['service_name'],
+                "Your %s appointment for %s on %s at %s has been %s.",
+                $type,
+                $appointment['name'],
                 date('F j, Y', strtotime($appointment['appointment_date'])),
                 date('g:i A', strtotime($appointment['appointment_time'])),
                 $status
@@ -49,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && isset($_
             createNotification($conn, 'appointment', $appointment_id, $title, $message, $appointment['patient_id']);
 
             $conn->commit();
-            $_SESSION['success'] = "Appointment has been " . $status . " successfully.";
+            $_SESSION['success'] = ucfirst($type) . " appointment has been " . $status . " successfully.";
         } catch (Exception $e) {
             $conn->rollback();
             $_SESSION['error'] = $e->getMessage();
@@ -67,26 +93,83 @@ $search = isset($_GET['search']) ? clean($_GET['search']) : '';
 
 // Build the query
 $query = "
-    SELECT a.*, p.first_name, p.last_name, p.phone, s.service_name, s.price
+    SELECT 
+        'service' as type,
+        a.appointment_id as id,
+        a.appointment_date,
+        a.appointment_time,
+        a.status,
+        p.first_name,
+        p.last_name,
+        p.phone,
+        s.service_name as name,
+        s.price,
+        NULL as package_id
     FROM appointments a
     JOIN patients p ON a.patient_id = p.patient_id
     JOIN services s ON a.service_id = s.service_id
-    WHERE 1=1
+    WHERE a.product_id IS NULL
+
+    UNION ALL
+
+    SELECT 
+        'package' as type,
+        pa.package_appointment_id as id,
+        pa.appointment_date,
+        pa.appointment_time,
+        pa.status,
+        p.first_name,
+        p.last_name,
+        p.phone,
+        pk.package_name as name,
+        pk.price,
+        pk.package_id
+    FROM package_appointments pa
+    JOIN package_bookings pb ON pa.booking_id = pb.booking_id
+    JOIN packages pk ON pb.package_id = pk.package_id
+    JOIN patients p ON pb.patient_id = p.patient_id
+
+    UNION ALL
+
+    SELECT 
+        'product' as type,
+        a.appointment_id as id,
+        a.appointment_date,
+        a.appointment_time,
+        a.status,
+        p.first_name,
+        p.last_name,
+        p.phone,
+        pr.product_name as name,
+        pr.price,
+        NULL as package_id
+    FROM appointments a
+    JOIN patients p ON a.patient_id = p.patient_id
+    JOIN products pr ON a.product_id = pr.product_id
+    WHERE a.product_id IS NOT NULL
 ";
+
 $params = [];
 
 if ($status_filter) {
-    $query .= " AND a.status = ?";
+    $query .= " AND (a.status = ? OR pa.status = ?)";
+    $params[] = $status_filter;
     $params[] = $status_filter;
 }
 
 if ($search) {
-    $query .= " AND (p.first_name LIKE ? OR p.last_name LIKE ? OR p.phone LIKE ? OR s.service_name LIKE ?)";
+    $query .= " AND (
+        p.first_name LIKE ? OR 
+        p.last_name LIKE ? OR 
+        p.phone LIKE ? OR 
+        s.service_name LIKE ? OR
+        pk.package_name LIKE ?
+    )";
     $search_param = "%$search%";
-    $params = array_merge($params, [$search_param, $search_param, $search_param, $search_param]);
+    $params = array_merge($params, [$search_param, $search_param, $search_param, $search_param, $search_param]);
 }
 
-$query .= " ORDER BY a.appointment_date DESC, a.appointment_time DESC";
+$query .= " ORDER BY appointment_date DESC, appointment_time DESC";
 
 $stmt = $conn->prepare($query);
 $stmt->execute($params);
@@ -104,7 +187,7 @@ $cancelled_appointments = count(array_filter($appointments, function($a) { retur
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Appointments</title>
+    <title>Manage Appointments and Products</title>
     <link rel="icon" type="image/png" href="../assets/img/ISCAP1-303-Skinovation-Clinic-COLORED-Logo.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -183,9 +266,11 @@ $cancelled_appointments = count(array_filter($appointments, function($a) { retur
 
     /* Badge styling */
     .badge {
-        padding: 0.5em 0.8em;
+        padding: 8px 12px;
         font-weight: 500;
         font-size: 0.85rem;
+        text-transform: capitalize;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .badge.bg-success {
@@ -257,7 +342,7 @@ $cancelled_appointments = count(array_filter($appointments, function($a) { retur
 
     .alert-success {
         background-color: #e8f5e9;
-        color:rgb(228, 228, 228);
+        color:rgb(0, 0, 0);
     }
 
     .alert-danger {
@@ -291,6 +376,26 @@ $cancelled_appointments = count(array_filter($appointments, function($a) { retur
     .btn-group .btn i {
         font-size: 0.9rem;
     }
+
+    /* Add custom badge color */
+    .bg-purple {
+        background: linear-gradient(135deg, #6f42c1 0%, #8250c8 100%) !important;
+        color: white;
+    }
+
+    .bg-primary {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%) !important;
+    }
+
+    .bg-success {
+        background: linear-gradient(135deg, #198754 0%, #157347 100%) !important;
+    }
+
+    /* Add new badge style for products */
+    .badge.bg-info {
+        background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%) !important;
+        color: white;
+    }
     </style>
 </head>
 <body>
@@ -299,7 +404,7 @@ $cancelled_appointments = count(array_filter($appointments, function($a) { retur
     <div class="content p-4">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1><i class="fas fa-calendar-alt"></i> Manage Appointments</h1>
+                <h1><i class="fas fa-calendar-alt"></i> Manage Appointments and Products</h1>
                 <div>
                     
                 </div>
@@ -378,51 +483,73 @@ $cancelled_appointments = count(array_filter($appointments, function($a) { retur
                         <table class="table table-striped table-hover">
                             <thead>
                                 <tr>
+                                    <th>Type</th>
                                     <th>Patient Name</th>
                                     <th>Contact</th>
-                                    <th>Service</th>
+                                    <th>Service/Package</th>
                                     <th>Date</th>
                                     <th>Time</th>
                                     <th>Price</th>
                                     <th>Status</th>
-                                 
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($appointments as $appointment): ?>
                                 <tr>
+                                    <td>
+                                        <span class="badge bg-<?php 
+                                            echo $appointment['type'] === 'service' ? 'primary' : 
+                                                ($appointment['type'] === 'package' ? 'success' : 
+                                                ($appointment['type'] === 'product' ? 'info' : '')); 
+                                        ?>" style="<?php 
+                                            echo $appointment['type'] === 'service' ? 'background: linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%) !important;' : 
+                                                ($appointment['type'] === 'package' ? 'background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%) !important;' : 
+                                                ($appointment['type'] === 'product' ? 'background: linear-gradient(135deg, #0288d1 0%, #039be5 100%) !important;' : '')); 
+                                        ?>">
+                                            <?php echo ucfirst($appointment['type']); ?>
+                                        </span>
+                                    </td>
                                     <td><?php echo clean($appointment['first_name'] . ' ' . $appointment['last_name']); ?></td>
                                     <td>
                                         <i class="fas fa-phone"></i> <?php echo clean($appointment['phone']); ?>
                                     </td>
-                                    <td><?php echo clean($appointment['service_name']); ?></td>
+                                    <td><?php echo clean($appointment['name']); ?></td>
                                     <td><?php echo date('M d, Y', strtotime($appointment['appointment_date'])); ?></td>
                                     <td><?php echo date('h:i A', strtotime($appointment['appointment_time'])); ?></td>
                                     <td>₱<?php echo number_format($appointment['price'], 2); ?></td>
                                     <td>
+                                        <?php if ($appointment['type'] !== 'product'): ?>
                                         <span class="badge bg-<?php 
                                             echo $appointment['status'] === 'confirmed' ? 'success' : 
                                                 ($appointment['status'] === 'cancelled' ? 'danger' : 'warning'); 
                                         ?>">
                                             <?php echo ucfirst($appointment['status']); ?>
                                         </span>
+                                        <?php else: ?>
+                                        <span>Pre-ordered</span>
+                                        <?php endif; ?>
                                     </td>
                                     <td>
-                                        <?php if ($appointment['status'] === 'pending'): ?>
+                                        <?php if ($appointment['status'] === 'pending' && $appointment['type'] !== 'product'): ?>
                                             <form method="POST" class="d-inline">
                                                 <input type="hidden" name="action" value="confirm">
-                                                <input type="hidden" name="appointment_id" value="<?php echo $appointment['appointment_id']; ?>">
+                                                <input type="hidden" name="appointment_id" value="<?php echo $appointment['id']; ?>">
+                                                <input type="hidden" name="type" value="<?php echo $appointment['type']; ?>">
                                                 <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Are you sure you want to confirm this appointment?')">
                                                     <i class="fas fa-check"></i> Confirm
                                                 </button>
                                             </form>
                                             <form method="POST" class="d-inline">
                                                 <input type="hidden" name="action" value="cancel">
-                                                <input type="hidden" name="appointment_id" value="<?php echo $appointment['appointment_id']; ?>">
+                                                <input type="hidden" name="appointment_id" value="<?php echo $appointment['id']; ?>">
+                                                <input type="hidden" name="type" value="<?php echo $appointment['type']; ?>">
                                                 <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel this appointment?')">
                                                     <i class="fas fa-times"></i> Cancel
                                                 </button>
                                             </form>
+                                        <?php elseif ($appointment['type'] === 'product'): ?>
+                                            <span>-</span>
                                         <?php endif; ?>
                                     </td>
                                 </tr>

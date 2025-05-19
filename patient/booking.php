@@ -169,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <?php if ($booking_success): ?>
                 <div class="alert alert-success text-center">
                     <h4><i class="bi bi-check-circle"></i> Booking Successful!</h4>
-                    <p>Your appointment has been booked successfully. You will receive a confirmation email shortly.</p>
+                    <p>Your appointment has been booked successfully. Please wait for confirmation.</p>
                     <a href="my-appointments.php" class="btn btn-primary mt-3">View My Appointments</a>
                 </div>
                 <?php else: ?>

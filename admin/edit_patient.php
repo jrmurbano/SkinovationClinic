@@ -21,7 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $first_name = clean($_POST['first_name']);
     $middle_name = clean($_POST['middle_name']);
     $last_name = clean($_POST['last_name']);
-    $email = clean($_POST['email']);
     $phone = clean($_POST['phone']);
     $address = clean($_POST['address']);
     $username = clean($_POST['username']);
@@ -32,20 +31,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("
                 UPDATE patients 
                 SET first_name = ?, middle_name = ?, last_name = ?, 
-                    email = ?, phone = ?, address = ?, 
+                    phone = ?, address = ?,
                     username = ?, password = ?
                 WHERE patient_id = ?
             ");
-            $stmt->execute([$first_name, $middle_name, $last_name, $email, $phone, $address, $username, $password, $patient_id]);
+            $stmt->execute([$first_name, $middle_name, $last_name, $phone, $address, $username, $password, $patient_id]);
         } else {
             $stmt = $conn->prepare("
                 UPDATE patients 
                 SET first_name = ?, middle_name = ?, last_name = ?, 
-                    email = ?, phone = ?, address = ?, 
+                    phone = ?, address = ?,
                     username = ?
                 WHERE patient_id = ?
             ");
-            $stmt->execute([$first_name, $middle_name, $last_name, $email, $phone, $address, $username, $patient_id]);
+            $stmt->execute([$first_name, $middle_name, $last_name, $phone, $address, $username, $patient_id]);
         }
 
         header('Location: view_patient.php?id=' . $patient_id . '&success=updated');
@@ -102,58 +101,41 @@ if (!$patient) {
             <div class="card">
                 <div class="card-body">
                     <form method="POST" class="needs-validation" novalidate>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
+                        <div class="row g-3">
+                            <div class="col-md-4">
                                 <label for="first_name" class="form-label">First Name</label>
-                                <input type="text" class="form-control" id="first_name" name="first_name" 
-                                       value="<?php echo clean($patient['first_name']); ?>" required>
-                                <div class="invalid-feedback">Please enter first name</div>
+                                <input type="text" class="form-control" id="first_name" name="first_name"
+                                    value="<?php echo clean($patient['first_name']); ?>" required>
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-4">
                                 <label for="middle_name" class="form-label">Middle Name</label>
-                                <input type="text" class="form-control" id="middle_name" name="middle_name" 
-                                       value="<?php echo clean($patient['middle_name']); ?>">
+                                <input type="text" class="form-control" id="middle_name" name="middle_name"
+                                    value="<?php echo clean($patient['middle_name'] ?? ''); ?>">
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-md-4">
                                 <label for="last_name" class="form-label">Last Name</label>
-                                <input type="text" class="form-control" id="last_name" name="last_name" 
-                                       value="<?php echo clean($patient['last_name']); ?>" required>
-                                <div class="invalid-feedback">Please enter last name</div>
+                                <input type="text" class="form-control" id="last_name" name="last_name"
+                                    value="<?php echo clean($patient['last_name']); ?>" required>
                             </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" 
-                                       value="<?php echo clean($patient['email'] ?? ''); ?>" required>
-                                <div class="invalid-feedback">Please enter a valid email</div>
-                            </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6">
                                 <label for="phone" class="form-label">Phone</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" 
-                                       value="<?php echo clean($patient['phone'] ?? ''); ?>" required>
-                                <div class="invalid-feedback">Please enter phone number</div>
+                                <input type="tel" class="form-control" id="phone" name="phone"
+                                    value="<?php echo clean($patient['phone']); ?>" required>
                             </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Address</label>
-                            <textarea class="form-control" id="address" name="address" rows="3"><?php echo clean($patient['address'] ?? ''); ?></textarea>
-                            <div class="invalid-feedback">Please enter address</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-6">
+                                <label for="address" class="form-label">Address</label>
+                                <input type="text" class="form-control" id="address" name="address"
+                                    value="<?php echo clean($patient['address'] ?? ''); ?>">
+                            </div>
+                            <div class="col-md-6">
                                 <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" 
-                                       value="<?php echo clean($patient['username']); ?>" required>
-                                <div class="invalid-feedback">Please enter username</div>
+                                <input type="text" class="form-control" id="username" name="username"
+                                    value="<?php echo clean($patient['username']); ?>" required>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="password" class="form-label">New Password (leave blank to keep current)</label>
-                                <input type="password" class="form-control" id="password" name="password">
-                                <div class="form-text">Only fill this if you want to change the password</div>
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password"
+                                    placeholder="Leave blank to keep current password">
                             </div>
                         </div>
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 18, 2025 at 11:21 PM
+-- Generation Time: May 19, 2025 at 03:02 AM
 -- Server version: 8.0.30
 -- PHP Version: 8.1.10
 
@@ -40,7 +40,7 @@ CREATE TABLE `admin` (
 --
 
 INSERT INTO `admin` (`admin_id`, `admin_last_name`, `admin_first_name`, `admin_username`, `admin_password`) VALUES
-(2, 'Urbano', 'Roshan', 'roshannaaaa', '$2y$10$wwnBJK186HIzzbuQSDAZTukPzBSxMGa6p1RJOplk0Md163EVVcABC'),
+(2, 'Urbano', 'Roshan', 'kekuro_team', '$2y$10$wwnBJK186HIzzbuQSDAZTukPzBSxMGa6p1RJOplk0Md163EVVcABC'),
 (3, 'reyes', 'khi', 'khi', '$2y$10$D7ty7Gevr7NipuHg4cCR9uKGqiirMdLOsOFs8tuCs1HU8jLsr9pEO');
 
 -- --------------------------------------------------------
@@ -52,7 +52,7 @@ INSERT INTO `admin` (`admin_id`, `admin_last_name`, `admin_first_name`, `admin_u
 CREATE TABLE `appointments` (
   `appointment_id` int NOT NULL,
   `patient_id` int NOT NULL,
-  `service_id` int NOT NULL,
+  `service_id` int DEFAULT NULL,
   `product_id` int DEFAULT NULL,
   `package_id` int DEFAULT NULL,
   `attendant_id` int NOT NULL,
@@ -75,7 +75,21 @@ INSERT INTO `appointments` (`appointment_id`, `patient_id`, `service_id`, `produ
 (13, 5, 7, NULL, NULL, 1, '2025-06-06', '16:00:00', 'cancelled', '2025-05-19 06:54:39', '2025-05-19 06:55:36'),
 (14, 5, 7, NULL, NULL, 1, '2025-05-30', '16:00:00', 'cancelled', '2025-05-19 06:54:59', '2025-05-19 06:55:40'),
 (15, 5, 7, NULL, NULL, 1, '2025-05-29', '14:00:00', 'cancelled', '2025-05-19 06:55:25', '2025-05-19 06:55:38'),
-(16, 5, 21, NULL, NULL, 1, '2025-05-30', '16:00:00', 'confirmed', '2025-05-19 07:03:27', '2025-05-19 07:03:40');
+(16, 5, 21, NULL, NULL, 1, '2025-05-30', '16:00:00', 'confirmed', '2025-05-19 07:03:27', '2025-05-19 07:03:40'),
+(17, 4, 29, NULL, NULL, 1, '2025-05-29', '17:00:00', 'confirmed', '2025-05-19 08:09:39', '2025-05-19 08:10:12'),
+(18, 4, 25, NULL, NULL, 1, '2025-05-29', '13:00:00', 'cancelled', '2025-05-19 08:10:59', '2025-05-19 08:13:16'),
+(19, 4, 29, NULL, NULL, 1, '2025-05-29', '14:00:00', 'confirmed', '2025-05-19 09:42:17', '2025-05-19 10:11:02'),
+(20, 4, NULL, 2, NULL, 1, '2025-06-06', '15:00:00', 'pending', '2025-05-19 09:52:49', '2025-05-19 09:52:49'),
+(21, 4, 2, NULL, NULL, 1, '2025-07-02', '14:00:00', 'confirmed', '2025-05-19 10:02:55', '2025-05-19 10:11:05'),
+(22, 4, NULL, NULL, 2, 1, '2025-07-30', '16:00:00', 'pending', '2025-05-19 10:03:14', '2025-05-19 10:03:14'),
+(23, 4, NULL, NULL, 16, 1, '2025-07-31', '14:00:00', 'pending', '2025-05-19 10:11:32', '2025-05-19 10:11:32'),
+(24, 4, NULL, NULL, 1, 1, '2025-05-30', '14:00:00', 'pending', '2025-05-19 10:12:25', '2025-05-19 10:12:25'),
+(25, 4, NULL, 1, NULL, 1, '2025-05-29', '12:00:00', 'pending', '2025-05-19 10:20:45', '2025-05-19 10:20:45'),
+(28, 2, 4, NULL, NULL, 1, '2025-05-30', '15:00:00', 'confirmed', '2025-05-19 10:34:04', '2025-05-19 10:35:00'),
+(29, 2, NULL, 5, NULL, 1, '2025-06-06', '14:00:00', 'pending', '2025-05-19 10:36:04', '2025-05-19 10:36:04'),
+(30, 2, 35, NULL, NULL, 1, '2025-06-17', '14:00:00', 'confirmed', '2025-05-19 10:46:32', '2025-05-19 10:47:49'),
+(31, 2, NULL, 1, NULL, 1, '2025-05-30', '14:00:00', 'pending', '2025-05-19 10:47:24', '2025-05-19 10:47:24'),
+(32, 2, 32, NULL, NULL, 1, '2025-07-18', '17:00:00', 'confirmed', '2025-05-19 10:52:35', '2025-05-19 10:53:05');
 
 -- --------------------------------------------------------
 
@@ -118,6 +132,13 @@ CREATE TABLE `cancellation_requests` (
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `cancellation_requests`
+--
+
+INSERT INTO `cancellation_requests` (`request_id`, `appointment_id`, `appointment_type`, `patient_id`, `reason`, `status`, `created_at`, `updated_at`) VALUES
+(1, 17, 'regular', 4, '', 'pending', '2025-05-19 00:09:52', '2025-05-19 00:09:52');
 
 -- --------------------------------------------------------
 
@@ -273,8 +294,11 @@ INSERT INTO `history_log` (`id`, `datetime`, `type`, `name`, `action`, `performe
 
 CREATE TABLE `notifications` (
   `notification_id` int NOT NULL,
-  `type` enum('appointment','confirmation','cancellation','reschedule') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `type` enum('appointment','package','confirmation','cancellation','reschedule') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `appointment_id` int DEFAULT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `message` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `patient_id` int DEFAULT NULL,
   `is_read` tinyint(1) DEFAULT '0',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -283,31 +307,13 @@ CREATE TABLE `notifications` (
 -- Dumping data for table `notifications`
 --
 
-INSERT INTO `notifications` (`notification_id`, `type`, `appointment_id`, `is_read`, `created_at`) VALUES
-(1, 'appointment', 11, 0, '2025-05-18 22:40:43'),
-(2, 'appointment', 11, 0, '2025-05-18 22:40:43'),
-(3, 'appointment', 11, 0, '2025-05-18 22:40:43'),
-(4, 'appointment', 11, 0, '2025-05-18 22:40:43'),
-(5, 'appointment', 12, 0, '2025-05-18 22:53:21'),
-(6, 'appointment', 12, 0, '2025-05-18 22:53:21'),
-(7, 'appointment', 12, 0, '2025-05-18 22:53:21'),
-(8, 'appointment', 12, 0, '2025-05-18 22:53:21'),
-(9, 'appointment', 13, 0, '2025-05-18 22:54:39'),
-(10, 'appointment', 13, 0, '2025-05-18 22:54:39'),
-(11, 'appointment', 13, 0, '2025-05-18 22:54:39'),
-(12, 'appointment', 13, 0, '2025-05-18 22:54:39'),
-(13, 'appointment', 14, 0, '2025-05-18 22:54:59'),
-(14, 'appointment', 14, 0, '2025-05-18 22:54:59'),
-(15, 'appointment', 14, 0, '2025-05-18 22:54:59'),
-(16, 'appointment', 14, 0, '2025-05-18 22:54:59'),
-(17, 'appointment', 15, 0, '2025-05-18 22:55:25'),
-(18, 'appointment', 15, 0, '2025-05-18 22:55:25'),
-(19, 'appointment', 15, 0, '2025-05-18 22:55:25'),
-(20, 'appointment', 15, 0, '2025-05-18 22:55:25'),
-(21, 'appointment', 16, 0, '2025-05-18 23:03:27'),
-(22, 'appointment', 16, 0, '2025-05-18 23:03:27'),
-(23, 'appointment', 16, 0, '2025-05-18 23:03:27'),
-(24, 'appointment', 16, 0, '2025-05-18 23:03:27');
+INSERT INTO `notifications` (`notification_id`, `type`, `appointment_id`, `title`, `message`, `patient_id`, `is_read`, `created_at`) VALUES
+(3, 'appointment', 28, 'Service Appointment Confirmed', 'Your service appointment for Charcoal on May 30, 2025 at 3:00 PM has been confirmed.', 2, 0, '2025-05-19 02:35:00'),
+(4, 'appointment', 15, 'Package Appointment Confirmed', 'Your package appointment for 3 + 1 Geneo Infusion on June 6, 2025 at 1:00 PM has been confirmed.', 2, 0, '2025-05-19 02:41:42'),
+(5, 'appointment', 16, 'Package Appointment Confirmed', 'Your package appointment for 3 + 1 Waist Cavitation on June 27, 2025 at 4:00 PM has been confirmed.', 2, 0, '2025-05-19 02:47:46'),
+(6, 'appointment', 30, 'Service Appointment Confirmed', 'Your service appointment for IPL Upperlip on June 17, 2025 at 2:00 PM has been confirmed.', 2, 0, '2025-05-19 02:47:49'),
+(7, 'appointment', 32, 'Service Appointment Confirmed', 'Your service appointment for IPL Arm on July 18, 2025 at 5:00 PM has been confirmed.', 2, 0, '2025-05-19 02:53:05'),
+(8, 'appointment', 17, 'Package Appointment Confirmed', 'Your package appointment for 3 + 1 Waist Cavitation on June 26, 2025 at 3:00 PM has been confirmed.', 2, 0, '2025-05-19 02:53:07');
 
 -- --------------------------------------------------------
 
@@ -426,12 +432,15 @@ CREATE TABLE `package_appointments` (
 --
 
 INSERT INTO `package_appointments` (`package_appointment_id`, `booking_id`, `attendant_id`, `appointment_date`, `appointment_time`, `status`, `created_at`, `updated_at`) VALUES
-(3, 5, 1, '2025-05-12', '10:00:00', 'pending', '2025-05-13 23:37:13', '2025-05-13 23:37:13'),
+(3, 5, 1, '2025-05-12', '10:00:00', 'confirmed', '2025-05-13 23:37:13', '2025-05-19 10:17:17'),
 (4, 6, 1, '2025-05-21', '11:00:00', 'cancelled', '2025-05-13 23:41:01', '2025-05-13 23:42:23'),
-(6, 8, 1, '2025-05-14', '09:00:00', 'pending', '2025-05-15 19:18:52', '2025-05-15 19:18:52'),
+(6, 8, 1, '2025-05-14', '09:00:00', 'confirmed', '2025-05-15 19:18:52', '2025-05-19 10:17:14'),
 (7, 9, 1, '2025-05-19', '10:00:00', 'cancelled', '2025-05-15 20:13:39', '2025-05-15 20:22:17'),
 (8, 10, 1, '2025-05-15', '10:00:00', 'cancelled', '2025-05-15 20:33:29', '2025-05-15 22:03:47'),
-(9, 11, 1, '2025-05-21', '12:00:00', 'cancelled', '2025-05-15 23:25:48', '2025-05-15 23:25:55');
+(9, 11, 1, '2025-05-21', '12:00:00', 'cancelled', '2025-05-15 23:25:48', '2025-05-15 23:25:55'),
+(15, 17, 1, '2025-06-06', '13:00:00', 'confirmed', '2025-05-19 10:41:33', '2025-05-19 10:41:42'),
+(16, 18, 1, '2025-06-27', '16:00:00', 'confirmed', '2025-05-19 10:46:48', '2025-05-19 10:47:46'),
+(17, 19, 1, '2025-06-26', '15:00:00', 'confirmed', '2025-05-19 10:52:52', '2025-05-19 10:53:07');
 
 -- --------------------------------------------------------
 
@@ -443,9 +452,9 @@ CREATE TABLE `package_bookings` (
   `booking_id` int NOT NULL,
   `patient_id` int NOT NULL,
   `package_id` int NOT NULL,
-  `sessions_remaining` int NOT NULL,
-  `valid_until` date NOT NULL,
-  `grace_period_until` date NOT NULL,
+  `sessions_remaining` int DEFAULT NULL,
+  `valid_until` date DEFAULT NULL,
+  `grace_period_until` date DEFAULT NULL,
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -460,7 +469,10 @@ INSERT INTO `package_bookings` (`booking_id`, `patient_id`, `package_id`, `sessi
 (8, 3, 2, 4, '2025-09-12', '2025-11-11', '2025-05-15 19:18:52', '2025-05-15 19:18:52'),
 (9, 3, 7, 5, '2025-09-12', '2025-11-11', '2025-05-15 20:13:39', '2025-05-15 20:22:17'),
 (10, 3, 1, 5, '2025-08-13', '2025-11-11', '2025-05-15 20:33:29', '2025-05-15 22:03:48'),
-(11, 3, 7, 5, '2025-09-12', '2025-11-11', '2025-05-15 23:25:48', '2025-05-15 23:25:55');
+(11, 3, 7, 5, '2025-09-12', '2025-11-11', '2025-05-15 23:25:48', '2025-05-15 23:25:55'),
+(17, 2, 17, NULL, NULL, NULL, '2025-05-19 10:41:33', '2025-05-19 10:41:33'),
+(18, 2, 8, NULL, NULL, NULL, '2025-05-19 10:46:48', '2025-05-19 10:46:48'),
+(19, 2, 8, NULL, NULL, NULL, '2025-05-19 10:52:52', '2025-05-19 10:52:52');
 
 -- --------------------------------------------------------
 
@@ -741,7 +753,8 @@ ALTER TABLE `history_log`
 --
 ALTER TABLE `notifications`
   ADD PRIMARY KEY (`notification_id`),
-  ADD KEY `appointment_id` (`appointment_id`);
+  ADD KEY `appointment_id` (`appointment_id`),
+  ADD KEY `patient_id` (`patient_id`);
 
 --
 -- Indexes for table `owner`
@@ -843,7 +856,7 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `appointment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `appointment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `attendants`
@@ -855,7 +868,7 @@ ALTER TABLE `attendants`
 -- AUTO_INCREMENT for table `cancellation_requests`
 --
 ALTER TABLE `cancellation_requests`
-  MODIFY `request_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `request_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `closed_dates`
@@ -879,7 +892,7 @@ ALTER TABLE `history_log`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `notification_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `notification_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `owner`
@@ -903,13 +916,13 @@ ALTER TABLE `packages`
 -- AUTO_INCREMENT for table `package_appointments`
 --
 ALTER TABLE `package_appointments`
-  MODIFY `package_appointment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `package_appointment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `package_bookings`
 --
 ALTER TABLE `package_bookings`
-  MODIFY `booking_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `booking_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `patients`
@@ -982,7 +995,7 @@ ALTER TABLE `feedback`
 -- Constraints for table `notifications`
 --
 ALTER TABLE `notifications`
-  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`appointment_id`) REFERENCES `appointments` (`appointment_id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `notifications_patient_id_fk` FOREIGN KEY (`patient_id`) REFERENCES `patients` (`patient_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `package_appointments`

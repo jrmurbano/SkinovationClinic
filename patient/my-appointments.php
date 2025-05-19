@@ -25,15 +25,15 @@ $sql = "SELECT
             a.appointment_date,
             a.appointment_time,
             a.status,
-            '' as notes,
-            s.service_name as name,
-            s.price,
-            att.first_name as attendant_first_name,
-            att.last_name as attendant_last_name
+            COALESCE(s.service_name, '') as name,
+            COALESCE(s.price, 0) as price,
+            COALESCE(att.first_name, '') as attendant_first_name,
+            COALESCE(att.last_name, '') as attendant_last_name,
+            NULL as product_id
         FROM appointments a
         LEFT JOIN services s ON a.service_id = s.service_id
         LEFT JOIN attendants att ON a.attendant_id = att.attendant_id
-        WHERE a.patient_id = ?
+        WHERE a.patient_id = ? AND a.product_id IS NULL AND a.service_id IS NOT NULL
         
         UNION ALL
         
@@ -43,21 +43,40 @@ $sql = "SELECT
             pa.appointment_date,
             pa.appointment_time,
             pa.status,
-            '' as notes,
-            p.package_name as name,
-            p.price,
-            att.first_name as attendant_first_name,
-            att.last_name as attendant_last_name
+            COALESCE(p.package_name, '') as name,
+            COALESCE(p.price, 0) as price,
+            COALESCE(att.first_name, '') as attendant_first_name,
+            COALESCE(att.last_name, '') as attendant_last_name,
+            NULL as product_id
         FROM package_appointments pa
-        JOIN package_bookings pb ON pa.booking_id = pb.booking_id
-        JOIN packages p ON pb.package_id = p.package_id
+        LEFT JOIN package_bookings pb ON pa.booking_id = pb.booking_id
+        LEFT JOIN packages p ON pb.package_id = p.package_id
         LEFT JOIN attendants att ON pa.attendant_id = att.attendant_id
         WHERE pb.patient_id = ?
+
+        UNION ALL
+
+        SELECT 
+            'product' as appointment_type,
+            a.appointment_id,
+            a.appointment_date,
+            a.appointment_time,
+            a.status,
+            COALESCE(p.product_name, '') as name,
+            COALESCE(p.price, 0) as price,
+            COALESCE(att.first_name, '') as attendant_first_name,
+            COALESCE(att.last_name, '') as attendant_last_name,
+            p.product_id
+        FROM appointments a
+        LEFT JOIN products p ON a.product_id = p.product_id
+        LEFT JOIN attendants att ON a.attendant_id = att.attendant_id
+        WHERE a.patient_id = ? AND a.product_id IS NOT NULL
         
         ORDER BY appointment_date DESC, appointment_time DESC";
 $stmt = $conn->prepare($sql);
 $stmt->bindValue(1, $patient_id, PDO::PARAM_INT);
 $stmt->bindValue(2, $patient_id, PDO::PARAM_INT);
+$stmt->bindValue(3, $patient_id, PDO::PARAM_INT);
 $stmt->execute();
 $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -173,21 +192,25 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <?php if (count($appointments) > 0): ?>
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="card-title mb-0">Upcoming Appointments</h3>
+                <div class="card-header" style="background: linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%) !important; color: white;">
+                    <h3 class="card-title mb-0">Upcoming Service Appointments</h3>
                 </div>
                 <div class="card-body">
                     <div class="appointments-list">
-                        <?php foreach ($appointments as $appointment): ?>
-                            <?php if (strtotime($appointment['appointment_date']) >= strtotime(date('Y-m-d'))): ?>
+                        <?php 
+                        $hasUpcomingServices = false;
+                        foreach ($appointments as $appointment): 
+                            if ($appointment['appointment_type'] === 'regular' && strtotime($appointment['appointment_date']) >= strtotime(date('Y-m-d'))): 
+                                $hasUpcomingServices = true;
+                        ?>
                                 <div class="appointment-card mb-3">
-                                    <h5 class="text-primary">Service: <?php echo clean($appointment['name']); ?></h5>
+                                    <h5 style="color: #4a148c;">Service: <?php echo clean($appointment['name']); ?></h5>
                                     <p><strong>Date:</strong> <?php echo date('F j, Y', strtotime($appointment['appointment_date'])); ?></p>
                                     <p><strong>Time:</strong> <?php echo date('g:i A', strtotime($appointment['appointment_time'])); ?></p>
                                     <p><strong>Attendant:</strong> <?php echo clean($appointment['attendant_first_name'] . ' ' . $appointment['attendant_last_name']); ?></p>
-                                    <p><strong>Price:</strong> ₱<?php echo number_format($appointment['price'], 2); ?></p>
+                                    <p><strong>Price:</strong> ₱<?php echo number_format((float)$appointment['price'], 2); ?></p>
                                     <p><strong>Status:</strong> 
                                         <span class="badge bg-<?php 
                                             echo $appointment['status'] === 'confirmed' ? 'success' : 
@@ -195,9 +218,6 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         ?>">
                                             <?php echo ucfirst($appointment['status']); ?>
                                         </span>
-                                        <?php if ($appointment['status'] === 'pending'): ?>
-                                            <small class="text-muted">(Waiting for admin confirmation)</small>
-                                        <?php endif; ?>
                                     </p>
                                     <div class="d-flex gap-2">
                                         <?php if ($appointment['status'] === 'confirmed' || $appointment['status'] === 'pending'): ?>
@@ -215,36 +235,116 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             </button>
                                         <?php endif; ?>
                                     </div>
+                                </div>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                        <?php if (!$hasUpcomingServices): ?>
+                            <div class="text-center text-muted">
+                                <p>No upcoming service appointments</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                                    <!-- Cancellation Request Modal -->
-                                    <div class="modal fade" id="cancelModal<?php echo $appointment['appointment_id']; ?>" tabindex="-1" aria-labelledby="cancelModalLabel<?php echo $appointment['appointment_id']; ?>" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="cancelModalLabel<?php echo $appointment['appointment_id']; ?>">Request Appointment Cancellation</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <form action="cancel_appointment.php" method="POST">
-                                                    <div class="modal-body">
-                                                        <input type="hidden" name="appointment_id" value="<?php echo $appointment['appointment_id']; ?>">
-                                                        <input type="hidden" name="appointment_type" value="<?php echo $appointment['appointment_type']; ?>">
-                                                        <p>Are you sure you want to request cancellation for this appointment?</p>
-                                                        <div class="mb-3">
-                                                            <label for="reason<?php echo $appointment['appointment_id']; ?>" class="form-label">Reason for cancellation (optional):</label>
-                                                            <textarea class="form-control" id="reason<?php echo $appointment['appointment_id']; ?>" name="reason" rows="3"></textarea>
-                                                        </div>
-                                                        <div class="alert alert-info">
-                                                            <i class="fas fa-info-circle"></i> Your cancellation request will be reviewed by the admin. You will be notified once it's approved or rejected.
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                                        <button type="submit" class="btn btn-danger">Submit Request</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header" style="background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%) !important; color: white;">
+                    <h3 class="card-title mb-0">Upcoming Package Appointments</h3>
+                </div>
+                <div class="card-body">
+                    <div class="appointments-list">
+                        <?php 
+                        $hasUpcomingPackages = false;
+                        foreach ($appointments as $appointment): 
+                            if ($appointment['appointment_type'] === 'package' && strtotime($appointment['appointment_date']) >= strtotime(date('Y-m-d'))): 
+                                $hasUpcomingPackages = true;
+                        ?>
+                                <div class="appointment-card mb-3">
+                                    <h5 style="color: #1b5e20;">Package: <?php echo clean($appointment['name']); ?></h5>
+                                    <p><strong>Date:</strong> <?php echo date('F j, Y', strtotime($appointment['appointment_date'])); ?></p>
+                                    <p><strong>Time:</strong> <?php echo date('g:i A', strtotime($appointment['appointment_time'])); ?></p>
+                                    <p><strong>Attendant:</strong> <?php echo clean($appointment['attendant_first_name'] . ' ' . $appointment['attendant_last_name']); ?></p>
+                                    <p><strong>Price:</strong> ₱<?php echo number_format((float)$appointment['price'], 2); ?></p>
+                                    <p><strong>Status:</strong> 
+                                        <span class="badge bg-<?php 
+                                            echo $appointment['status'] === 'confirmed' ? 'success' : 
+                                                ($appointment['status'] === 'cancelled' ? 'danger' : 'warning'); 
+                                        ?>">
+                                            <?php echo ucfirst($appointment['status']); ?>
+                                        </span>
+                                    </p>
+                                    <div class="d-flex gap-2">
+                                        <?php if ($appointment['status'] === 'confirmed' || $appointment['status'] === 'pending'): ?>
+                                            <a href="reschedule_appointment.php?id=<?php echo $appointment['appointment_id']; ?>&type=package" 
+                                               class="btn btn-warning btn-sm" 
+                                               <?php echo (strtotime($appointment['appointment_date']) <= strtotime(date('Y-m-d'))) ? 'disabled' : ''; ?>>
+                                                <i class="fas fa-calendar-alt"></i> Reschedule
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-danger btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#cancelModal<?php echo $appointment['appointment_id']; ?>"
+                                                    <?php echo (strtotime($appointment['appointment_date']) <= strtotime('+1 day')) ? 'disabled' : ''; ?>>
+                                                <i class="fas fa-times"></i> Request Cancellation
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
+                                </div>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                        <?php if (!$hasUpcomingPackages): ?>
+                            <div class="text-center text-muted">
+                                <p>No upcoming package appointments</p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header" style="background: linear-gradient(135deg, #0288d1 0%, #039be5 100%) !important; color: white;">
+                    <h3 class="card-title mb-0">Pre-ordered Products</h3>
+                </div>
+                <div class="card-body">
+                    <div class="appointments-list">
+                        <?php foreach ($appointments as $appointment): ?>
+                            <?php if ($appointment['appointment_type'] === 'product' && strtotime($appointment['appointment_date']) >= strtotime(date('Y-m-d'))): ?>
+                                <div class="appointment-card mb-3">
+                                    <h5 style="color: #0288d1;">Product: <?php echo clean($appointment['name']); ?></h5>
+                                    <p><strong>Pickup Date:</strong> <?php echo date('F j, Y', strtotime($appointment['appointment_date'])); ?></p>
+                                    <p><strong>Pickup Time:</strong> <?php echo date('g:i A', strtotime($appointment['appointment_time'])); ?></p>
+                                    <p><strong>Staff:</strong> <?php echo clean($appointment['attendant_first_name'] . ' ' . $appointment['attendant_last_name']); ?></p>
+                                    <p><strong>Price:</strong> ₱<?php echo number_format($appointment['price'], 2); ?></p>
+                                    <?php if ($appointment['appointment_type'] !== 'product'): ?>
+                                    <p><strong>Status:</strong> 
+                                        <span class="badge bg-<?php 
+                                            echo $appointment['status'] === 'confirmed' ? 'success' : 
+                                                ($appointment['status'] === 'cancelled' ? 'danger' : 'warning'); 
+                                        ?>">
+                                            <?php echo ucfirst($appointment['status']); ?>
+                                        </span>
+                                    </p>
+                                    <div class="d-flex gap-2">
+                                        <?php if ($appointment['status'] === 'confirmed' || $appointment['status'] === 'pending'): ?>
+                                            <a href="reschedule_appointment.php?id=<?php echo $appointment['appointment_id']; ?>&type=product" 
+                                               class="btn btn-warning btn-sm" 
+                                               <?php echo (strtotime($appointment['appointment_date']) <= strtotime(date('Y-m-d'))) ? 'disabled' : ''; ?>>
+                                                <i class="fas fa-calendar-alt"></i> Reschedule
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-danger btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#cancelModal<?php echo $appointment['appointment_id']; ?>"
+                                                    <?php echo (strtotime($appointment['appointment_date']) <= strtotime('+1 day')) ? 'disabled' : ''; ?>>
+                                                <i class="fas fa-times"></i> Request Cancellation
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php endif; ?>
                                 </div>
                             <?php endif; ?>
                         <?php endforeach; ?>
@@ -252,21 +352,32 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-6">
-            <div class="card shadow-sm mb-4">
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
                 <div class="card-header bg-secondary text-white">
-                    <h3 class="card-title mb-0">Appointment History</h3>
+                    <h3 class="card-title mb-0">History</h3>
                 </div>
                 <div class="card-body">
                     <div class="appointments-list">
                         <?php foreach ($appointments as $appointment): ?>
                             <?php if (strtotime($appointment['appointment_date']) < strtotime(date('Y-m-d'))): ?>
                                 <div class="appointment-card mb-3">
-                                    <h5 class="text-secondary">Service: <?php echo clean($appointment['name']); ?></h5>
+                                    <h5 class="text-secondary">
+                                        <?php if ($appointment['appointment_type'] === 'product'): ?>
+                                            Product: 
+                                        <?php elseif ($appointment['appointment_type'] === 'package'): ?>
+                                            Package: 
+                                        <?php else: ?>
+                                            Service: 
+                                        <?php endif; ?>
+                                        <?php echo clean($appointment['name']); ?>
+                                    </h5>
                                     <p><strong>Date:</strong> <?php echo date('F j, Y', strtotime($appointment['appointment_date'])); ?></p>
                                     <p><strong>Time:</strong> <?php echo date('g:i A', strtotime($appointment['appointment_time'])); ?></p>
-                                    <p><strong>Attendant:</strong> <?php echo clean($appointment['attendant_first_name'] . ' ' . $appointment['attendant_last_name']); ?></p>
+                                    <p><strong>Staff:</strong> <?php echo clean($appointment['attendant_first_name'] . ' ' . $appointment['attendant_last_name']); ?></p>
                                     <p><strong>Price:</strong> ₱<?php echo number_format($appointment['price'], 2); ?></p>
                                     <p><strong>Status:</strong> <span class="status-badge status-<?php echo strtolower($appointment['status']); ?>"> <?php echo ucfirst($appointment['status']); ?></span></p>
                                 </div>
@@ -323,6 +434,46 @@ $appointments = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php endif; ?>
     });
     </script>
+
+    <!-- Cancellation Request Modal -->
+    <?php foreach ($appointments as $appointment): ?>
+    <div class="modal fade" id="cancelModal<?php echo $appointment['appointment_id']; ?>" tabindex="-1" aria-labelledby="cancelModalLabel<?php echo $appointment['appointment_id']; ?>" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel<?php echo $appointment['appointment_id']; ?>">
+                        <?php if ($appointment['appointment_type'] === 'product'): ?>
+                            Request Product Pre-order Cancellation
+                        <?php elseif ($appointment['appointment_type'] === 'package'): ?>
+                            Request Package Cancellation
+                        <?php else: ?>
+                            Request Appointment Cancellation
+                        <?php endif; ?>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="cancel_appointment.php" method="POST">
+                    <div class="modal-body">
+                        <input type="hidden" name="appointment_id" value="<?php echo $appointment['appointment_id']; ?>">
+                        <input type="hidden" name="appointment_type" value="<?php echo $appointment['appointment_type']; ?>">
+                        <p>Are you sure you want to request cancellation for this <?php echo $appointment['appointment_type']; ?>?</p>
+                        <div class="mb-3">
+                            <label for="reason<?php echo $appointment['appointment_id']; ?>" class="form-label">Reason for cancellation (optional):</label>
+                            <textarea class="form-control" id="reason<?php echo $appointment['appointment_id']; ?>" name="reason" rows="3"></textarea>
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Your cancellation request will be reviewed by the admin. You will be notified once it's approved or rejected.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Submit Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <?php endforeach; ?>
 </body>
 
 </html>

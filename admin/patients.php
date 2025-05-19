@@ -175,7 +175,6 @@ $patients = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         </div>
                                     </td>
                                     <td>
-                                        <div><i class="fas fa-envelope text-muted me-2"></i><?php echo clean($patient['email'] ?? 'N/A'); ?></div>
                                         <div><i class="fas fa-phone text-muted me-2"></i><?php echo clean($patient['phone']); ?></div>
                                     </td>
                                     <td>

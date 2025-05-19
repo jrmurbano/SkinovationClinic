@@ -46,9 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'Middle Name',
             'Last Name',
             'Username',
-            'Email',
             'Phone',
-            'Address',
+            'Created At',
             'Total Appointments',
             'Completed Appointments',
             'Cancelled Appointments',
@@ -64,9 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $patient['middle_name'],
                 $patient['last_name'],
                 $patient['username'],
-                $patient['email'],
                 $patient['phone'],
-                $patient['address'],
+                $patient['created_at'],
                 $patient['total_appointments'],
                 $patient['completed_appointments'],
                 $patient['cancelled_appointments'],
@@ -90,9 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo '<th>Middle Name</th>';
         echo '<th>Last Name</th>';
         echo '<th>Username</th>';
-        echo '<th>Email</th>';
         echo '<th>Phone</th>';
-        echo '<th>Address</th>';
+        echo '<th>Created At</th>';
         echo '<th>Total Appointments</th>';
         echo '<th>Completed Appointments</th>';
         echo '<th>Cancelled Appointments</th>';
@@ -108,9 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo '<td>' . $patient['middle_name'] . '</td>';
             echo '<td>' . $patient['last_name'] . '</td>';
             echo '<td>' . $patient['username'] . '</td>';
-            echo '<td>' . $patient['email'] . '</td>';
             echo '<td>' . $patient['phone'] . '</td>';
-            echo '<td>' . $patient['address'] . '</td>';
+            echo '<td>' . $patient['created_at'] . '</td>';
             echo '<td>' . $patient['total_appointments'] . '</td>';
             echo '<td>' . $patient['completed_appointments'] . '</td>';
             echo '<td>' . $patient['cancelled_appointments'] . '</td>';

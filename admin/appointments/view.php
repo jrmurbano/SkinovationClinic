@@ -18,7 +18,7 @@ $appointment_id = clean($_GET['id']);
 
 // Fetch appointment details with patient and service information
 $stmt = $conn->prepare("
-    SELECT a.*, p.first_name, p.last_name, p.email, p.phone, p.address,
+    SELECT a.*, p.first_name, p.last_name, p.phone, p.address,
            s.service_name, s.price, s.description as service_description
     FROM appointments a
     JOIN patients p ON a.patient_id = p.patient_id
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             
             // Refresh appointment data
             $stmt = $conn->prepare("
-                SELECT a.*, p.first_name, p.last_name, p.email, p.phone, p.address,
+                SELECT a.*, p.first_name, p.last_name, p.phone, p.address,
                        s.service_name, s.price, s.description as service_description
                 FROM appointments a
                 JOIN patients p ON a.patient_id = p.patient_id
@@ -159,10 +159,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             <h5 class="card-title mb-0">Patient Information</h5>
                         </div>
                         <div class="card-body">
-                            <p><strong>Name:</strong> <?php echo clean($appointment['first_name'] . ' ' . $appointment['last_name']); ?></p>
-                            <p><strong>Email:</strong> <?php echo clean($appointment['email']); ?></p>
-                            <p><strong>Phone:</strong> <?php echo clean($appointment['phone']); ?></p>
-                            <p><strong>Address:</strong> <?php echo clean($appointment['address']); ?></p>
+                            <div class="patient-info mb-4">
+                                <h4>Patient Information</h4>
+                                <p><strong>Name:</strong> <?php echo clean($appointment['first_name'] . ' ' . $appointment['last_name']); ?></p>
+                                <p><strong>Phone:</strong> <?php echo clean($appointment['phone']); ?></p>
+                                <?php if (!empty($appointment['address'])): ?>
+                                <p><strong>Address:</strong> <?php echo clean($appointment['address']); ?></p>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>

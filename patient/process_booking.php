@@ -18,11 +18,34 @@ if (!isset($_SESSION['patient_id'])) {
 // Define createNotification if not already defined (must be before any calls)
 if (!function_exists('createNotification')) {
     function createNotification($conn, $type, $appointment_id, $title, $message, $patient_id = null) {
-        // The notifications table does NOT have title, message, or patient_id columns.
-        // Only insert into columns that exist: type, appointment_id, is_read, created_at
-        $stmt = $conn->prepare("INSERT INTO notifications (type, appointment_id, is_read, created_at) VALUES (?, ?, 0, NOW())");
-        $stmt->bind_param('si', $type, $appointment_id);
-        $stmt->execute();
+        try {
+            // Validate patient_id exists
+            if ($patient_id) {
+                $check_stmt = $conn->prepare("SELECT 1 FROM patients WHERE patient_id = ?");
+                $check_stmt->bind_param('i', $patient_id);
+                $check_stmt->execute();
+                if (!$check_stmt->fetch()) {
+                    error_log("Invalid patient_id: $patient_id");
+                    return false;
+                }
+            }
+
+            $stmt = $conn->prepare("INSERT INTO notifications (type, appointment_id, title, message, patient_id, is_read, created_at) VALUES (?, ?, ?, ?, ?, 0, NOW())");
+            if (!$stmt) {
+                error_log("Prepare failed: " . $conn->error);
+                return false;
+            }
+            $stmt->bind_param('sissi', $type, $appointment_id, $title, $message, $patient_id);
+            $result = $stmt->execute();
+            if (!$result) {
+                error_log("Execute failed: " . $stmt->error);
+                return false;
+            }
+            return true;
+        } catch (Exception $e) {
+            error_log("Error in createNotification: " . $e->getMessage());
+            return false;
+        }
     }
 }
 
@@ -177,57 +200,84 @@ try {
             1
         );
     } elseif ($package_id) {
-        // Handle package booking as an appointment
+        // Handle package booking
         $stmt = $conn->prepare("
-            INSERT INTO appointments (
-                patient_id, package_id, attendant_id, 
-                appointment_date, appointment_time, status, 
-                created_at
-            ) VALUES (?, ?, ?, ?, ?, 'pending', NOW())
+            INSERT INTO package_bookings (patient_id, package_id, created_at)
+            VALUES (?, ?, NOW())
         ");
         if (!$stmt) {
             fwrite($debug_log, "Prepare Error: " . $conn->error . "\n");
             throw new Exception('Database error: ' . $conn->error);
         }
-        $stmt->bind_param('iiiss', $patient_id, $package_id, $attendant_id, $appointment_date, $appointment_time);
+        $stmt->bind_param('ii', $patient_id, $package_id);
+        if (!$stmt->execute()) {
+            fwrite($debug_log, "SQL Error: " . $stmt->error . "\n");
+            throw new Exception('Failed to create package booking: ' . $stmt->error);
+        }
+        $booking_id = $conn->insert_id;
+        fwrite($debug_log, "Created package booking with ID: " . $booking_id . "\n");
+
+        // Create the first package appointment
+        $stmt = $conn->prepare("
+            INSERT INTO package_appointments (
+                booking_id, appointment_date, appointment_time, 
+                attendant_id, status, created_at
+            ) VALUES (?, ?, ?, ?, 'pending', NOW())
+        ");
+        if (!$stmt) {
+            fwrite($debug_log, "Prepare Error: " . $conn->error . "\n");
+            throw new Exception('Database error: ' . $conn->error);
+        }
+        $stmt->bind_param('issi', $booking_id, $appointment_date, $appointment_time, $attendant_id);
         if (!$stmt->execute()) {
             fwrite($debug_log, "SQL Error: " . $stmt->error . "\n");
             throw new Exception('Failed to create package appointment: ' . $stmt->error);
         }
-        $appointment_id = $conn->insert_id;
-        fwrite($debug_log, "Created package appointment with ID: " . $appointment_id . "\n");
-        // Schedule reminders
-        scheduleAppointmentReminders($conn, $appointment_id);
-        // Create notifications
+        $package_appointment_id = $conn->insert_id;
+        fwrite($debug_log, "Created package appointment with ID: " . $package_appointment_id . "\n");
+
+        // Get package and patient details for notifications
         $stmt = $conn->prepare("
-            SELECT pk.package_name, p.first_name, p.last_name 
-            FROM appointments a 
-            JOIN packages pk ON a.package_id = pk.package_id 
-            JOIN patients p ON a.patient_id = p.patient_id 
-            WHERE a.appointment_id = ?
+            SELECT p.package_name, pt.first_name, pt.last_name 
+            FROM package_bookings pb
+            JOIN packages p ON pb.package_id = p.package_id
+            JOIN patients pt ON pb.patient_id = pt.patient_id
+            WHERE pb.booking_id = ?
         ");
-        $stmt->bind_param('i', $appointment_id);
+        $stmt->bind_param('i', $booking_id);
         $stmt->execute();
-        $appointment_info = $stmt->get_result()->fetch_assoc();
+        $booking_info = $stmt->get_result()->fetch_assoc();
+
+        // Create notification for patient
         createNotification(
             $conn,
-            'appointment',
-            $appointment_id,
-            "Your package booking for {$appointment_info['package_name']} on " .
-            date('F d, Y', strtotime($appointment_date)) . " at " .
-            date('h:i A', strtotime($appointment_time)) . " has been booked. Please wait for confirmation.",
-            '',
+            'package',
+            $package_appointment_id,
+            "Package Appointment Booked",
+            sprintf(
+                "Your package appointment for %s on %s at %s has been booked. Please wait for confirmation.",
+                $booking_info['package_name'],
+                date('F d, Y', strtotime($appointment_date)),
+                date('g:i A', strtotime($appointment_time))
+            ),
             $patient_id
         );
+
+        // Create notification for admin
         createNotification(
             $conn,
-            'appointment',
-            $appointment_id,
-            "New package booking from {$appointment_info['first_name']} {$appointment_info['last_name']} for {$appointment_info['package_name']} on " .
-            date('F d, Y', strtotime($appointment_date)) . " at " .
-            date('h:i A', strtotime($appointment_time)),
-            '',
-            1
+            'package',
+            $package_appointment_id,
+            "New Package Appointment",
+            sprintf(
+                "New package appointment from %s %s for %s on %s at %s",
+                $booking_info['first_name'],
+                $booking_info['last_name'],
+                $booking_info['package_name'],
+                date('F d, Y', strtotime($appointment_date)),
+                date('g:i A', strtotime($appointment_time))
+            ),
+            1 // Admin ID
         );
     } elseif ($product_id) {
         // Handle product pre-order as an appointment

@@ -37,28 +37,62 @@ $unread_count = $stmt->fetchColumn();
 
 // Fetch latest unread notifications for bell dropdown (limit 5)
 $stmt = $conn->query("
-    SELECT n.*, a.appointment_date, s.service_name, CONCAT(pt.first_name, ' ', pt.last_name) as patient_name
+    SELECT 
+        n.*,
+        CASE 
+            WHEN n.type = 'appointment' THEN a.appointment_date
+            WHEN n.type = 'package' THEN pa.appointment_date
+        END as appointment_date,
+        CASE 
+            WHEN n.type = 'appointment' AND a.service_id IS NOT NULL THEN s.service_name
+            WHEN n.type = 'appointment' AND a.product_id IS NOT NULL THEN pr.product_name
+            WHEN n.type = 'package' THEN p.package_name
+        END as item_name,
+        CASE 
+            WHEN n.type = 'appointment' THEN CONCAT(pt1.first_name, ' ', pt1.last_name)
+            WHEN n.type = 'package' THEN CONCAT(pt2.first_name, ' ', pt2.last_name)
+        END as patient_name
     FROM notifications n
-    LEFT JOIN appointments a ON n.appointment_id = a.appointment_id
+    LEFT JOIN appointments a ON n.appointment_id = a.appointment_id AND n.type = 'appointment'
+    LEFT JOIN package_appointments pa ON n.appointment_id = pa.package_appointment_id AND n.type = 'package'
     LEFT JOIN services s ON a.service_id = s.service_id
-    LEFT JOIN patients pt ON a.patient_id = pt.patient_id
+    LEFT JOIN products pr ON a.product_id = pr.product_id
+    LEFT JOIN package_bookings pb ON pa.booking_id = pb.booking_id
+    LEFT JOIN packages p ON pb.package_id = p.package_id
+    LEFT JOIN patients pt1 ON a.patient_id = pt1.patient_id
+    LEFT JOIN patients pt2 ON pb.patient_id = pt2.patient_id
     WHERE n.is_read = 0
     ORDER BY n.created_at DESC
     LIMIT 5
 ");
 $unread_notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch notifications with related appointment info
+// Fetch all notifications with related appointment info
 $stmt = $conn->query("
-    SELECT n.*, 
-           a.appointment_id,
-           a.appointment_date,
-           s.service_name,
-           CONCAT(pt.first_name, ' ', pt.last_name) as patient_name
+    SELECT 
+        n.*,
+        CASE 
+            WHEN n.type = 'appointment' THEN a.appointment_date
+            WHEN n.type = 'package' THEN pa.appointment_date
+        END as appointment_date,
+        CASE 
+            WHEN n.type = 'appointment' AND a.service_id IS NOT NULL THEN s.service_name
+            WHEN n.type = 'appointment' AND a.product_id IS NOT NULL THEN pr.product_name
+            WHEN n.type = 'package' THEN p.package_name
+        END as item_name,
+        CASE 
+            WHEN n.type = 'appointment' THEN CONCAT(pt1.first_name, ' ', pt1.last_name)
+            WHEN n.type = 'package' THEN CONCAT(pt2.first_name, ' ', pt2.last_name)
+        END as patient_name
     FROM notifications n
-    LEFT JOIN appointments a ON n.appointment_id = a.appointment_id
+    LEFT JOIN appointments a ON n.appointment_id = a.appointment_id AND n.type = 'appointment'
+    LEFT JOIN package_appointments pa ON n.appointment_id = pa.package_appointment_id AND n.type = 'package'
     LEFT JOIN services s ON a.service_id = s.service_id
-    LEFT JOIN patients pt ON a.patient_id = pt.patient_id
+    LEFT JOIN products pr ON a.product_id = pr.product_id
+    LEFT JOIN package_bookings pb ON pa.booking_id = pb.booking_id
+    LEFT JOIN packages p ON pb.package_id = p.package_id
+    LEFT JOIN patients pt1 ON a.patient_id = pt1.patient_id
+    LEFT JOIN patients pt2 ON pb.patient_id = pt2.patient_id
     ORDER BY n.created_at DESC
 ");
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -111,6 +145,12 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background-color: #e3f2fd;
             border-left-color: #2196f3;
         }
+        .notification-item.package {
+            border-left-color: #28a745;
+        }
+        .notification-item.appointment {
+            border-left-color: #007bff;
+        }
         .notification-item .time {
             font-size: 0.85em;
             color: #6c757d;
@@ -119,7 +159,7 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-weight: bold;
             color: #2196f3;
         }
-        .notification-item .service-name {
+        .notification-item .item-name {
             color: #28a745;
         }
         #notifBell {
@@ -157,8 +197,8 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="dropdown-item">
                                         <div class="fw-bold"><?php echo clean($notif['patient_name']); ?></div>
                                         <div class="small text-muted">
-                                            <?php echo clean($notif['service_name']); ?> &middot; 
-                                            <?php echo $notif['appointment_date'] ? date('M d, Y h:i A', strtotime($notif['appointment_date'])) : ''; ?>
+                                            <?php echo clean($notif['item_name']); ?> &middot; 
+                                            <?php echo $notif['appointment_date'] ? date('M d, Y', strtotime($notif['appointment_date'])) : ''; ?>
                                         </div>
                                         <div class="small text-secondary mt-1">
                                             <?php echo clean($notif['message']); ?>
@@ -169,7 +209,6 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <?php endif; ?>
                     </ul>
                 </div>
-               
             </div>
 
             <?php if (isset($_GET['success'])): ?>
@@ -198,7 +237,7 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php else: ?>
                     <div class="notifications-list">
                         <?php foreach ($notifications as $notification): ?>
-                        <div class="notification-item <?php echo !$notification['is_read'] ? 'unread' : ''; ?>">
+                        <div class="notification-item <?php echo !$notification['is_read'] ? 'unread' : ''; ?> <?php echo $notification['type']; ?>">
                             <div class="d-flex justify-content-between align-items-start">
                                 <div>
                                     <h5 class="mb-1"><?php echo clean($notification['title']); ?></h5>
@@ -206,8 +245,8 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <?php if ($notification['patient_name']): ?>
                                     <p class="mb-1">
                                         <span class="patient-name"><?php echo clean($notification['patient_name']); ?></span>
-                                        <?php if ($notification['service_name']): ?>
-                                        booked <span class="service-name"><?php echo clean($notification['service_name']); ?></span>
+                                        <?php if ($notification['item_name']): ?>
+                                        booked <span class="item-name"><?php echo clean($notification['item_name']); ?></span>
                                         <?php endif; ?>
                                     </p>
                                     <?php endif; ?>
@@ -219,16 +258,16 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="notification-actions">
                                     <?php if (!$notification['is_read']): ?>
                                     <form method="POST" class="d-inline">
-                                        <input type="hidden" name="notification_id" value="<?php echo $notification['id']; ?>">
+                                        <input type="hidden" name="notification_id" value="<?php echo $notification['notification_id']; ?>">
                                         <button type="submit" name="action" value="mark_read" class="btn btn-success btn-sm">
                                             <i class="fas fa-check"></i> Mark as Read
                                         </button>
                                     </form>
                                     <?php endif; ?>
-                                    <a href="edit_notification.php?id=<?php echo $notification['id']; ?>" class="btn btn-primary btn-sm">
+                                    <a href="edit_notification.php?id=<?php echo $notification['notification_id']; ?>" class="btn btn-primary btn-sm">
                                         <i class="fas fa-edit"></i> Edit
                                     </a>
-                                    <a href="notifications.php?delete=<?php echo $notification['id']; ?>" 
+                                    <a href="notifications.php?delete=<?php echo $notification['notification_id']; ?>" 
                                        class="btn btn-danger btn-sm"
                                        onclick="return confirm('Are you sure you want to delete this notification?')">
                                         <i class="fas fa-trash"></i> Delete

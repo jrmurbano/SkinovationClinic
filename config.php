@@ -73,6 +73,20 @@ if (!function_exists('isOwnerLoggedIn')) {
 if (!function_exists('createNotification')) {
     function createNotification($conn, $type, $appointment_id, $title, $message, $patient_id = null) {
         try {
+            // Validate the appointment_id exists in the appropriate table based on type
+            if ($appointment_id) {
+                if ($type === 'package') {
+                    $check_stmt = $conn->prepare("SELECT 1 FROM package_appointments WHERE package_appointment_id = ?");
+                } else {
+                    $check_stmt = $conn->prepare("SELECT 1 FROM appointments WHERE appointment_id = ?");
+                }
+                $check_stmt->execute([$appointment_id]);
+                if (!$check_stmt->fetch()) {
+                    error_log("Invalid appointment_id for type $type: $appointment_id");
+                    return false;
+                }
+            }
+
             $stmt = $conn->prepare("
                 INSERT INTO notifications (type, appointment_id, title, message, patient_id, is_read, created_at) 
                 VALUES (?, ?, ?, ?, ?, 0, NOW())
