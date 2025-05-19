@@ -1,19 +1,13 @@
-Changes (aligning to DFD):
-
-1. add a notification bell icon across all interfaces of both admin and patient (top right of interface, icon must be font awesome). When the admin confirms appointment/reschedules, it sets a notification to be sent on both admin and patient the day before the appointment and on the day apointment. Please choose an appropriate notification sound.
+Changes:
+1. Booking and Rescheduling a service, package, and preordering a product work just fine. Cancellation doesn't work.
+2. add a notification bell icon across all interfaces of both admin and patient (top right of interface, icon must be font awesome). When the admin confirms appointment/reschedules, it sets a notification to be sent on both admin and patient the day before the appointment and on the day apointment. There may be a notification functionalities and sound already in this project folder.
 
 When the admin confirms cancellation, it must remove the notification.
 
-The notifications table is this
-- notification_id
-- [foreign keys]
-- message
-- is_read
-
 The patient must be able to "Mark as Read" a notification and admin can see if patient already marked as read them.
 
-2. If all above is fixed, working, and if you still can, let's proceed to improving the Patient Profile Manager.
-add the following to the patient fields mag register sila
+3. If all above is fixed, working, and if you still can, let's proceed to improving the Patient Profile Manager.
+add the following to the patient fields when they register
 - Address
 - Gender
 - Civil Status
@@ -23,4 +17,14 @@ add the following to the patient fields mag register sila
 
 All changes shall be visible to admin, too.
 
-3. Add owner view
+4. Add owner interface
+-create new folder (owner)
+-new login interface for owner 
+they can only view
+-Reports on Dashboard
+-List of Services, Packages, and Products
+-List of Appointments
+-List of Patients 
+-Treatment and Product History Log
+
+5. Mockup Ui charts in Admin and Owner dashboard

@@ -27,6 +27,27 @@ $unread_notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="text-center mb-4">
         <img src="../assets/img/ISCAP1-303-Skinovation-Clinic-WHITE-Logo.png" alt="Skinovation Clinic Logo" class="img-fluid" style="max-width: 150px;">
     </div>
+    <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+        <h3 class="text-light mb-0">Admin Panel</h3>
+        <!-- Add notification bell -->
+        <div class="dropdown">
+            <a class="text-light position-relative" href="#" id="adminNotificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-bell fa-lg"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger admin-notification-count">
+                    0
+                </span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-end p-0" aria-labelledby="adminNotificationDropdown" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                <div class="p-2 border-bottom d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">Notifications</h6>
+                    <button class="btn btn-sm btn-link text-decoration-none mark-all-read">Mark All as Read</button>
+                </div>
+                <div class="admin-notifications-list">
+                    <!-- Admin notifications will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="position-relative mb-3">
         
         <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notifBell" style="min-width: 350px;">
@@ -209,3 +230,8 @@ $unread_notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
         font-weight: 600;
     }
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/notifications.js"></script>
+</body>
+</html>

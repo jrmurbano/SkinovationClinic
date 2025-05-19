@@ -3481,3 +3481,177 @@ SESSION data: Array
 
 Created package booking with ID: 20
 Created package appointment with ID: 18
+
+
+2025-05-19 03:32:00 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-06-22
+    [appointment_time] => 11:00:00
+    [attendant_id] => 1
+    [package_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+)
+
+Validating input:
+Patient ID: 5
+Service ID: 
+Attendant ID: 1
+Date: 2025-06-22
+Time: 11:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-06-22
+    [appointment_time] => 11:00:00
+    [attendant_id] => 1
+    [package_id] => 2
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 5
+    [user_name] => Angela Mateos Balmes
+    [user_username] => angelabalmes
+)
+
+Created package booking with ID: 21
+Created package appointment with ID: 19
+
+
+2025-05-19 03:47:56 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [product_id] => 3
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+)
+
+Validating input:
+Patient ID: 4
+Service ID: 
+Attendant ID: 1
+Date: 2025-05-30
+Time: 14:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 14:00:00
+    [attendant_id] => 1
+    [product_id] => 3
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+)
+
+
+
+2025-05-19 03:48:06 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-23
+    [appointment_time] => 10:00:00
+    [attendant_id] => 1
+    [product_id] => 3
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+)
+
+Validating input:
+Patient ID: 4
+Service ID: 
+Attendant ID: 1
+Date: 2025-05-23
+Time: 10:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-23
+    [appointment_time] => 10:00:00
+    [attendant_id] => 1
+    [product_id] => 3
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [admin_id] => 2
+    [patient_id] => 4
+    [user_name] => Olivia Isabel Rodrigo
+    [user_username] => oliviarodrigo
+)
+
+Created product pre-order appointment with ID: 33
+
+
+2025-05-19 03:49:12 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-07-20
+    [appointment_time] => 13:00:00
+    [attendant_id] => 1
+    [service_id] => 34
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 2
+    [user_name] => Emil Joaquin Hinolan Diaz
+    [user_username] => emil123
+    [selected_service_id] => 34
+)
+
+Validating input:
+Patient ID: 2
+Service ID: 34
+Attendant ID: 1
+Date: 2025-07-20
+Time: 13:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-07-20
+    [appointment_time] => 13:00:00
+    [attendant_id] => 1
+    [service_id] => 34
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 2
+    [user_name] => Emil Joaquin Hinolan Diaz
+    [user_username] => emil123
+    [selected_service_id] => 34
+)
+
+Created appointment with ID: 34

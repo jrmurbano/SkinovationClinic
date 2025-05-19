@@ -11,7 +11,7 @@ if (!isset($_SESSION['admin_id'])) {
 // Handle notification deletion
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     $id = clean($_GET['delete']);
-    $stmt = $conn->prepare("DELETE FROM notifications WHERE id = ?");
+    $stmt = $conn->prepare("DELETE FROM notifications WHERE notification_id = ?");
     $stmt->execute([$id]);
     header('Location: notifications.php?success=deleted');
     exit();
@@ -23,7 +23,7 @@ if (isset($_POST['action']) && isset($_POST['notification_id'])) {
     $action = clean($_POST['action']);
     
     if ($action === 'mark_read') {
-        $stmt = $conn->prepare("UPDATE notifications SET is_read = 1 WHERE id = ?");
+        $stmt = $conn->prepare("UPDATE notifications SET is_read = 1 WHERE notification_id = ?");
         $stmt->execute([$id]);
     }
     
@@ -264,9 +264,6 @@ $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         </button>
                                     </form>
                                     <?php endif; ?>
-                                    <a href="edit_notification.php?id=<?php echo $notification['notification_id']; ?>" class="btn btn-primary btn-sm">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </a>
                                     <a href="notifications.php?delete=<?php echo $notification['notification_id']; ?>" 
                                        class="btn btn-danger btn-sm"
                                        onclick="return confirm('Are you sure you want to delete this notification?')">
