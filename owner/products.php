@@ -114,8 +114,7 @@ $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     </style>
 </head>
-<body class="bg-light">
-    <?php include 'owner_header.php'; ?>
+<body class="bg-light">header.php'; ?>
     
     <div class="container-fluid py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">

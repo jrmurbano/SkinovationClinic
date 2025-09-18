@@ -3929,3 +3929,263 @@ SESSION data: Array
 )
 
 Created product pre-order appointment with ID: 38
+
+
+2025-05-19 09:10:19 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 17:00:00
+    [attendant_id] => 1
+    [service_id] => 19
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 8
+    [user_name] => Charwin Perez Padilla
+    [user_username] => charwinpadilla
+    [selected_service_id] => 19
+)
+
+Validating input:
+Patient ID: 8
+Service ID: 19
+Attendant ID: 1
+Date: 2025-05-30
+Time: 17:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 17:00:00
+    [attendant_id] => 1
+    [service_id] => 19
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 8
+    [user_name] => Charwin Perez Padilla
+    [user_username] => charwinpadilla
+    [selected_service_id] => 19
+)
+
+Created appointment with ID: 39
+
+
+2025-05-19 09:14:29 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 17:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 8
+    [user_name] => Charwin Perez Padilla
+    [user_username] => charwinpadilla
+    [selected_service_id] => 29
+)
+
+Validating input:
+Patient ID: 8
+Service ID: 29
+Attendant ID: 1
+Date: 2025-05-30
+Time: 17:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 17:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 8
+    [user_name] => Charwin Perez Padilla
+    [user_username] => charwinpadilla
+    [selected_service_id] => 29
+)
+
+
+
+2025-05-19 09:14:46 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 17:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 8
+    [user_name] => Charwin Perez Padilla
+    [user_username] => charwinpadilla
+    [selected_service_id] => 29
+)
+
+Validating input:
+Patient ID: 8
+Service ID: 29
+Attendant ID: 1
+Date: 2025-05-30
+Time: 17:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 17:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 8
+    [user_name] => Charwin Perez Padilla
+    [user_username] => charwinpadilla
+    [selected_service_id] => 29
+)
+
+
+
+2025-05-19 09:14:55 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 17:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 8
+    [user_name] => Charwin Perez Padilla
+    [user_username] => charwinpadilla
+    [selected_service_id] => 29
+)
+
+Validating input:
+Patient ID: 8
+Service ID: 29
+Attendant ID: 1
+Date: 2025-05-30
+Time: 17:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 17:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 8
+    [user_name] => Charwin Perez Padilla
+    [user_username] => charwinpadilla
+    [selected_service_id] => 29
+)
+
+
+
+2025-05-19 09:15:11 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 17:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 8
+    [user_name] => Charwin Perez Padilla
+    [user_username] => charwinpadilla
+    [selected_service_id] => 29
+)
+
+Validating input:
+Patient ID: 8
+Service ID: 29
+Attendant ID: 1
+Date: 2025-05-30
+Time: 17:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-05-30
+    [appointment_time] => 17:00:00
+    [attendant_id] => 1
+    [service_id] => 29
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 8
+    [user_name] => Charwin Perez Padilla
+    [user_username] => charwinpadilla
+    [selected_service_id] => 29
+)
+
+
+
+2025-09-18 09:22:53 - New booking attempt
+POST data: Array
+(
+    [appointment_date] => 2025-09-18
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [service_id] => 25
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 9
+    [user_name] => k sr r
+    [user_username] => khi
+    [selected_service_id] => 25
+)
+
+Validating input:
+Patient ID: 9
+Service ID: 25
+Attendant ID: 1
+Date: 2025-09-18
+Time: 12:00:00
+POST data: Array
+(
+    [appointment_date] => 2025-09-18
+    [appointment_time] => 12:00:00
+    [attendant_id] => 1
+    [service_id] => 25
+    [policyAgree] => on
+)
+
+SESSION data: Array
+(
+    [patient_id] => 9
+    [user_name] => k sr r
+    [user_username] => khi
+    [selected_service_id] => 25
+)
+
+Created appointment with ID: 40
